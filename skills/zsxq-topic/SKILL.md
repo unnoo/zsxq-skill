@@ -1,7 +1,7 @@
 ---
 name: zsxq-topic
 version: 1.0.0
-description: "知识星球主题管理：搜索主题、查看详情、发布帖子、发表评论、回答提问、设置精华和标签。当用户需要查找内容、发帖、评论、回答问题、或管理主题时使用。"
+description: "知识星球主题管理：搜索主题、查看详情、发布帖子、发表评论、回答提问、删除主题、设置精华和标签。当用户需要查找内容、发帖、评论、回答问题、删除主题、或管理主题时使用。"
 metadata:
   requires:
     bins: ["zsxq-cli"]
@@ -69,3 +69,5 @@ Shortcut 未覆盖的高级操作：
 | `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限） |
 | `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（标签名数组） |
 | `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问（`unanswered`/`answered`） |
+| `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问（`unanswered`/`answered`） |
+| [`delete topic`](references/zsxq-topic-delete.md) | `topic_id`（路径参数） | 删除主题（`api raw --method DELETE`，不可恢复） |
