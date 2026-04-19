@@ -50,6 +50,14 @@ zsxq-cli api call get_self_question_topics \
 zsxq-cli api call get_self_question_topics \
   --params '{"topic_filter":"answered","count":20}'
 
+# 查看别人向我发起的未回答提问
+zsxq-cli api call get_self_answer_topics \
+  --params '{"topic_filter":"unanswered","count":20}'
+
+# 查看别人向我发起的已回答提问
+zsxq-cli api call get_self_answer_topics \
+  --params '{"topic_filter":"answered","count":20}'
+
 # 确认某主题是 q&a 类型
 zsxq-cli topic +detail --topic-id <id> --json
 # 检查返回 JSON 中 "type": "q&a"
