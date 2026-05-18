@@ -68,13 +68,13 @@ zsxq-cli api call get_self_info --params '{}'
 zsxq-cli api call search_groups --params '{"keyword":"Go语言"}'
 zsxq-cli api call get_user_footprints --params '{"user_id":"123456","group_id":"123456789"}'
 
-# 推荐：对通用 HTTP API 使用显式参数的 raw 子命令
-zsxq-cli api raw --method GET --path /v2/groups/123456789/topics --query '{"count":10}'
-
+# 当 MCP 工具未覆盖某个接口时，使用 raw 子命令直接调用 HTTP API
 # --body 支持简写，自动包装 req_data
 zsxq-cli api raw --method PUT --path /v2/topics/123 --body '{"text":"新内容"}'
 ```
 
+> 列表/查询类操作请优先使用 `api call`（如 `get_group_topics`），`api raw` 主要用于 MCP 工具尚未封装的写入接口。
+>
 > `api raw` 响应已去除三层嵌套，直接返回数据内容。
 
 ## 链接拼接
