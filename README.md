@@ -188,6 +188,18 @@ zsxq-cli api raw --method GET --path /v3/users/self  # 直接调用原始接口
 
 ---
 
+## Star History
+
+<a href="https://star-history.com/#unnoo/zsxq-skill&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=unnoo/zsxq-skill&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=unnoo/zsxq-skill&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=unnoo/zsxq-skill&type=Date" />
+  </picture>
+</a>
+
+---
+
 ## License
 
 MIT
