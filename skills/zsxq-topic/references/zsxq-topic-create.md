@@ -1,7 +1,5 @@
 # topic +create（发布主题）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +create`。
 
 在指定星球内发布一条新主题（帖子）。
@@ -54,12 +52,20 @@ zsxq-cli topic +create \
 # 第一步：确认目标星球
 zsxq-cli group +list
 
-# 第二步：（可选）确认内容无误后执行
+# 第二步：确认内容无误后执行
 zsxq-cli topic +create --group-id <id> --text "内容"
 
 # 第三步：验证发布结果
 zsxq-cli topic +detail --topic-id <新建的 topic_id>
 ```
+
+## 失败语义
+
+写入失败即原子回滚 —— 不会留下空主题或半成品 topic_id。重试前请先确认参数是否合法。
+
+## 错误说明
+
+通用错误（401、`--group-id is required`、星球无权限发帖等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

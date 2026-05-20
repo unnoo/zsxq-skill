@@ -1,16 +1,16 @@
 ---
 name: zsxq-topic
-version: 1.0.0
-description: "知识星球主题管理：搜索主题、查看详情、发布帖子、编辑主题、发表评论、回答提问、删除主题、设置精华和标签。当用户需要查找内容、发帖、编辑、评论、回答问题、删除主题、或管理主题时使用。"
+version: 1.3.0
+description: "知识星球主题管理：搜索主题、查看主题详情、发布帖子、编辑主题、发表评论、回复某条评论（楼中楼）、回答提问、删除主题；通过 api call 查看主题评论列表、设置精华、设置标签、查看自己提的问题与已回答记录。当用户需要查找内容、发帖、编辑主题、评论、回复评论、回答问题、删除主题、查看主题评论、查看自己的提问记录、或管理主题精华和标签时使用。"
 metadata:
   requires:
     bins: ["zsxq-cli"]
   cliHelp: "zsxq-cli topic --help"
 ---
 
-# topic (v1)
+# topic
 
-**CRITICAL — 开始前 MUST 先用 Read 工具读取 [`../zsxq-shared/SKILL.md`](../zsxq-shared/SKILL.md)，其中包含认证、错误处理规则。**
+> 首次使用或遇到认证错误（401 / token 过期 / `not logged in`）时，先读 [`../zsxq-shared/SKILL.md`](../zsxq-shared/SKILL.md) 了解登录与 API 调用约定。日常调用已登录账户时无需每次重读。
 
 ## Core Concepts
 
@@ -31,21 +31,6 @@ Group (group_id)
     ├── Answer（q&a 类型专属）
     └── Hashtag 标签列表
 ```
-
-## Important Notes
-
-### 写入操作前必须确认
-
-发帖、编辑、评论、回答均为**公开操作**，执行前必须向用户确认：
-1. 目标星球 / 主题（group_id / topic_id）
-2. 发布的内容（text）
-
-### topic_id 的获取
-
-不确定 topic_id 时，先查询再操作：
-- 关键词搜索：`topic +search --group-id xxx --query "关键词"`
-- 浏览最新：`group +topics --group-id xxx`
-- 查看详情：`topic +detail --topic-id xxx`
 
 ## Shortcuts（推荐优先使用）
 
@@ -71,4 +56,9 @@ Shortcut 未覆盖的高级操作：
 | `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（标签名数组） |
 | `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问（`unanswered`/`answered`） |
 | `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问（`unanswered`/`answered`） |
-| [`delete topic`](references/zsxq-topic-delete.md) | `topic_id`（路径参数） | 删除主题（`api raw --method DELETE`，不可恢复） |
+
+## 原始 HTTP 调用（`zsxq-cli api raw`）
+
+| 操作 | 命令模板 | 说明 |
+|------|----------|------|
+| [删除主题](references/zsxq-topic-delete.md) | `api raw --method DELETE --path /v2/topics/<topic_id>` | 删除主题，不可恢复 |

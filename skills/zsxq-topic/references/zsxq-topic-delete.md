@@ -1,6 +1,4 @@
-# topic delete（删除主题）
-
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
+# topic 删除（通过 api raw）
 
 通过 `zsxq-cli api raw` 删除指定主题。删除后**不可恢复**。
 
@@ -35,6 +33,10 @@ zsxq-cli topic +detail --topic-id 15522482218442
 zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
 ```
 
+## 失败语义
+
+删除失败即原子回滚 —— 主题保持原状不会被部分删除。
+
 ## 错误说明
 
 | 错误             | 原因 |
@@ -42,8 +44,11 @@ zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
 | `code: 100262` | 无权限删除该主题（非主题作者或星主） |
 | `code: 100002` | 主题不存在或已被删除 |
 
+通用错误（401、参数缺失等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+
 ## 参考
 
+- [zsxq-topic-edit](zsxq-topic-edit.md) — 删除前若只是想改内容，优先考虑编辑
 - [zsxq-topic-detail](zsxq-topic-detail.md) — 删除前确认主题内容
 - [zsxq-topic-search](zsxq-topic-search.md) — 搜索主题获取 topic_id
 - [zsxq-shared](../../zsxq-shared/SKILL.md)

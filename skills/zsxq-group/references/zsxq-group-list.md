@@ -1,22 +1,17 @@
 # group +list（列出星球）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli group +list`。
 
-列出当前登录用户**创建**的知识星球列表。常用于获取 `group_id` 供后续操作使用。
+列出当前登录用户**加入或创建**的所有知识星球。常用于获取 `group_id` 供后续操作使用。
 
 ## 命令
 
 ```bash
-# 列出创建的星球（默认最多 10 个，表格显示）
+# 列出星球（默认最多 10 个，表格显示）
 zsxq-cli group +list
 
 # 返回更多结果
 zsxq-cli group +list --limit 50
-
-# 包含所有状态的星球（含已关闭等）
-zsxq-cli group +list --scope all
 
 # JSON 格式输出（含完整字段）
 zsxq-cli group +list --json
@@ -24,11 +19,10 @@ zsxq-cli group +list --json
 
 ## 参数
 
-| 参数 | 必填 | 默认值 | 说明 |
-|------|------|--------|------|
-| `--limit <n>` | 否 | 10 | 最多返回数量（1–200） |
-| `--scope <s>` | 否 | `normal` | `normal`：正常星球；`all`：所有状态 |
-| `--json` | 否 | — | 输出原始 JSON（含 owner、statistics 等完整字段） |
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--limit <n>` | 否 | 最多返回数量，默认 10，最大 200 |
+| `--json` | 否 | 输出原始 JSON（含 owner、statistics 等完整字段） |
 
 ## 输出（表格模式）
 
@@ -38,9 +32,17 @@ zsxq-cli group +list --json
 
 ## 说明
 
-- 此命令只列出当前用户**创建**的星球，不含加入的他人星球
-- 若需要查看加入的星球，使用 `--scope all` 或通过 `zsxq-cli api call get_user_groups` 配合参数调用
+- 返回结果同时包含用户**加入**和**创建**的星球
 - `group_id` 是纯数字字符串，后续 `+topics`、`+hashtags` 等命令均需要此值
+- 如需在结果中区分"加入 / 创建"，使用 `--json` 查看完整字段
+
+## 错误说明
+
+| 症状 | 可能原因 | 处理 |
+|------|---------|------|
+| 返回空列表 | 当前账户尚未加入或创建任何星球 | 确认登录账户：`zsxq-cli user +info` |
+
+通用错误（401 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
 
 ## 参考
 

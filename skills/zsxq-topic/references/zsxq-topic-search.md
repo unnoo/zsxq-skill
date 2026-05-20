@@ -1,7 +1,5 @@
 # topic +search（搜索主题）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +search`。
 
 在指定星球内进行全文搜索，返回匹配的主题列表。搜索使用 RAG 服务，结果按相关性排序。
@@ -39,6 +37,14 @@ zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 - 结果数量由服务端决定，不支持 `--limit` 参数
 - 若需要按时间浏览（而非搜索），改用 `group +topics`
 - 获得 `topic_id` 后，用 `topic +detail` 查看完整内容
+
+## 错误说明
+
+| 症状 | 可能原因 | 处理 |
+|------|---------|------|
+| 返回空列表 | 关键词未命中或星球内容较少 | 换近义词或改用 `group +topics` 时间序浏览 |
+
+通用错误（401、`--group-id is required`、`--query is required` 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
 
 ## 参考
 

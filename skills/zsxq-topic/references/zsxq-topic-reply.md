@@ -1,7 +1,5 @@
 # topic +reply（发表评论）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +reply`。
 
 对指定主题发表评论，支持楼中楼（回复某条评论）。
@@ -44,20 +42,9 @@ zsxq-cli topic +reply \
 |------|------|------|
 | `--topic-id <id>` | **是** | 主题 ID |
 | `--text <text>` | **是** | 评论内容 |
-| `--reply-to <id>` | 否 | 被回复的评论 ID（楼中楼）；省略则为顶层评论 |
-| `--files <paths>` | 否 | 附件路径，多个用逗号分隔 |
+| `--reply-to <id>` | 否 | 被回复的评论 ID（楼中楼，即对评论的回复而非对主题的评论）；省略则为顶层评论 |
+| `--files <paths>` | 否 | 附件路径，多个用逗号分隔（如 `screenshot.png,log.txt`） |
 | `--json` | 否 | 输出原始 JSON（含 comment_id、create_time 等） |
-
-## 获取 comment_id
-
-如需回复某条评论（楼中楼），先获取评论列表：
-
-```bash
-zsxq-cli api call get_topic_comments \
-  --params '{"topic_id":"111222333444","limit":30}'
-```
-
-从返回结果中找到目标评论的 `comment_id`，再传入 `--reply-to`。
 
 ## 输出
 
@@ -69,6 +56,36 @@ zsxq-cli api call get_topic_comments \
   "text": "示例评论内容"
 }
 ```
+
+## 推荐工作流
+
+顶层评论：
+
+```bash
+# 第一步：确认目标主题
+zsxq-cli topic +detail --topic-id 111222333444
+
+# 第二步：发表评论
+zsxq-cli topic +reply --topic-id 111222333444 --text "评论内容"
+```
+
+楼中楼回复（先拿到要回复的 `comment_id`）：
+
+```bash
+# 第一步：列出主题评论，找到目标 comment_id
+zsxq-cli api call get_topic_comments --params '{"topic_id":"111222333444","limit":30}'
+
+# 第二步：用 --reply-to 指向那条评论
+zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 222333444555
+```
+
+## 失败语义
+
+写入失败即原子回滚 —— 不会留下空评论或半成品 comment_id。重试前请先确认参数是否合法。
+
+## 错误说明
+
+通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

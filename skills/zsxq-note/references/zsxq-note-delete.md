@@ -1,7 +1,5 @@
 # note +delete（删除笔记）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli note +delete`。
 
 删除指定笔记。删除后**不可恢复**。
@@ -33,6 +31,14 @@ zsxq-cli note +detail --note-id 444555666777
 # 第二步：向用户确认后执行删除
 zsxq-cli note +delete --note-id 444555666777
 ```
+
+## 失败语义
+
+删除失败即原子回滚 —— 笔记保持原状不会被部分删除。
+
+## 错误说明
+
+通用错误（401、`--note-id is required`、笔记不存在、无权限等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

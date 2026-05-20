@@ -1,7 +1,5 @@
 # note +list（查看笔记列表）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli note +list`。
 
 查看当前登录用户的个人笔记列表，按创建时间倒序排列。
@@ -35,6 +33,26 @@ zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800"
 | NOTE ID | CONTENT | CREATED AT |
 |---------|---------|------------|
 | 444555666777 | 示例笔记内容… | 2026-04-10T09:00:00.000+0800 |
+
+## 说明
+
+按创建时间倒序返回。翻页时取上一页最后一条 note 的 `create_time` 作为下一页 `--end-time`：
+
+```bash
+# 第一页
+zsxq-cli note +list --json
+
+# 第二页
+zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800" --json
+```
+
+## 错误说明
+
+| 症状 | 可能原因 | 处理 |
+|------|---------|------|
+| 返回空列表 | 当前账户尚未创建任何笔记 | 正常情况，无需处理 |
+
+通用错误（401、`--end-time` 格式错误等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
 
 ## 参考
 

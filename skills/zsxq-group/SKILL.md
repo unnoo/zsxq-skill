@@ -1,6 +1,6 @@
 ---
 name: zsxq-group
-version: 1.0.0
+version: 1.3.0
 description: "知识星球（星球）管理：列出星球、浏览主题、查询标签、搜索成员。当用户需要查看自己加入或创建的星球、浏览星球内容、获取 group_id、查询星球标签或成员时使用。"
 metadata:
   requires:
@@ -8,9 +8,9 @@ metadata:
   cliHelp: "zsxq-cli group --help"
 ---
 
-# group (v1)
+# group
 
-**CRITICAL — 开始前 MUST 先用 Read 工具读取 [`../zsxq-shared/SKILL.md`](../zsxq-shared/SKILL.md)，其中包含认证、错误处理规则。**
+> 首次使用或遇到认证错误（401 / token 过期 / `not logged in`）时，先读 [`../zsxq-shared/SKILL.md`](../zsxq-shared/SKILL.md) 了解登录与 API 调用约定。日常调用已登录账户时无需每次重读。
 
 ## Core Concepts
 
@@ -24,6 +24,8 @@ metadata:
 Group (group_id)
 ├── Topic (topic_id) — talk / q&a / article
 │   ├── Comment (comment_id)
+│   │   └── 楼中楼 Reply (replied_comment_id)
+│   ├── Answer（q&a 类型专属）
 │   └── Hashtag 标签
 └── Hashtag (hashtag_id)
     └── Topic 列表
@@ -35,16 +37,11 @@ Shortcut 是对常用操作的高级封装（`zsxq-cli group +<verb> [flags]`）
 
 | Shortcut | 说明 |
 |----------|------|
-| [`+list`](references/zsxq-group-list.md) | 列出当前用户加入的所有星球，支持分页，输出 group_id 和名称表格 |
+| [`+list`](references/zsxq-group-list.md) | 列出当前用户加入或创建的所有星球，输出 group_id 和名称表格 |
 | [`+topics`](references/zsxq-group-topics.md) | 列出星球内最新主题，支持分页游标，输出 topic_id / 类型 / 标题 / 时间表格 |
 | [`+hashtags`](references/zsxq-group-hashtags.md) | 列出星球内所有标签及主题数量 |
 
 ## API（通过 `zsxq-cli api call` 直接调用）
-
-```bash
-zsxq-cli api list                           # 查看所有可用工具
-zsxq-cli api call <tool> --params '<json>'  # 调用工具
-```
 
 Shortcut 未覆盖的高级操作：
 

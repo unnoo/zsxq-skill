@@ -1,7 +1,5 @@
 # topic +answer（回答提问）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +answer`。
 
 对 `q&a` 类型的主题发布**官方回答**。仅适用于问答类主题，且每个问题只能回答一次。
@@ -46,29 +44,36 @@ zsxq-cli topic +answer \
 | `--files <paths>` | 否 | 附件路径，多个用逗号分隔 |
 | `--json` | 否 | 输出原始 JSON |
 
-## 查找待回答的提问
+## 推荐工作流
+
+先确认主题类型，再发布：
 
 ```bash
-# 查看自己发起的未回答提问
-zsxq-cli api call get_self_question_topics \
-  --params '{"topic_filter":"unanswered","count":20}'
+# 第一步：确认目标主题是 q&a 类型并核对问题内容
+zsxq-cli topic +detail --topic-id 111222333466 --json
+# 查看返回 JSON 中的 "type" 是否为 "q&a"
 
-# 查看已回答的提问
-zsxq-cli api call get_self_question_topics \
-  --params '{"topic_filter":"answered","count":20}'
-
-# 查看别人向我发起的未回答提问
-zsxq-cli api call get_self_answer_topics \
-  --params '{"topic_filter":"unanswered","count":20}'
-
-# 查看别人向我发起的已回答提问
-zsxq-cli api call get_self_answer_topics \
-  --params '{"topic_filter":"answered","count":20}'
-
-# 确认某主题是 q&a 类型
-zsxq-cli topic +detail --topic-id <id> --json
-# 检查返回 JSON 中 "type": "q&a"
+# 第二步：确认无误后发布回答
+zsxq-cli topic +answer \
+  --topic-id 111222333466 \
+  --text "示例回答内容"
 ```
+
+如果不知道有哪些待回答的提问，先列一下：
+
+```bash
+# 自己发起的未回答提问
+zsxq-cli api call get_self_question_topics --params '{"topic_filter":"unanswered","count":20}'
+
+# 别人向我发起的未回答提问
+zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered","count":20}'
+```
+
+> `get_self_question_topics` / `get_self_answer_topics` 还支持 `topic_filter:"answered"` 查看已回答记录。
+
+## 失败语义
+
+写入失败即原子回滚 —— 失败不会消耗"每题只能回答一次"的额度，确认参数后可重试。
 
 ## 错误说明
 
@@ -77,17 +82,7 @@ zsxq-cli topic +detail --topic-id <id> --json
 | `问题已回答` | 该主题已有官方回答，每题只能回答一次 |
 | `topic is not q&a` | 主题类型不是提问，应使用 `+reply` 发评论 |
 
-## 推荐工作流
-
-```bash
-# 第一步：确认主题类型和内容
-zsxq-cli topic +detail --topic-id 111222333466 --json
-
-# 第二步：确认无误后发布回答
-zsxq-cli topic +answer \
-  --topic-id 111222333466 \
-  --text "示例回答内容"
-```
+通用错误（401、`--topic-id is required`、主题不存在等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
 
 ## 参考
 

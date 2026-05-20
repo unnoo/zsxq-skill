@@ -1,7 +1,5 @@
 # topic +edit（编辑主题）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +edit`。
 
 编辑自己发布的主题内容或附件。未修改的字段自动保留。
@@ -64,12 +62,13 @@ zsxq-cli topic +edit \
 zsxq-cli topic +detail --topic-id 111222333444
 ```
 
+## 失败语义
+
+编辑失败即原子回滚 —— 原内容保留不变，不会出现"改一半"的状态。重试前请先确认参数是否合法。
+
 ## 错误说明
 
-| 错误 | 原因 |
-|------|------|
-| 无权限 | 只能编辑自己发布的主题 |
-| 主题不存在 | topic_id 无效或主题已被删除 |
+通用错误（401、`--topic-id is required`、主题不存在、403 无权限编辑他人主题等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
 
 ## 参考
 

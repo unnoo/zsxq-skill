@@ -1,7 +1,5 @@
 # topic +detail（查看主题详情）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli topic +detail`。
 
 获取单条主题的完整详情，包括内容正文、发布者、点赞数、评论数、标签等。
@@ -29,11 +27,11 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 {
   "topic": {
     "topic_id": "111222333444",
-    "type": "talk",               // talk / q&a / article
+    "type": "talk",
     "title": "示例主题标题",
     "content": "示例主题正文内容...",
     "create_time": "2025-12-31T09:19:28.239+0800",
-    "digested": false,            // 是否精华
+    "digested": false,
     "counts": {
       "comments": 3,
       "likes": 10,
@@ -51,18 +49,20 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 }
 ```
 
-## 获取评论列表
+字段含义：
 
-`+detail` 不含评论内容，如需获取评论，使用 API 调用：
+- `type`：主题类型，`talk`（普通帖子）/ `q&a`（提问）/ `article`（文章）
+- `digested`：是否被设为精华
+- `counts`：评论数 / 点赞数 / 阅读数
+- `owner` / `group`：主题作者与所属星球的精简信息
 
-```bash
-zsxq-cli api call get_topic_comments \
-  --params '{"topic_id":"111222333444","limit":30}'
+## 说明
 
-# 翻页（使用返回的 index 值）
-zsxq-cli api call get_topic_comments \
-  --params '{"topic_id":"111222333444","limit":30,"index":"<上一页返回的 index>"}'
-```
+- `+detail` 不含评论内容；如需评论列表，调用 `get_topic_comments`（见 zsxq-topic SKILL.md 的 API 表）
+
+## 错误说明
+
+通用错误（401、`--topic-id is required`、主题不存在、无权限访问等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

@@ -1,7 +1,5 @@
 # group +topics（浏览星球主题）
 
-> **前置条件：** 先阅读 [`../zsxq-shared/SKILL.md`](../../zsxq-shared/SKILL.md) 了解认证和安全规则。
-
 本 skill 对应 shortcut：`zsxq-cli group +topics`。
 
 列出指定星球内最新发布的主题，按时间倒序排列，支持分页。
@@ -24,12 +22,12 @@ zsxq-cli group +topics --group-id 123456789 --json
 
 ## 参数
 
-| 参数 | 必填 | 默认值 | 说明 |
-|------|------|--------|------|
-| `--group-id <id>` | **是** | — | 星球 ID（从 `group +list` 获取） |
-| `--limit <n>` | 否 | 20 | 返回数量（1–30） |
-| `--end-time <t>` | 否 | — | 分页游标，格式：`2025-12-01T00:00:00.000+0800`（上一页返回的 `next_end_time`） |
-| `--json` | 否 | — | 输出原始 JSON |
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--group-id <id>` | **是** | 星球 ID（从 `group +list` 获取） |
+| `--limit <n>` | 否 | 返回数量，默认 20，最大 30 |
+| `--end-time <t>` | 否 | 分页游标，格式：`2025-12-01T00:00:00.000+0800`（上一页返回的 `next_end_time`） |
+| `--json` | 否 | 输出原始 JSON |
 
 ## 输出（表格模式）
 
@@ -40,9 +38,9 @@ zsxq-cli group +topics --group-id 123456789 --json
 - `TYPE`：`talk`（帖子）、`q&a`（提问）、`article`（文章）
 - `TITLE / DIGEST`：优先显示标题，无标题时显示内容摘要（截断至 50 字符）
 
-## 分页说明
+## 说明
 
-当 `--json` 输出中 `has_more: true` 时，使用返回的 `next_end_time` 值作为 `--end-time` 参数继续翻页：
+按时间倒序返回最新主题。当 `--json` 输出中 `has_more: true` 时，使用返回的 `next_end_time` 值作为 `--end-time` 参数继续翻页：
 
 ```bash
 # 第一页
@@ -53,6 +51,10 @@ zsxq-cli group +topics --group-id 123456789 --json
 zsxq-cli group +topics --group-id 123456789 \
   --end-time "2025-11-01T10:00:00.000+0800" --json
 ```
+
+## 错误说明
+
+通用错误（401、参数缺失、404、`--end-time` 格式错误等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
