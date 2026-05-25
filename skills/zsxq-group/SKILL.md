@@ -15,14 +15,14 @@ metadata:
 ## Core Concepts
 
 - **星球（Group）**：知识星球的社群单元，由 `group_id`（纯数字）唯一标识。用户可以是创建者（owner）或成员（member）。
-- **主题（Topic）**：星球内的内容单元，包括帖子（talk）、提问（q&a）、文章（article）等，由 `topic_id` 唯一标识。
+- **主题（Topic）**：星球内的内容单元，包括帖子（talk）、提问（q&a）、作业（task）、作业答案（solution）等，由 `topic_id` 唯一标识。
 - **标签（Hashtag）**：星球内的分类标签，由 `hashtag_id` 标识，可附加到主题上。
 
 ## Resource Relationships
 
 ```
 Group (group_id)
-├── Topic (topic_id) — talk / q&a / article
+├── Topic (topic_id) — talk / q&a / task / solution
 │   ├── Comment (comment_id)
 │   │   └── 楼中楼 Reply (replied_comment_id)
 │   ├── Answer（q&a 类型专属）

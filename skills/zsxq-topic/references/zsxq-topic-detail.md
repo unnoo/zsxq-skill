@@ -51,7 +51,7 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 
 字段含义：
 
-- `type`：主题类型，`talk`（普通帖子）/ `q&a`（提问）/ `article`（文章）
+- `type`：主题类型，`talk`（普通帖子）/ `q&a`（提问）/ `task`（作业题目）/ `solution`（作业答案）
 - `digested`：是否被设为精华
 - `counts`：评论数 / 点赞数 / 阅读数
 - `owner` / `group`：主题作者与所属星球的精简信息

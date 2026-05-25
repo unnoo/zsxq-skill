@@ -17,7 +17,8 @@ metadata:
 - **主题（Topic）**：星球内的内容单元，由 `topic_id` 唯一标识。类型：
   - `talk`：普通帖子（图文）
   - `q&a`：提问，可被星主回答
-  - `article`：长文章
+  - `task`：作业题目
+  - `solution`：作业答案
 - **评论（Comment）**：主题下的回复，由 `comment_id` 标识，支持楼中楼（`replied_comment_id`）。
 - **精华（Digested）**：星主可将优质主题设为精华，在星球内突出展示。
 
@@ -25,7 +26,7 @@ metadata:
 
 ```
 Group (group_id)
-└── Topic (topic_id) — talk / q&a / article
+└── Topic (topic_id) — talk / q&a / task / solution
     ├── Comment (comment_id)
     │   └── 楼中楼 Reply (replied_comment_id)
     ├── Answer（q&a 类型专属）
@@ -40,7 +41,7 @@ Shortcut 是对常用操作的高级封装（`zsxq-cli topic +<verb> [flags]`）
 |----------|------|
 | [`+search`](references/zsxq-topic-search.md) | 在星球内全文搜索主题，返回 topic_id / 类型 / 标题 / 时间表格 |
 | [`+detail`](references/zsxq-topic-detail.md) | 获取单条主题的完整详情（内容、评论数、点赞数、标签等） |
-| [`+create`](references/zsxq-topic-create.md) | 在指定星球发布新主题（帖子），需确认内容后执行 |
+| [`+create`](references/zsxq-topic-create.md) | 在指定星球发布新主题（仅支持 talk 类型），需确认内容后执行 |
 | [`+edit`](references/zsxq-topic-edit.md) | 编辑自己发布的主题（正文、附件），需确认内容后执行 |
 | [`+reply`](references/zsxq-topic-reply.md) | 对主题发表评论，支持楼中楼回复，需确认内容后执行 |
 | [`+answer`](references/zsxq-topic-answer.md) | 对提问类主题（q&a）发布官方回答，需确认内容后执行 |
