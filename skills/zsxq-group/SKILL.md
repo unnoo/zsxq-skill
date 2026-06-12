@@ -1,6 +1,6 @@
 ---
 name: zsxq-group
-version: 1.3.1
+version: 1.3.2
 description: "知识星球（星球）管理：列出星球、浏览主题、查询标签、搜索成员。当用户需要查看自己加入或创建的星球、浏览星球内容、获取 group_id、查询星球标签或成员时使用。"
 metadata:
   requires:
@@ -50,3 +50,13 @@ Shortcut 未覆盖的高级操作：
 | `search_groups` | `keyword` | 按关键词搜索星球 |
 | `search_group_members` | `group_id`, `keyword`, `limit` | 搜索星球成员 |
 | `get_hashtag_topics` | `hashtag_id`, `limit`, `end_time` | 列出某标签下的主题（分页） |
+
+## 反例（不要做）
+
+| ❌ 不要做 | ✅ 应该做 |
+|----------|----------|
+| 按关键词找内容时用 `+topics` 翻页逐条人工筛选 | 用 [zsxq-topic](../zsxq-topic/SKILL.md) 的 `+search` 全文搜索 |
+| 查「自己最近发过什么」时逐个星球跑 `+topics` | 用 [zsxq-user](../zsxq-user/SKILL.md) 的 `+footprints` 一次拿到跨星球足迹 |
+| 用户只给星球名称时，让用户自己提供 group_id 或凭记忆猜 ID | 先 `group +list`（自己加入的）或 `search_groups`（公开搜索）查到 ID 再继续 |
+| 名称命中多个相似星球时默认取第一个 | 列出候选（group_id + 名称）让用户确认 |
+| 把 `search_group_members` 当成员列表接口、调大 `limit` 遍历全员 | 它是关键词搜索，只用于按昵称定位具体成员 |
