@@ -1,12 +1,12 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex when working with code in this repository.
 
 ## Project Overview
 
 zsxq-skill is the official skill package for `zsxq-cli` (知识星球 CLI). It contains **documentation-only skill definitions** — no application code, no build system, no tests. All files are Markdown (scenario scripts under `scripts/`, when added, are the only executable code).
 
-The skill is consumed by AI agents (Claude Code, Cursor, OpenClaw) to learn how to operate the 知识星球 platform via `zsxq-cli`.
+The skill is consumed by AI agents (Codex, Cursor, OpenClaw) to learn how to operate the 知识星球 platform via `zsxq-cli`.
 
 ## Architecture
 

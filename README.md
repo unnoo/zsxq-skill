@@ -107,19 +107,24 @@ zsxq-cli auth status
 
 ## Agent Skills
 
-| Skill | 说明 |
+只需安装**一个** `zsxq` Skill，即可获得全部能力：
+
+| 能力 | 说明 |
 |-------|------|
-| `zsxq-shared` | 认证登录、诊断配置、安全规则（所有其他 Skill 自动加载） |
-| `zsxq-group` | 列出星球、浏览主题、查询标签、搜索成员 |
-| `zsxq-topic` | 搜索主题、查看详情、发布主题、编辑主题、评论、回答提问、删除主题、设置精华和标签 |
-| `zsxq-note` | 创建、编辑、查看、删除个人笔记 |
-| `zsxq-user` | 查看账号信息、查询跨星球发过的主题足迹 |
+| 认证与错误排查 | 认证登录、诊断配置、常见错误处理 |
+| 星球管理 | 列出星球、浏览主题、查询标签、搜索成员 |
+| 主题操作 | 搜索主题、查看详情、发布主题、编辑主题、评论、回答提问、删除主题、设置精华和标签 |
+| 个人笔记 | 创建、编辑、查看、删除个人笔记 |
+| 用户信息 | 查看账号信息、查询跨星球发过的主题足迹 |
+| 场景编排 | 多步骤业务场景（如从旧版 5 个 Skill 迁移到单一 `zsxq`） |
+
+> 从旧版（`zsxq-shared` / `zsxq-group` / `zsxq-topic` / `zsxq-user` / `zsxq-note` 五件套）升级的用户，安装新版后直接对 AI 说「检查并迁移旧版知识星球 skill」，AI 会先扫描报告、经你确认后再清理。
 
 ---
 
 ## 功能详情
 
-### 星球管理（zsxq-group）
+### 星球管理（group）
 
 ```bash
 zsxq-cli group +list                          # 列出你加入的所有星球
@@ -127,7 +132,7 @@ zsxq-cli group +topics --group-id <id>        # 浏览星球最新主题
 zsxq-cli group +hashtags --group-id <id>      # 查看星球所有标签
 ```
 
-### 主题操作（zsxq-topic）
+### 主题操作（topic）
 
 ```bash
 zsxq-cli topic +search --group-id <id> --query "关键词"   # 搜索主题
@@ -138,7 +143,7 @@ zsxq-cli topic +reply  --topic-id <id> --text "评论"      # 发表评论
 zsxq-cli topic +answer --topic-id <id> --text "回答"      # 回答提问
 ```
 
-### 个人笔记（zsxq-note）
+### 个人笔记（note）
 
 ```bash
 zsxq-cli note +list                              # 查看我的笔记列表
@@ -148,7 +153,7 @@ zsxq-cli note +edit   --note-id <id> --text "新"  # 编辑笔记
 zsxq-cli note +delete --note-id <id>              # 删除笔记
 ```
 
-### 用户与足迹（zsxq-user）
+### 用户与足迹（user）
 
 ```bash
 zsxq-cli user +info          # 查看我的账号信息
