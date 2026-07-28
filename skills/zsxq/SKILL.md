@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、发帖、评论、回答、删除主题、笔记、NPS 反馈、group_id、topic_id，需要查看/搜索/发布/编辑/管理知识星球内容，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、拼接分享链接、直接调用底层接口（api call / api raw），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
   version: 2.0.0
   requires:
@@ -137,10 +137,12 @@ User (user_id) — 已登录账户
 | 工具 | 参数 | 说明 |
 |------|------|------|
 | `get_topic_comments` | `topic_id`, `limit`, `index` | 获取主题评论列表（分页） |
-| `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限） |
-| `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签 |
+| `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ |
+| `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（会覆盖原标签）⚠️ |
 | `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问 |
 | `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问 |
+
+> ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容，`set_topic_tags` 覆盖原有标签），执行前必须向用户确认，并遵守[安全规则](#安全规则)。
 
 **原始 HTTP 调用：**
 

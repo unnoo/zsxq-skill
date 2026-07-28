@@ -1,6 +1,6 @@
 # note +delete（删除笔记）
 
-本 skill 对应 shortcut：`zsxq-cli note +delete`。
+对应命令：`zsxq-cli note +delete`。
 
 删除指定笔记。删除后**不可恢复**。
 

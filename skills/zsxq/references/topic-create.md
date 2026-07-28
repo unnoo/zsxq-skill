@@ -1,6 +1,6 @@
 # topic +create（发布主题）
 
-本 skill 对应 shortcut：`zsxq-cli topic +create`。
+对应命令：`zsxq-cli topic +create`。
 
 在指定星球内发布一条新主题（帖子）。
 

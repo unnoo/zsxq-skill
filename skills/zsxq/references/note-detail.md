@@ -1,6 +1,6 @@
 # note +detail（查看笔记详情）
 
-本 skill 对应 shortcut：`zsxq-cli note +detail`。
+对应命令：`zsxq-cli note +detail`。
 
 获取单条笔记的完整详情，包括内容正文、创建时间等。
 

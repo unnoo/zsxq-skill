@@ -1,6 +1,6 @@
 # note +list（查看笔记列表）
 
-本 skill 对应 shortcut：`zsxq-cli note +list`。
+对应命令：`zsxq-cli note +list`。
 
 查看当前登录用户的个人笔记列表，按创建时间倒序排列。
 

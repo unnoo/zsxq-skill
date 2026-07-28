@@ -1,6 +1,6 @@
 # topic +answer（回答提问）
 
-本 skill 对应 shortcut：`zsxq-cli topic +answer`。
+对应命令：`zsxq-cli topic +answer`。
 
 对 `q&a` 类型的主题发布**官方回答**。仅适用于问答类主题，且每个问题只能回答一次。
 

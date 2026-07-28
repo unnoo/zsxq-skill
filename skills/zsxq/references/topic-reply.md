@@ -1,6 +1,6 @@
 # topic +reply（发表评论）
 
-本 skill 对应 shortcut：`zsxq-cli topic +reply`。
+对应命令：`zsxq-cli topic +reply`。
 
 对指定主题发表评论，支持楼中楼（回复某条评论）。
 

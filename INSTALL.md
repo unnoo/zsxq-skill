@@ -69,4 +69,3 @@ npx skills add ./zsxq-skill --yes
 > 检查并迁移旧版知识星球 skill
 
 AI 会先扫描各安装位置并出具报告，经用户确认后才移动文件（先备份、可回滚）。仅检查不清理也可以，说「只检查旧版 zsxq skill」即可。
-

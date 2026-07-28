@@ -1,6 +1,6 @@
 # group +topics（浏览星球主题）
 
-本 skill 对应 shortcut：`zsxq-cli group +topics`。
+对应命令：`zsxq-cli group +topics`。
 
 列出指定星球内最新发布的主题，按时间倒序排列，支持分页。
 

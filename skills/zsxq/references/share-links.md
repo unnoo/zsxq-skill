@@ -15,7 +15,7 @@
 ## 说明
 
 - `group_id` / `topic_id` 均为纯数字，不确定时先用 [group-list](group-list.md) / [topic-search](topic-search.md) 查询确认
-- 笔记（Note）链接由 `note +create` / `note +detail` 直接返回，无需拼接
+- 笔记（Note）暂无稳定的分享链接拼接模板：`note +create` / `note +detail` 只返回 `note_id`、`text`、`create_time`，没有 URL 字段。不要凭 `note_id` 臆造链接；如用户需要笔记分享地址，让其在客户端「分享」处获取
 
 ## 参考
 

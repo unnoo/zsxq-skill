@@ -1,6 +1,6 @@
 # topic +search（搜索主题）
 
-本 skill 对应 shortcut：`zsxq-cli topic +search`。
+对应命令：`zsxq-cli topic +search`。
 
 在指定星球内进行全文搜索，返回匹配的主题列表。搜索使用 RAG 服务，结果按相关性排序。
 

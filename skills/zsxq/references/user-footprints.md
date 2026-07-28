@@ -1,6 +1,6 @@
 # user +footprints（查看主题足迹）
 
-本 skill 对应 shortcut：`zsxq-cli user +footprints`。
+对应命令：`zsxq-cli user +footprints`。
 
 查看当前用户在**所有星球**中最近发过的主题，按时间倒序排列。
 

@@ -1,6 +1,6 @@
 # user +info（查看个人资料）
 
-本 skill 对应 shortcut：`zsxq-cli user +info`。
+对应命令：`zsxq-cli user +info`。
 
 获取当前登录账户的完整个人资料，包括 user_id、昵称、地区、认证状态、订阅信息等。
 

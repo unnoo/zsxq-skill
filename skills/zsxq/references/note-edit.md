@@ -1,6 +1,6 @@
 # note +edit（编辑笔记）
 
-本 skill 对应 shortcut：`zsxq-cli note +edit`。
+对应命令：`zsxq-cli note +edit`。
 
 编辑已有笔记的内容。未修改的字段自动保留。
 

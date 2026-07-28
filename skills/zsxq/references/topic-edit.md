@@ -1,6 +1,6 @@
 # topic +edit（编辑主题）
 
-本 skill 对应 shortcut：`zsxq-cli topic +edit`。
+对应命令：`zsxq-cli topic +edit`。
 
 编辑自己发布的主题内容或附件。未修改的字段自动保留。
 

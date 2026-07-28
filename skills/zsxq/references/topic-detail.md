@@ -1,6 +1,6 @@
 # topic +detail（查看主题详情）
 
-本 skill 对应 shortcut：`zsxq-cli topic +detail`。
+对应命令：`zsxq-cli topic +detail`。
 
 获取单条主题的完整详情，包括内容正文、发布者、点赞数、评论数、标签等。
 

@@ -1,6 +1,6 @@
 # group +list（列出星球）
 
-本 skill 对应 shortcut：`zsxq-cli group +list`。
+对应命令：`zsxq-cli group +list`。
 
 列出当前登录用户**加入或创建**的所有知识星球。常用于获取 `group_id` 供后续操作使用。
 

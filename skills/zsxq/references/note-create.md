@@ -1,6 +1,6 @@
 # note +create（创建笔记）
 
-本 skill 对应 shortcut：`zsxq-cli note +create`。
+对应命令：`zsxq-cli note +create`。
 
 在知识星球创建一条公开笔记，支持文本和图片附件。任何人通过笔记链接均可访问。
 

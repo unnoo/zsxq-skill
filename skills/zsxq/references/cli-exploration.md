@@ -16,7 +16,7 @@
 
 ## api call
 
-优先使用 `api call`，它提供类型安全的参数校验：
+优先使用 `api call`：它是封装好的底层接口工具，参数以结构化 JSON 传入，比手写 `api raw` 的 method/path 更不易出错：
 
 ```bash
 zsxq-cli api call get_self_info --params '{}'

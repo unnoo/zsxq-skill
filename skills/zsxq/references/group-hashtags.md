@@ -1,6 +1,6 @@
 # group +hashtags（查看星球标签）
 
-本 skill 对应 shortcut：`zsxq-cli group +hashtags`。
+对应命令：`zsxq-cli group +hashtags`。
 
 列出指定星球内所有的话题标签（Hashtag）及其主题数量。常用于获取 `hashtag_id` 以便按分类浏览内容。
 
