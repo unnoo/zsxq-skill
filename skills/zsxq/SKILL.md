@@ -45,6 +45,8 @@ metadata:
 | 评论 / 楼中楼回复 | → [`references/topic-reply.md`](references/topic-reply.md) |
 | 回答提问 | → [`references/topic-answer.md`](references/topic-answer.md) |
 | 删除主题 | → [`references/topic-delete.md`](references/topic-delete.md) |
+| 设为精华 / 取消精华（星主） | → [`references/topic-digest.md`](references/topic-digest.md) |
+| 给主题设置标签 | → [`references/topic-tags.md`](references/topic-tags.md) |
 | 查看自己的用户信息 | → [`references/user-info.md`](references/user-info.md) |
 | 查看自己发过的帖子（跨星球） | → [`references/user-footprints.md`](references/user-footprints.md) |
 | 提交 NPS 反馈 | → [`references/user-nps.md`](references/user-nps.md) |
@@ -134,15 +136,15 @@ User (user_id) — 已登录账户
 
 **API（`zsxq-cli api call`）：**
 
-| 工具 | 参数 | 说明 |
-|------|------|------|
-| `get_topic_comments` | `topic_id`, `limit`, `index` | 获取主题评论列表（分页） |
-| `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ |
-| `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（会覆盖原标签）⚠️ |
-| `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问 |
-| `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问 |
+| 工具 | 参数 | 说明 | Reference |
+|------|------|------|-----------|
+| `get_topic_comments` | `topic_id`, `limit`, `index` | 获取主题评论列表（分页） | — |
+| `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ | [`topic-digest.md`](references/topic-digest.md) |
+| `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（titles 为完整标签集合）⚠️ | [`topic-tags.md`](references/topic-tags.md) |
+| `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问 | — |
+| `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问 | — |
 
-> ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容，`set_topic_tags` 覆盖原有标签），执行前必须向用户确认，并遵守[安全规则](#安全规则)。
+> ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容），执行前必须向用户确认，并遵守[安全规则](#安全规则)与对应 reference 的 `> [!CAUTION]` 块。
 
 **原始 HTTP 调用：**
 
