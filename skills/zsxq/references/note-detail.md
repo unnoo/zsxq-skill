@@ -37,10 +37,10 @@ zsxq-cli note +detail --note-id 444555666777 --json
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401、`--note-id is required`、笔记不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-note-list](zsxq-note-list.md) — 查看笔记列表获取 note_id
-- [zsxq-note-edit](zsxq-note-edit.md) — 编辑笔记
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [note-list](note-list.md) — 查看笔记列表获取 note_id
+- [note-edit](note-edit.md) — 编辑笔记
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

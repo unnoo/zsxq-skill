@@ -44,10 +44,10 @@ zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 |------|---------|------|
 | 返回空列表 | 关键词未命中或星球内容较少 | 换近义词或改用 `group +topics` 时间序浏览 |
 
-通用错误（401、`--group-id is required`、`--query is required` 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--group-id is required`、`--query is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-topic-detail](zsxq-topic-detail.md) — 查看主题完整详情
-- [zsxq-group-topics](../../zsxq-group/references/zsxq-group-topics.md) — 按时间浏览主题
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-detail](topic-detail.md) — 查看主题完整详情
+- [group-topics](group-topics.md) — 按时间浏览主题
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

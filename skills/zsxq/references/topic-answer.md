@@ -82,10 +82,10 @@ zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered",
 | `问题已回答` | 该主题已有官方回答，每题只能回答一次 |
 | `topic is not q&a` | 主题类型不是提问，应使用 `+reply` 发评论 |
 
-通用错误（401、`--topic-id is required`、主题不存在等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--topic-id is required`、主题不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-topic-reply](zsxq-topic-reply.md) — 发表普通评论（适用于所有类型）
-- [zsxq-topic-detail](zsxq-topic-detail.md) — 查看主题详情和类型
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-reply](topic-reply.md) — 发表普通评论（适用于所有类型）
+- [topic-detail](topic-detail.md) — 查看主题详情和类型
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

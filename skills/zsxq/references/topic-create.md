@@ -68,10 +68,10 @@ zsxq-cli topic +detail --topic-id <新建的 topic_id>
 
 ## 错误说明
 
-通用错误（401、`--group-id is required`、星球无权限发帖等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401、`--group-id is required`、星球无权限发帖等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-topic-reply](zsxq-topic-reply.md) — 对已发主题评论
-- [zsxq-group-list](../../zsxq-group/references/zsxq-group-list.md) — 获取 group_id
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-reply](topic-reply.md) — 对已发主题评论
+- [group-list](group-list.md) — 获取 group_id
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

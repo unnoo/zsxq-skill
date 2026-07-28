@@ -52,9 +52,9 @@ zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800" --json
 |------|---------|------|
 | 返回空列表 | 当前账户尚未创建任何笔记 | 正常情况，无需处理 |
 
-通用错误（401、`--end-time` 格式错误等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-note-create](zsxq-note-create.md) — 创建笔记
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [note-create](note-create.md) — 创建笔记
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

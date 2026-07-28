@@ -85,10 +85,10 @@ zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 2
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-topic-detail](zsxq-topic-detail.md) — 查看主题详情（获取 topic_id）
-- [zsxq-topic-answer](zsxq-topic-answer.md) — 回答提问类主题（q&a 专用）
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-detail](topic-detail.md) — 查看主题详情（获取 topic_id）
+- [topic-answer](topic-answer.md) — 回答提问类主题（q&a 专用）
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

@@ -42,10 +42,10 @@ zsxq-cli group +list --json
 |------|---------|------|
 | 返回空列表 | 当前账户尚未加入或创建任何星球 | 确认登录账户：`zsxq-cli user +info` |
 
-通用错误（401 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401 等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-group-topics](zsxq-group-topics.md) — 查看星球内主题
-- [zsxq-group-hashtags](zsxq-group-hashtags.md) — 查看星球标签
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [group-topics](group-topics.md) — 查看星球内主题
+- [group-hashtags](group-hashtags.md) — 查看星球标签
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

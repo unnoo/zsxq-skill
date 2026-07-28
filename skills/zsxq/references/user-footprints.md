@@ -50,10 +50,10 @@ zsxq-cli user +footprints --end-time "2025-11-01T00:00:00.000+0800"
 |------|---------|------|
 | 返回空列表 | 当前账户近期未在任何星球发主题 | 正常情况，无需处理 |
 
-通用错误（401、`--end-time` 格式错误等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-user-info](zsxq-user-info.md) — 查看用户 ID 等基本信息
-- [zsxq-group-topics](../../zsxq-group/references/zsxq-group-topics.md) — 查看单个星球的主题列表
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [user-info](user-info.md) — 查看用户 ID 等基本信息
+- [group-topics](group-topics.md) — 查看单个星球的主题列表
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

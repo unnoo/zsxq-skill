@@ -58,15 +58,15 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 
 ## 说明
 
-- `+detail` 不含评论内容；如需评论列表，调用 `get_topic_comments`（见 zsxq-topic SKILL.md 的 API 表）
+- `+detail` 不含评论内容；如需评论列表，调用 `get_topic_comments`（见 [SKILL.md](../SKILL.md#主题管理topic) 的 API 表）
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、无权限访问等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401、`--topic-id is required`、主题不存在、无权限访问等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-topic-reply](zsxq-topic-reply.md) — 对主题发表评论
-- [zsxq-topic-answer](zsxq-topic-answer.md) — 回答提问类主题
-- [zsxq-topic-search](zsxq-topic-search.md) — 搜索主题
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-reply](topic-reply.md) — 对主题发表评论
+- [topic-answer](topic-answer.md) — 回答提问类主题
+- [topic-search](topic-search.md) — 搜索主题
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

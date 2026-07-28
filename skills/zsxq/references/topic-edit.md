@@ -68,11 +68,11 @@ zsxq-cli topic +detail --topic-id 111222333444
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、403 无权限编辑他人主题等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--topic-id is required`、主题不存在、403 无权限编辑他人主题等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-topic-detail](zsxq-topic-detail.md) — 编辑前确认主题内容
-- [zsxq-topic-create](zsxq-topic-create.md) — 发布新主题
-- [zsxq-topic-delete](zsxq-topic-delete.md) — 删除主题
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-detail](topic-detail.md) — 编辑前确认主题内容
+- [topic-create](topic-create.md) — 发布新主题
+- [topic-delete](topic-delete.md) — 删除主题
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

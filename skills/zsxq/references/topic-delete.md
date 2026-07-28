@@ -44,11 +44,11 @@ zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
 | `code: 100262` | 无权限删除该主题（非主题作者或星主） |
 | `code: 100002` | 主题不存在或已被删除 |
 
-通用错误（401、参数缺失等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-topic-edit](zsxq-topic-edit.md) — 删除前若只是想改内容，优先考虑编辑
-- [zsxq-topic-detail](zsxq-topic-detail.md) — 删除前确认主题内容
-- [zsxq-topic-search](zsxq-topic-search.md) — 搜索主题获取 topic_id
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [topic-edit](topic-edit.md) — 删除前若只是想改内容，优先考虑编辑
+- [topic-detail](topic-detail.md) — 删除前确认主题内容
+- [topic-search](topic-search.md) — 搜索主题获取 topic_id
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

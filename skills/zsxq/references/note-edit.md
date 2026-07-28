@@ -48,10 +48,10 @@ zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在、403 无权限编辑他人笔记等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--note-id is required`、笔记不存在、403 无权限编辑他人笔记等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-note-detail](zsxq-note-detail.md) — 编辑前查看笔记内容
-- [zsxq-note-create](zsxq-note-create.md) — 创建笔记
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [note-detail](note-detail.md) — 编辑前查看笔记内容
+- [note-create](note-create.md) — 创建笔记
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

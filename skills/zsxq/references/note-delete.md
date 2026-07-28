@@ -38,10 +38,10 @@ zsxq-cli note +delete --note-id 444555666777
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在、无权限等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401、`--note-id is required`、笔记不存在、无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-note-detail](zsxq-note-detail.md) — 删除前确认笔记内容
-- [zsxq-note-list](zsxq-note-list.md) — 查看笔记列表获取 note_id
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [note-detail](note-detail.md) — 删除前确认笔记内容
+- [note-list](note-list.md) — 查看笔记列表获取 note_id
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

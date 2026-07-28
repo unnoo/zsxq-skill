@@ -41,7 +41,33 @@ zsxq-cli user +nps \
   - 推荐者（Promoters）9–10：忠实用户，会主动推荐
   - 中立者（Passives）7–8：满意但不会主动推荐
   - 贬损者（Detractors）1–6：不满意，可能有负面口碑
-- 主动触发场景：当用户在使用 skill 过程中表达对产品不满、产品缺能力、CLI 工具未封装、或多次重试受挫时，参见 [zsxq-shared 反馈提醒](../../zsxq-shared/SKILL.md#反馈提醒nps)。
+
+## 主动触发场景
+
+当用户在使用过程中遇到「适合反馈给知识星球官方」的情况时，AI 在完成主任务后顺带提示用户考虑提交 NPS 反馈。
+
+| # | 场景 | 信号 | 标签 |
+|---|------|------|------|
+| 1 | 用户表达对产品本身的不满 | 抱怨产品规则/体验 | `#产品建议#` |
+| 2 | 需求在知识星球产品侧不存在 | 排查后确认接口/能力根本没有 | `#产品建议#` |
+| 3 | zsxq-cli / skill 工具侧未封装 | `api list` 中找不到，`api raw` 也无现成 path | `#工具反馈#` |
+| 4 | 同一命令多次重试仍失败 | 同一目标连续失败 ≥ 3 次，且非排除清单内错误 | `#工具反馈#` |
+
+**排除场景（不触发）：**
+
+- `401` / `not logged in` → 引导 `auth login`
+- `403` / 无权限 → 提示切换账户或加入星球
+- `404` / 资源不存在 → 重新核对 ID
+- 参数缺失 / 格式错误 → 用查询命令补齐
+
+**提示流程：**
+
+1. 命中触发场景 → AI 一句话提示（不打断主任务）
+2. 用户拒绝 → 回到主任务，会话内不再提
+3. 用户接受 → AI 协助起草：询问 score（1–10），起草 suggestion（≤ 500 字，以 `#产品建议#` 或 `#工具反馈#` 开头）
+4. 用户确认 → 执行 `zsxq-cli user +nps`
+
+**关键约束**：每会话最多 1 次；先解决用户的事再顺口提；score 必须问用户；suggestion 必须复述确认。
 
 ## 推荐工作流
 
@@ -65,9 +91,9 @@ zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
 | `--score must be 1–10` | 分数超出范围或非整数 | 改为 1–10 的整数 |
 | `--suggestion exceeds 500 chars` | 建议超过 500 字 | 精简至 500 字以内 |
 
-通用错误（401、`--score is required` / `--suggestion is required` 等参数缺失）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--score is required` / `--suggestion is required` 等参数缺失）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-user-info](zsxq-user-info.md) — 查看当前登录账户
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [user-info](user-info.md) — 查看当前登录账户
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

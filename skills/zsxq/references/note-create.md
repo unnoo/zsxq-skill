@@ -61,11 +61,11 @@ zsxq-cli note +detail --note-id <新建的 note_id>
 
 ## 错误说明
 
-通用错误（401 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。本命令无特有错误。
+通用错误（401 等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
-- [zsxq-note-edit](zsxq-note-edit.md) — 编辑笔记
-- [zsxq-note-delete](zsxq-note-delete.md) — 删除笔记
-- [zsxq-topic-create](../../zsxq-topic/references/zsxq-topic-create.md) — 在星球内发布主题（帖子）
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [note-edit](note-edit.md) — 编辑笔记
+- [note-delete](note-delete.md) — 删除笔记
+- [topic-create](topic-create.md) — 在星球内发布主题（帖子）
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则

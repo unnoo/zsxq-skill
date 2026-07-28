@@ -59,9 +59,9 @@ zsxq-cli user +info --json
 |------|---------|------|
 | 输出账户与预期不符 | 当前 keychain 中保存的是其他账户 | `zsxq-cli auth logout` 后重新登录 |
 
-通用错误（401 等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401 等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-shared](../../zsxq-shared/SKILL.md) — 认证与登录
-- [zsxq-group-list](../../zsxq-group/references/zsxq-group-list.md) — 查看星球列表
+- [auth-errors](auth-errors.md) — 认证与登录
+- [group-list](group-list.md) — 查看星球列表

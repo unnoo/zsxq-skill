@@ -47,10 +47,10 @@ zsxq-cli api call get_hashtag_topics \
 |------|---------|------|
 | 返回空列表 | 该星球尚未创建任何标签 | 正常情况，无需处理 |
 
-通用错误（401、`--group-id is required`、星球不存在/无权限等）见 [zsxq-shared](../../zsxq-shared/SKILL.md#常见错误处理)。
+通用错误（401、`--group-id is required`、星球不存在/无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
-- [zsxq-group-topics](zsxq-group-topics.md) — 浏览星球全部主题
-- [zsxq-topic-search](../../zsxq-topic/references/zsxq-topic-search.md) — 关键词搜索主题
-- [zsxq-shared](../../zsxq-shared/SKILL.md)
+- [group-topics](group-topics.md) — 浏览星球全部主题
+- [topic-search](topic-search.md) — 关键词搜索主题
+- [SKILL.md](../SKILL.md) — 能力索引与安全规则
