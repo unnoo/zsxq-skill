@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、拼接分享链接、直接调用底层接口（api call / api raw），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
   version: 2.0.0
   requires:
@@ -31,6 +31,15 @@ metadata:
 | 用户想要… | 去哪看 |
 |----------|--------|
 | 登录 / 查看登录状态 / 排查认证或 HTTP 错误 | → [`references/auth-errors.md`](references/auth-errors.md) |
+| 每日巡场：查今天需要关注/处理的新内容 | → [`scenarios/daily-patrol.md`](references/scenarios/daily-patrol.md) |
+| 整理评论区、找未回复评论并起草回复 | → [`scenarios/triage-comments.md`](references/scenarios/triage-comments.md) |
+| 处理别人向我提的、还没回答的问题 | → [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
+| 整理精华与标签（加精 / 打标签建议） | → [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
+| 生成运营日报 / 周报 / 复盘 | → [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
+| 巡查监控负面 / 风险内容 | → [`scenarios/monitor-risky-content.md`](references/scenarios/monitor-risky-content.md) |
+| 按给定标签批量给主题打标 | → [`scenarios/batch-tag-topics.md`](references/scenarios/batch-tag-topics.md) |
+| 到期成员续费关怀（识别即将到期成员、分层写话术） | → [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
+| 把最新主题批量收录进专栏 | → [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
 | 检查/迁移/清理旧版 zsxq skill | → [`references/scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
 | 直接调底层 API / 探索未封装能力 | → [`references/cli-exploration.md`](references/cli-exploration.md) |
 | 拼接知识星球分享链接 | → [`references/share-links.md`](references/share-links.md) |
@@ -93,6 +102,15 @@ User (user_id) — 已登录账户
 
 | 场景 | 触发语 | 入口 |
 |------|--------|------|
+| 每日巡场 | 「每日巡场 / 巡检星球」「看看今天有什么要处理的」 | [`scenarios/daily-patrol.md`](references/scenarios/daily-patrol.md) |
+| 评论区运营 | 「整理评论区问题给我回复」「找出没回复的评论、起草回复」 | [`scenarios/triage-comments.md`](references/scenarios/triage-comments.md) |
+| 提问管理 | 「找出别人向我提问但我还没回答的」「按优先级整理待回答提问」 | [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
+| 精华与标签整理 | 「整理最近主题，该加精加精、该打标签打标签」「哪些帖子值得设精华」 | [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
+| 运营日报 / 周报 / 复盘 | 「做今天的运营日报」「做本周运营周报」「复盘过去 7 天运营」 | [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
+| 负面内容监控 | 「巡查 / 监控星球风险内容」「每小时查辱骂 / 广告 / 投诉」 | [`scenarios/monitor-risky-content.md`](references/scenarios/monitor-risky-content.md) |
+| 自动打标签 | 「用给定标签给最近主题批量打标」「批量回标历史内容」 | [`scenarios/batch-tag-topics.md`](references/scenarios/batch-tag-topics.md) |
+| 到期成员续费关怀 | 「查即将到期的成员」「做续费关怀 / 续费提醒」「按活跃度给到期成员写话术」 | [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
+| 收录主题到专栏 | 「把最新 N 条主题收录进专栏 XX」「批量把主题归档到专栏 / 整理专题合集」 | [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
 | 迁移旧版 skill | 「检查/清理/迁移旧版知识星球 skill」「升级 zsxq skill」 | [`scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
 
 ## 星球管理（group）
@@ -110,6 +128,16 @@ User (user_id) — 已登录账户
 | `search_groups` | `keyword` | 按关键词搜索星球 |
 | `search_group_members` | `group_id`, `keyword`, `limit` | 搜索星球成员 |
 | `get_hashtag_topics` | `hashtag_id`, `limit`, `end_time` | 列出某标签下的主题（分页） |
+
+**原始 HTTP 调用：**
+
+| 操作 | 命令模板 | Reference |
+|------|----------|-----------|
+| 成员列表 | `api raw --method GET --path /v2/groups/<group_id>/members --query '<json>'` | [`group-members.md`](references/group-members.md) |
+| 专栏列表 | `api raw --method GET --path /v2/groups/<group_id>/columns` | [`group-columns.md`](references/group-columns.md) |
+| 收录主题到专栏 | `api raw --method POST --path /v2/groups/<group_id>/columns/<column_id>/topics --body '{"topic_id":<id>}'` ⚠️ | [`column-add-topic.md`](references/column-add-topic.md) |
+
+> ⚠️ = 写入操作，执行前必须向用户确认，详见 [`column-add-topic.md`](references/column-add-topic.md)。成员列表的 `expired_time` 仅付费星球星主/管理员可见。
 
 ### 反例（不要做）
 
@@ -142,7 +170,7 @@ User (user_id) — 已登录账户
 | `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ | [`topic-digest.md`](references/topic-digest.md) |
 | `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（titles 为完整标签集合）⚠️ | [`topic-tags.md`](references/topic-tags.md) |
 | `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问 | — |
-| `get_self_answer_topics` | `topic_filter`, `count`, `end_time` | 查看别人向我发起的提问 | — |
+| `get_self_answer_topics` | `topic_filter`（`unanswered`/`answered`）, `count`, `end_time` | 查看别人向我发起的提问（账号级，返回项带 `group` 字段，需按星球过滤） | — |
 
 > ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容），执行前必须向用户确认，并遵守[安全规则](#安全规则)与对应 reference 的 `> [!CAUTION]` 块。
 
