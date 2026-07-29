@@ -48,7 +48,7 @@ zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
 
 | 字段 | 说明 |
 |------|------|
-| `column_id` | 专栏 ID，收录主题（[column-add-topic](column-add-topic.md)）、浏览专栏主题时使用 |
+| `column_id` | 专栏 ID，设置主题所属专栏（[topic-attached-columns](topic-attached-columns.md)）、浏览专栏主题时使用 |
 | `name` | 专栏名称，用于按名字定位目标专栏 |
 | `statistics.topics_count` | 专栏内主题数，判断是否接近每栏 100 条上限 |
 | `create_time` | 专栏创建时间 |
@@ -68,7 +68,7 @@ zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
 
 ## 参考
 
-- [column-add-topic](column-add-topic.md) — 拿到 `column_id` 后把主题收录进专栏
+- [topic-attached-columns](topic-attached-columns.md) — 拿到 `column_id` 后读取/设置主题所属专栏
 - [group-list](group-list.md) — 获取 `group_id`
 - [批量收录主题到专栏](scenarios/archive-topics-to-column.md) — 组合本操作的场景
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

@@ -56,6 +56,7 @@ metadata:
 | 删除主题 | → [`references/topic-delete.md`](references/topic-delete.md) |
 | 设为精华 / 取消精华（星主） | → [`references/topic-digest.md`](references/topic-digest.md) |
 | 给主题设置标签 | → [`references/topic-tags.md`](references/topic-tags.md) |
+| 读取 / 设置主题所属专栏（收录到专栏） | → [`references/topic-attached-columns.md`](references/topic-attached-columns.md) |
 | 查看自己的用户信息 | → [`references/user-info.md`](references/user-info.md) |
 | 查看自己发过的帖子（跨星球） | → [`references/user-footprints.md`](references/user-footprints.md) |
 | 提交 NPS 反馈 | → [`references/user-nps.md`](references/user-nps.md) |
@@ -135,9 +136,8 @@ User (user_id) — 已登录账户
 |------|----------|-----------|
 | 成员列表 | `api raw --method GET --path /v2/groups/<group_id>/members --query '<json>'` | [`group-members.md`](references/group-members.md) |
 | 专栏列表 | `api raw --method GET --path /v2/groups/<group_id>/columns` | [`group-columns.md`](references/group-columns.md) |
-| 收录主题到专栏 | `api raw --method POST --path /v2/groups/<group_id>/columns/<column_id>/topics --body '{"topic_id":<id>}'` ⚠️ | [`column-add-topic.md`](references/column-add-topic.md) |
 
-> ⚠️ = 写入操作，执行前必须向用户确认，详见 [`column-add-topic.md`](references/column-add-topic.md)。成员列表的 `expired_time` 仅付费星球星主/管理员可见。
+> 成员列表的 `expired_time` 仅付费星球星主/管理员可见。主题的专栏归属为主题维度操作，见[主题管理](#主题管理topic)的原始 HTTP 调用。
 
 ### 反例（不要做）
 
@@ -179,6 +179,10 @@ User (user_id) — 已登录账户
 | 操作 | 命令模板 | Reference |
 |------|----------|-----------|
 | 删除主题 | `api raw --method DELETE --path /v2/topics/<topic_id>` ⚠️ | [`topic-delete.md`](references/topic-delete.md) |
+| 读取主题所属专栏 | `api raw --method GET --path /v2/topics/<topic_id>/attached_columns` | [`topic-attached-columns.md`](references/topic-attached-columns.md) |
+| 设置主题所属专栏 | `api raw --method POST --path /v2/topics/<topic_id>/attached_columns --body '{"column_ids":[...]}'` ⚠️ | [`topic-attached-columns.md`](references/topic-attached-columns.md) |
+
+> ⚠️ = 写入操作，执行前必须向用户确认。设置主题所属专栏为**全量替换**：`column_ids` 会覆盖该主题原有专栏归属，「加入某专栏」须先读现有集合再并入回设，详见 [`topic-attached-columns.md`](references/topic-attached-columns.md)。
 
 ## 用户信息（user）
 
