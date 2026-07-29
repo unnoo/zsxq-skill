@@ -119,6 +119,8 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 - SKILL.md `## 安全规则` 节给出 token、写入意图确认、ID 查询前置、`api raw` 不绕过约束等全局规则；reference 不重复
 - 当心可见性陷阱：笔记（Note）是公开内容，**任何持有链接的人都可访问**；description / reference / SKILL.md 三处需保持一致
 
+> 完整生命周期（理解 → 设计 → 实现 → 验证 → 验收收尾）、验证协议与验收产物见 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)。下面两节只列文件与注册要点。
+
 ## Adding a New Operation
 
 1. 在 `skills/zsxq/references/` 下创建 `<domain>-<verb>.md`，按"Reference doc 统一模板"组织小节顺序
@@ -129,6 +131,7 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
    - 快速索引表加一行
 3. 如果是新操作类型或新关键词，更新 SKILL.md frontmatter 的 `description` 以包含新关键词
 4. 错误：通用错误归 `auth-errors.md`，新增的命令特有错误才写在 reference 的「错误说明」节
+5. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」用真实运行校准文档，产出 `docs/verification/<id>.md` 报告 + `docs/verification/logs/<id>.log` 日志；写操作须先过测试授权门并选安全测试策略。收尾跑 `python3 scripts/check-docs.py`。
 
 ## Adding a New Scenario
 
@@ -154,4 +157,5 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 3. 简单场景只用入口文件；复杂场景保持入口不变，附加文档放 `references/scenarios/<scenario-id>/`，脚本放 `scripts/scenarios/<scenario-id>/`，静态资源放 `assets/scenarios/<scenario-id>/`
 4. 在 SKILL.md 的「场景（Scenarios）」表注册入口 + 触发语；快速索引表加一行；description 补充触发关键词
 5. 场景只负责编排；命令参数和错误语义以原子操作 reference 为唯一来源
-6. 场景脚本要求：显式输入不猜 ID、结构化输入输出、不读写 token、非零退出码表示失败、写入类提供 dry-run 且保留用户确认、完成实际运行验证。简单 CLI 编排不得封装为脚本
+6. 场景脚本要求：显式输入不猜 ID、结构化输入输出、不读写 token、非零退出码表示失败、写入类提供 dry-run 且保留用户确认。简单 CLI 编排不得封装为脚本
+7. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」端到端跑通主干 + 每条分支/停止条件各一个用例，产出 `docs/verification/<scenario-id>.md` 报告 + `logs/<scenario-id>.log` 日志；写操作须先过测试授权门。收尾跑 `python3 scripts/check-docs.py`
