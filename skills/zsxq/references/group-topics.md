@@ -52,6 +52,8 @@ zsxq-cli group +topics --group-id 123456789 \
   --end-time "2025-11-01T10:00:00.000+0800" --json
 ```
 
+> **翻页边界去重**：`next_end_time` 等于本页最后一条主题的 `create_time`，而 `--end-time` 是**含等于**的，因此下一页会把上一页最后一条主题**重复返回为首条**。翻页累积时须按 `topic_id` 去重（周期巡查同理按 `comment_id`），不要重复计数或重复处理边界主题。
+
 ## 错误说明
 
 通用错误（401、参数缺失、404、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。

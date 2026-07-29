@@ -1,0 +1,130 @@
+==============================================================================
+验证原始日志 — batch-tag-topics（批量打标签）
+==============================================================================
+日志协议：命令原样、输出照录（成功与失败都记）、每条命令记 [exit N]；
+token 等凭证已脱敏为 <TOKEN>；禁止 && echo ok / || true / 2>/dev/null 掩盖失败。
+报告 docs/verification/batch-tag-topics.md 每段「实际摘录」均可在此找到原文。
+
+环境：zsxq-cli 0.4.9 / macOS / python3 3.12.4
+日期：2026-07-29
+星球：758421284（研发测试）；操作者 Pigrun user_id=748118287（admin+partner，非 owner）
+写操作授权：用户 2026-07-28 一次性授权「研发测试 758421284 可发布/POST/PUT」，仅限本星球；
+           写策略=仅在自建一次性主题上操作，测完 DELETE 清理（群级净零）。
+==============================================================================
+
+
+
+## batch-tag-topics / topic-tags 覆盖式语义验证（自建主题 55522441448144114，测完删除）
+
+$ zsxq-cli api call set_topic_tags --params '{"topic_id":"55522441448144114","titles":["回归X","回归Y"]}'
+{
+  "success": true,
+  "topic": {
+    "annotation": "\u003ce type=\"hashtag\" hid=\"28244225422421\" title=\"%23%E5%9B%9E%E5%BD%92X%23\" /\u003e\u003ce type=\"hashtag\" hid=\"15411442144112\" title=\"%23%E5%9B%9E%E5%BD%92Y%23\" /\u003e",
+    "content": "【自动化验证·可删】skill 场景回归测试主题 A — 用于 tags/digest/column/reply 写机制验证，测完即删。2026-07-28",
+    "counts": {
+      "comments": 0,
+      "likes": 0,
+      "readers": 1,
+      "reading": 1,
+      "rewards": 0
+    },
+    "create_time": "2026-07-29T16:47:44.679+0800",
+    "digested": false,
+    "files": [],
+    "group": {
+      "group_id": "758421284",
+      "name": "研发测试"
+    },
+    "images": [],
+    "modify_time": "",
+    "owner": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "title": "【自动化验证·可删】skill...",
+    "topic_id": "55522441448144114",
+    "type": "talk"
+  }
+}
+[exit 0]
+
+$ zsxq-cli topic +detail --topic-id 55522441448144114 --json
+{
+  "success": true,
+  "topic": {
+    "annotation": "<e type=\"hashtag\" hid=\"28244225422421\" title=\"%23%E5%9B%9E%E5%BD%92X%23\" /><e type=\"hashtag\" hid=\"15411442144112\" title=\"%23%E5%9B%9E%E5%BD%92Y%23\" />",
+    "content": "【自动化验证·可删】skill 场景回归测试主题 A — 用于 tags/digest/column/reply 写机制验证，测完即删。2026-07-28",
+    "counts": {
+      "comments": 0,
+      "likes": 0,
+      "readers": 1,
+      "reading": 1,
+      "rewards": 0
+    },
+    "create_time": "2026-07-29T16:47:44.679+0800",
+    "digested": false,
+    "files": [],
+    "group": {
+      "group_id": "758421284",
+      "name": "研发测试"
+    },
+    "images": [],
+    "modify_time": "",
+    "owner": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "title": "【自动化验证·可删】skill...",
+    "topic_id": "55522441448144114",
+    "type": "talk"
+  }
+}
+[exit 0]
+
+$ zsxq-cli api call set_topic_tags --params '{"topic_id":"55522441448144114","titles":["回归Z"]}'
+{
+  "success": true,
+  "topic": {
+    "annotation": "\u003ce type=\"hashtag\" hid=\"15411442144852\" title=\"%23%E5%9B%9E%E5%BD%92Z%23\" /\u003e",
+    "content": "【自动化验证·可删】skill 场景回归测试主题 A — 用于 tags/digest/column/reply 写机制验证，测完即删。2026-07-28",
+    "counts": {
+      "comments": 0,
+      "likes": 0,
+      "readers": 1,
+      "reading": 1,
+      "rewards": 0
+    },
+    "create_time": "2026-07-29T16:47:44.679+0800",
+    "digested": false,
+    "files": [],
+    "group": {
+      "group_id": "758421284",
+      "name": "研发测试"
+    },
+    "images": [],
+    "modify_time": "",
+    "owner": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "title": "【自动化验证·可删】skill...",
+    "topic_id": "55522441448144114",
+    "type": "talk"
+  }
+}
+[exit 0]
+
+$ zsxq-cli topic +detail --topic-id 55522441448144114 --json | grep -o 'title="[^"]*"'
+[exit 1]
+
+$ zsxq-cli api call set_topic_tags --params '{"topic_id":"55522441448144114","titles":["回归X","回归Y","回归Z"]}' | python3 -c 'import sys,json; d=json.load(sys.stdin); print("annotation:", d["topic"]["annotation"])'
+annotation: <e type="hashtag" hid="28244225422421" title="%23%E5%9B%9E%E5%BD%92X%23" /><e type="hashtag" hid="15411442144112" title="%23%E5%9B%9E%E5%BD%92Y%23" /><e type="hashtag" hid="15411442144852" title="%23%E5%9B%9E%E5%BD%92Z%23" />
+[exit 0]
+

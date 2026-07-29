@@ -1,0 +1,80 @@
+==============================================================================
+验证原始日志 — triage-comments（评论分诊与回复）
+==============================================================================
+日志协议：命令原样、输出照录（成功与失败都记）、每条命令记 [exit N]；
+token 等凭证已脱敏为 <TOKEN>；禁止 && echo ok / || true / 2>/dev/null 掩盖失败。
+报告 docs/verification/triage-comments.md 每段「实际摘录」均可在此找到原文。
+
+环境：zsxq-cli 0.4.9 / macOS / python3 3.12.4
+日期：2026-07-29
+星球：758421284（研发测试）；操作者 Pigrun user_id=748118287（admin+partner，非 owner）
+写操作授权：用户 2026-07-28 一次性授权「研发测试 758421284 可发布/POST/PUT」，仅限本星球；
+           写策略=仅在自建一次性主题上操作，测完 DELETE 清理（群级净零）。
+==============================================================================
+
+
+
+## triage-comments 写机制：topic +reply 在自建主题上验证（55522441448144114）
+
+$ zsxq-cli topic +reply --topic-id 55522441448144114 --text 【自动化验证·可删】顶层评论写机制测试。2026-07-28 --json
+✓ Comment posted
+{
+  "comment": {
+    "comment_id": "1521255452254812",
+    "create_time": "2026-07-29T16:54:12.777+0800",
+    "group_owner_liked": false,
+    "likes_count": 0,
+    "owner": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+      "description": "篮球队长，羽毛球队长，游泳队长，乒乓球队长，中国首位最年轻的过百亿身价程序员。有任何思想上，学术上，生活上，心理上的问题都可以找他",
+      "location": "广东",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "rewards_count": 0,
+    "sticky": false,
+    "text": "【自动化验证·可删】顶层评论写机制测试。2026-07-28",
+    "topic_owner_liked": false
+  },
+  "success": true
+}
+[exit 0]
+
+$ zsxq-cli api call get_topic_comments --params '{"topic_id":"55522441448144114","limit":30}' | python3 -c 'import sys,json; d=json.load(sys.stdin); cs=d["comments"]; print("comment_id="+cs[0]["comment_id"] if cs else "none")'
+comment_id=1521255452254812
+[exit 0]
+
+$ zsxq-cli topic +reply --topic-id 55522441448144114 --text 【自动化验证·可删】楼中楼回复写机制测试。 --reply-to 1521255452254812 --json
+✓ Comment posted
+{
+  "comment": {
+    "comment_id": "4842488584482548",
+    "create_time": "2026-07-29T16:55:07.694+0800",
+    "group_owner_liked": false,
+    "likes_count": 0,
+    "owner": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+      "description": "篮球队长，羽毛球队长，游泳队长，乒乓球队长，中国首位最年轻的过百亿身价程序员。有任何思想上，学术上，生活上，心理上的问题都可以找他",
+      "location": "广东",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "parent_comment_id": "1521255452254812",
+    "repliee": {
+      "alias": "Pigrun1",
+      "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+      "description": "篮球队长，羽毛球队长，游泳队长，乒乓球队长，中国首位最年轻的过百亿身价程序员。有任何思想上，学术上，生活上，心理上的问题都可以找他",
+      "name": "Pigrun",
+      "user_id": "748118287"
+    },
+    "rewards_count": 0,
+    "sticky": false,
+    "text": "【自动化验证·可删】楼中楼回复写机制测试。",
+    "topic_owner_liked": false
+  },
+  "success": true
+}
+[exit 0]
+

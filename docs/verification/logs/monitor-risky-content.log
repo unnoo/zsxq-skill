@@ -1,0 +1,518 @@
+==============================================================================
+验证原始日志 — monitor-risky-content（负面内容监控）
+==============================================================================
+日志协议：命令原样、输出照录（成功与失败都记）、每条命令记 [exit N]；
+token 等凭证已脱敏为 <TOKEN>；禁止 && echo ok / || true / 2>/dev/null 掩盖失败。
+报告 docs/verification/monitor-risky-content.md 每段「实际摘录」均可在此找到原文。
+
+环境：zsxq-cli 0.4.9 / macOS / python3 3.12.4
+日期：2026-07-29
+星球：758421284（研发测试）；操作者 Pigrun user_id=748118287（admin+partner，非 owner）
+写操作授权：用户 2026-07-28 一次性授权「研发测试 758421284 可发布/POST/PUT」，仅限本星球；
+           写策略=仅在自建一次性主题上操作，测完 DELETE 清理（群级净零）。
+==============================================================================
+
+
+
+## monitor-risky-content：拉时间窗内主题（只读发现）
+
+$ zsxq-cli group +topics --group-id 758421284 --limit 10 --json
+{
+  "count": 10,
+  "has_more": true,
+  "next_end_time": "2026-06-03T17:54:00.010+0800",
+  "success": true,
+  "topics_brief": [
+    {
+      "annotation": "",
+      "content": "【自动化验证·可删】研发测试 运营日报 2026-07-28\n概览：近期主题 10 条，其中 talk 8 / q&a 2；评论活跃主题「文件」(7 评)。\n待办：3 条跨星球未答提问（见提问管理）。\n— 本帖为 skill 回归测试自动生成，测完即删。",
+      "counts": {
+        "comments": 0,
+        "likes": 0,
+        "readers": 1,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-07-29T17:00:04.840+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "【自动化验证·可删】研发测试 ...",
+      "topic_id": "55522441481241154",
+      "type": "talk"
+    },
+    {
+      "annotation": "<e type=\"hashtag\" hid=\"28244225422421\" title=\"%23%E5%9B%9E%E5%BD%92X%23\" /><e type=\"hashtag\" hid=\"15411442144112\" title=\"%23%E5%9B%9E%E5%BD%92Y%23\" /><e type=\"hashtag\" hid=\"15411442144852\" title=\"%23%E5%9B%9E%E5%BD%92Z%23\" />",
+      "content": "【自动化验证·可删】skill 场景回归测试主题 A — 用于 tags/digest/column/reply 写机制验证，测完即删。2026-07-28",
+      "counts": {
+        "comments": 2,
+        "likes": 0,
+        "readers": 1,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-07-29T16:47:44.679+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "【自动化验证·可删】skill...",
+      "topic_id": "55522441448144114",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "「文件」",
+      "counts": {
+        "comments": 7,
+        "likes": 0,
+        "readers": 13,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-07-15T15:31:51.343+0800",
+      "digested": false,
+      "files": [
+        {
+          "create_time": "2026-07-15T15:31:50.973+0800",
+          "download_count": 2,
+          "duration": 0,
+          "file_id": "181282588214482",
+          "hash": "14646a49b8f7e4e5670f4c55616c7ce7ce477253a7fc63fe9f89ce4828793f9f",
+          "name": "Go语言圣经(中文版).pdf",
+          "size": 4347440,
+          "source": "talk"
+        }
+      ],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": null,
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "title": "「文件」",
+      "topic_id": "14422151554128522",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "这是通过 Beta (Go) MCP 服务器创建的验证主题。\n\n时间戳：1782121507\n验证项目：\n1. create_topic 标题正确\n2. topic_id 精度正确\n3. 读回内容一致",
+      "counts": {
+        "comments": 1,
+        "likes": 0,
+        "readers": 12,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-22T17:45:08.172+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "这是通过 Beta (Go) ...",
+      "topic_id": "82255242821881882",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "这是一条自动化集成测试主题，测试完成后可忽略。",
+      "counts": {
+        "comments": 0,
+        "likes": 0,
+        "readers": 11,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-11T10:37:55.171+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "这是一条自动化集成测试主题，测...",
+      "topic_id": "82255225551824582",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "这是一条自动化集成测试主题，测试完成后可忽略。",
+      "counts": {
+        "comments": 1,
+        "likes": 0,
+        "readers": 11,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-11T10:33:51.473+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "这是一条自动化集成测试主题，测...",
+      "topic_id": "14422442228248252",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "这是一条自动化集成测试主题，测试完成后可忽略。",
+      "counts": {
+        "comments": 0,
+        "likes": 0,
+        "readers": 11,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-11T10:33:04.897+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "这是一条自动化集成测试主题，测...",
+      "topic_id": "45544554441458258",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "文件测试",
+      "counts": {
+        "comments": 0,
+        "likes": 0,
+        "readers": 13,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-08T10:02:01.204+0800",
+      "digested": false,
+      "files": [
+        {
+          "create_time": "2026-06-08T10:02:01.069+0800",
+          "download_count": 2,
+          "duration": 0,
+          "file_id": "412458821858128",
+          "hash": "719eb493b581b2e70c627e7377942319d60e665178e4eba2dc3d143b85847028",
+          "name": "index (1).html",
+          "size": 685,
+          "source": "talk"
+        }
+      ],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": null,
+        "avatar_url": "https://images.zsxq.com/FrvSZTe8li8FJ0mbtPFQ50Lv4ui1?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Cai-_--",
+        "user_id": "185454555452252"
+      },
+      "title": "文件测试",
+      "topic_id": "14422451442452182",
+      "type": "talk"
+    },
+    {
+      "annotation": "",
+      "content": "问题：测试回答下",
+      "counts": {
+        "comments": 1,
+        "likes": 0,
+        "readers": 13,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-03T17:55:12.627+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "「语音」",
+      "topic_id": "55522511818555214",
+      "type": "q&a"
+    },
+    {
+      "annotation": "",
+      "content": "测试图片审核",
+      "counts": {
+        "comments": 0,
+        "likes": 0,
+        "readers": 12,
+        "reading": 1,
+        "rewards": 0
+      },
+      "create_time": "2026-06-03T17:54:00.010+0800",
+      "digested": false,
+      "files": [],
+      "group": {
+        "group_id": "758421284",
+        "name": "研发测试"
+      },
+      "images": [
+        {
+          "image_id": "1525458455844852",
+          "large": {
+            "height": 800,
+            "url": "https://images.zsxq.com/Fstglwp9VeTBYXu8VAW2tq4OYYoq?imageMogr2/auto-orient/thumbnail/800x/format/jpg/blur/1x0/quality/75&e=1788191999&s=bjvttvyvb&token=<TOKEN>",
+            "width": 800
+          },
+          "original": {
+            "height": 1024,
+            "size": 23113,
+            "url": "https://images.zsxq.com/Fstglwp9VeTBYXu8VAW2tq4OYYoq?imageMogr2/auto-orient/quality/100!/ignore-error/1&e=1788191999&s=bjvttvyvb&token=<TOKEN>",
+            "width": 1024
+          },
+          "source": "talk",
+          "thumbnail": {
+            "height": 750,
+            "url": "https://images.zsxq.com/Fstglwp9VeTBYXu8VAW2tq4OYYoq?imageMogr2/auto-orient/thumbnail/750x/format/jpg/blur/1x0/quality/75&e=1788191999&s=bjvttvyvb&token=<TOKEN>",
+            "width": 750
+          },
+          "type": "png"
+        }
+      ],
+      "modify_time": "",
+      "owner": {
+        "alias": "Pigrun1",
+        "avatar_url": "https://images.zsxq.com/FupU3e3PTdgaLTNLMyDChlABroWO?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1&e=1788191999&token=<TOKEN>",
+        "name": "Pigrun",
+        "user_id": "748118287"
+      },
+      "title": "测试图片审核",
+      "topic_id": "55522511818482524",
+      "type": "talk"
+    }
+  ]
+}
+[exit 0]
+
+### 第三步：拉活跃主题「文件」(7 评) 的评论做评论级风险扫描
+
+$ zsxq-cli api call get_topic_comments --params \{\"topic_id\":\"14422151554128522\",\"limit\":20\}
+{
+  "comments": [
+    {
+      "comment_id": "2854555451111251",
+      "create_time": "2026-07-15T15:39:49.356+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "[色][色][色]",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "8854555451111242",
+      "create_time": "2026-07-15T15:40:01.535+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "[得意][得意][得意]",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "1521222128888482",
+      "create_time": "2026-07-15T15:40:05.229+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "[害羞][害羞][害羞]",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "2854555485554881",
+      "create_time": "2026-07-15T15:43:37.709+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "[害羞][害羞][害羞]",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "5124222412125144",
+      "create_time": "2026-07-15T15:58:22.085+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/FmnG9F954nKkcShqTKBnrYV4yVCi?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "88884525288182"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "[色][色][色]",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "2854585112418151",
+      "create_time": "2026-07-27T17:27:37.991+0800",
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/Fki0taWatDoA_smuiw9sA1shse3v?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "814545221114542"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "哈哈",
+      "topic_owner_liked": false
+    },
+    {
+      "comment_id": "8854585112418112",
+      "create_time": "2026-07-27T17:28:24.029+0800",
+      "files": [
+        {
+          "create_time": "2026-07-27T17:28:23.841+0800",
+          "download_count": 1,
+          "duration": 0,
+          "file_id": "181284241258882",
+          "hash": "14646a49b8f7e4e5670f4c55616c7ce7ce477253a7fc63fe9f89ce4828793f9f",
+          "name": "Go语言圣经(中文版).pdf",
+          "size": 4347440
+        }
+      ],
+      "group_owner_liked": false,
+      "likes_count": 0,
+      "owner": {
+        "avatar_url": "https://images.zsxq.com/Fki0taWatDoA_smuiw9sA1shse3v?imageMogr2/auto-orient/thumbnail/150x/format/jpg/blur/1x0/quality/75/ignore-error/1\u0026e=1788191999\u0026token=<TOKEN>",
+        "location": "广东",
+        "name": "明明",
+        "user_id": "814545221114542"
+      },
+      "rewards_count": 0,
+      "sticky": false,
+      "text": "急哦",
+      "topic_owner_liked": false
+    }
+  ],
+  "count": 7,
+  "has_more": true,
+  "index": "1785144504030_0",
+  "success": true
+}
+[exit 0]
+
+
+------------------------------------------------------------------------------
+[分支补测] 翻页边界去重 + q&a 已答判定（见 branch-probes）
+------------------------------------------------------------------------------
+## 读场景分支补测：翻页续拉（>30/时间窗游标，daily-patrol/monitor/poster 共用）
+
+### 分支A：第1页取 next_end_time → 作 --end-time 拉第2页 → 确认两页 topic_id 不重叠
+
+$ zsxq-cli group +topics --group-id 758421284 --limit 3 --json > /Users/pigrun/.claude/jobs/dc7ff25f/tmp/p1.json; python3 -c 'import json; d=json.load(open("/Users/pigrun/.claude/jobs/dc7ff25f/tmp/p1.json")); print("第1页 topic_ids:", [t["topic_id"] for t in d["topics_brief"]]); print("has_more:", d["has_more"]); print("next_end_time:", d["next_end_time"]); open("/Users/pigrun/.claude/jobs/dc7ff25f/tmp/net.txt","w").write(d["next_end_time"])'
+第1页 topic_ids: ['14422151554128522', '82255242821881882', '82255225551824582']
+has_more: True
+next_end_time: 2026-06-11T10:37:55.171+0800
+[exit 0]
+
+$ zsxq-cli group +topics --group-id 758421284 --limit 3 --end-time '2026-06-11T10:37:55.171+0800' --json > /Users/pigrun/.claude/jobs/dc7ff25f/tmp/p2.json; python3 -c 'import json; p1=[t["topic_id"] for t in json.load(open("/Users/pigrun/.claude/jobs/dc7ff25f/tmp/p1.json"))["topics_brief"]]; p2=[t["topic_id"] for t in json.load(open("/Users/pigrun/.claude/jobs/dc7ff25f/tmp/p2.json"))["topics_brief"]]; print("第2页 topic_ids:", p2); print("两页交集(应为空):", set(p1)&set(p2)); print("翻页续拉无重叠:", len(set(p1)&set(p2))==0)'
+第2页 topic_ids: ['82255225551824582', '14422442228248252', '45544554441458258']
+两页交集(应为空): {'82255225551824582'}
+翻页续拉无重叠: False
+[exit 0]
