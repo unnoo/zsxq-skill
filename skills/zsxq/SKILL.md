@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
   version: 2.0.0
   requires:
@@ -36,6 +36,7 @@ metadata:
 | 处理别人向我提的、还没回答的问题 | → [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
 | 整理精华与标签（加精 / 打标签建议） | → [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
 | 生成运营日报 / 周报 / 复盘 | → [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
+| 把星球内容做成日报海报图片（PNG） | → [`scenarios/generate-daily-poster.md`](references/scenarios/generate-daily-poster.md) |
 | 巡查监控负面 / 风险内容 | → [`scenarios/monitor-risky-content.md`](references/scenarios/monitor-risky-content.md) |
 | 按给定标签批量给主题打标 | → [`scenarios/batch-tag-topics.md`](references/scenarios/batch-tag-topics.md) |
 | 到期成员续费关怀（识别即将到期成员、分层写话术） | → [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
@@ -108,6 +109,7 @@ User (user_id) — 已登录账户
 | 提问管理 | 「找出别人向我提问但我还没回答的」「按优先级整理待回答提问」 | [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
 | 精华与标签整理 | 「整理最近主题，该加精加精、该打标签打标签」「哪些帖子值得设精华」 | [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
 | 运营日报 / 周报 / 复盘 | 「做今天的运营日报」「做本周运营周报」「复盘过去 7 天运营」 | [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
+| 生成星球日报海报 | 「生成星球日报海报 / 做张日报图」「把最近内容做成一张海报发群里」 | [`scenarios/generate-daily-poster.md`](references/scenarios/generate-daily-poster.md) |
 | 负面内容监控 | 「巡查 / 监控星球风险内容」「每小时查辱骂 / 广告 / 投诉」 | [`scenarios/monitor-risky-content.md`](references/scenarios/monitor-risky-content.md) |
 | 自动打标签 | 「用给定标签给最近主题批量打标」「批量回标历史内容」 | [`scenarios/batch-tag-topics.md`](references/scenarios/batch-tag-topics.md) |
 | 到期成员续费关怀 | 「查即将到期的成员」「做续费关怀 / 续费提醒」「按活跃度给到期成员写话术」 | [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
