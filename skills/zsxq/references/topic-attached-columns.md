@@ -39,19 +39,33 @@ zsxq-cli api raw --method POST \
 
 ## 输出
 
-- 读取：返回 `body.resp_data.columns[]`，每项为专栏对象（`column_id` / `name` / `statistics.topics_count` 等，格式同 [group-columns](group-columns.md)）。
-- 设置：成功返回成功封套（`succeeded` / `success` 为 `true`）；若存在超限专栏则返回错误 code。
+**读取**：`body.resp_data.columns[]`，每项为专栏对象（`column_id` / `name` / `statistics.topics_count` 等，格式同 [group-columns](group-columns.md)）；已归入主题的专栏项会多带一个 `last_topic_attach_time`。无归属时 `columns` 为空数组 `[]`。
 
 ```json
 {
   "body": {
     "resp_data": {
       "columns": [
-        { "column_id": 5585254544, "name": "哈哈哈", "statistics": { "topics_count": 4 } }
+        {
+          "column_id": 5585254544,
+          "name": "哈哈哈",
+          "last_topic_attach_time": "2026-07-29T11:02:29.238+0800",
+          "statistics": { "topics_count": 5 }
+        }
       ]
     },
     "succeeded": true
   },
+  "status_code": 200,
+  "success": true
+}
+```
+
+**设置**：成功时 `resp_data` 为空对象、以 `succeeded` / `success` 为 `true` 表示成功（不回显专栏列表，需另发一次读取复核）；若存在超限专栏则返回错误 code。
+
+```json
+{
+  "body": { "resp_data": {}, "succeeded": true },
   "status_code": 200,
   "success": true
 }
@@ -89,6 +103,7 @@ zsxq-cli api raw --method POST \
 |------|------|
 | 上限错误 code | `column_ids` 中某专栏已达 100 主题上限，该专栏设置失败 |
 | 无权限 / `code` 类权限错误 | 当前账户非星主 / 合伙人 / 管理员，无权设置 |
+| `429`「操作过于频繁，请稍后重试」 | 短时间内密集写入触发限流。放慢节奏、每次写入间隔约 2 秒后重试；批量场景见 [archive-topics-to-column](scenarios/archive-topics-to-column.md) |
 | `接口 ... 不存在，请检查路径是否正确` | 当前 zsxq-cli 版本的底层接口工具尚未登记该路径，需升级 zsxq-cli（该接口为主题维度 `attached_columns`，替代已废弃的 column 维度收录接口） |
 
 通用错误（401、404 主题不存在、`--body` / 参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
