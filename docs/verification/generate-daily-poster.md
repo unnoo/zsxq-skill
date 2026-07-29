@@ -13,7 +13,7 @@
 
 ## 测试用例
 
-> 覆盖：只读数据链路（星球列表、主题 JSON + 字段校准）、打分公式核算、渲染前置（二维码、本地 HTTP 服务）。Playwright 截图本身因环境无 MCP 未实测（用例6）。「实际」列摘录真实输出，完整原文见 [`logs/generate-daily-poster.log`](logs/generate-daily-poster.log) 对应用例段。
+> 覆盖：只读数据链路（星球列表、主题 JSON + 字段校准）、打分公式核算、渲染前置（二维码、本地 HTTP 服务）、**HTML 海报生成 + 布局规则断言、降级兜底**。仅 Playwright 截图本身因环境无 MCP 未实测（用例8）。「实际」列摘录真实输出，完整原文见 [`logs/generate-daily-poster.log`](logs/generate-daily-poster.log) 对应用例段。
 
 | # | 用例（意图） | 执行的命令 | 预期 | 实际（真实输出摘录） | 结论 |
 |---|------------|-----------|------|---------------------|------|
@@ -22,7 +22,9 @@
 | 3 | 打分公式核算（第 4 步） | `python3 verify_scoring.py`（内嵌用例2 真实字段） | formula_score 按 scoring.md 公式算出、降序正确 | 「文件」=19.40 居首；comments=1 的排在 comments=0 之上；同分稳定序 | ✅ |
 | 4 | 二维码生成（render-poster「二维码」） | `npx --yes qrcode "https://m.zsxq.com/groups/758421284/join.html" -o … -w 300` | 生成 300px PNG | `saved qrcode to: …`；`PNG image data, 300 x 300` | ✅ |
 | 5 | 本地 HTTP 服务兜底（render-poster「截图」步骤1） | `python3 -m http.server 8199 --directory .` + curl | 同源静态服务可访问 | `HTTP 200` | ✅ |
-| 6 | Playwright 截图路径 | 预检 `browser_navigate` / `page.screenshot` / `browser_close` | 出 PNG | **本环境无 Playwright MCP 工具，未实测** | ⚠️ 未实测 |
+| 6 | **HTML 海报生成 + 布局规则断言**（render-poster「渲染 HTML」+ layout-single） | `python3 gen_poster.py`（layout-single 规格 + 用例2 真实数据） | 结构良好；数据绑定；0 值省略逐行+汇总生效 | 7 断言全 PASS：标签平衡、5 主题行、likes 全 0 无 👍、主题#3 无 💬、绑定 💬7👀11、汇总 💬20👀56 | ✅ |
+| 7 | **降级兜底**：浏览器不可用时保留 HTML 到用户目录（render-poster「截图失败兜底」） | `cp … 日报-<ts>.html` 到模拟用户目录 + 校验可读 | HTML 按 `日报-<ts>.html` 落盘、可读、内容完整 | 落盘 2944 字节、首行 `<!doctype html>`、`.topic` 行数=5；清理成功 | ✅ |
+| 8 | Playwright 截图（正常路径最后一环） | 预检 `browser_navigate` / `page.screenshot` / `browser_close` | 出 PNG | **本环境无 Playwright MCP 工具，未实测** | ⚠️ 未实测 |
 
 ## 实测校准了哪些文档假设
 
@@ -39,13 +41,16 @@
 
 ## 未覆盖 / 已知风险
 
-- **Playwright 截图路径（用例6）未实测**：本运行环境无 Playwright MCP（无 `browser_*` 工具），故「浏览器预检 → 2x zoom → page.screenshot 出 PNG → browser_close」无法执行。该段文档系从原 `zsxq-report` skill 原样迁移、迁移中未改命令语义；渲染前置链路（数据/打分/二维码/HTTP 服务）已由用例1-5 覆盖。**待在配有 Playwright MCP 的环境补测截图与降级兜底。**
-- **多星球布局、二维码贴图后的实际视觉效果**未渲染验证（依赖同一截图能力）。
-- 模型四维打分为主观评估，本次只核算了公式兜底分（客观、可复现的部分）；模型分的质量不在静态验证范围。
+> 边界厘清：首版报告把「整条渲染路径」标为未实测，掩盖了其中可测的部分。本次补测后拆分如下——
+
+- **HTML 生成（用例6）、降级兜底（用例7）：已测通过**。二者是本地文件操作、不碰星球、不需 Playwright，本环境完全可测。
+- **Playwright 截图本身（用例8）：真不可测**。本环境无 Playwright MCP（无 `browser_*` 工具），故「浏览器预检 → 2x zoom → page.screenshot 出 PNG → browser_close」无法执行。该段文档系从原 `zsxq-report` skill 原样迁移、未改命令语义。**待在配有 Playwright MCP 的环境补测截图与 PNG 视觉效果。**
+- 多星球布局的实际视觉渲染同样依赖截图能力，未做像素级验证（结构规则已由用例6 的 layout-single 断言间接覆盖）。
+- 模型四维打分为主观评估，本次只核算了公式兜底分（客观、可复现的部分）；模型分质量不在静态验证范围。
 
 ## 结论
 
-**有条件通过（Playwright 截图路径未实测）。**
+**有条件通过（仅 Playwright 截图未实测；渲染前置 + HTML 生成 + 降级兜底均已实测通过）。**
 
-- 只读数据链路（`group +list` / `group +topics --json`）、打分公式、渲染前置（二维码生成、本地 HTTP 服务兜底）均按预期工作，真实输出与文档一致；迁移中的字段回退、跨引用改写已按实测校准。
-- 唯一未覆盖的是 Playwright 截图本身——因本环境缺 MCP 能力，非文档缺陷；该路径命令由旧 skill 原样迁移，风险低。补测条件明确（需 Playwright MCP 环境）。
+- 只读数据链路（`group +list` / `group +topics --json`）、打分公式、二维码生成、本地 HTTP 服务、**HTML 海报生成（含 0 值省略等布局规则断言）、降级兜底（HTML 落盘到用户目录）** 均按预期工作，真实输出与文档一致；迁移中的字段回退、跨引用改写已按实测校准。
+- 唯一未覆盖的是 Playwright 截图这一环——因本环境缺 MCP 能力，非文档缺陷；该路径命令由旧 skill 原样迁移，且其失败时的降级兜底已验证可用（用例7），风险低。补测条件明确（需 Playwright MCP 环境）。

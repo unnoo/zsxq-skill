@@ -151,19 +151,74 @@ render-poster「a. npx http-server … b. python3 -m http.server」回退链一�
 
 
 ------------------------------------------------------------------------------
-[用例6] Playwright 截图路径 —— 本环境未实测（能力缺失）
+[用例6] HTML 海报生成 + 布局规则断言 —— render-poster「渲染 HTML」+ layout-single
+------------------------------------------------------------------------------
+（本地文件操作，不碰星球、不需 Playwright。按 layout-single.md 规格用用例2 的
+真实 5 条主题生成 HTML，并断言布局规则真的生效。脚本为可复现底稿。）
+
+$ python3 gen_poster.py ./zsxq-report-20260729.html
+生成 ./zsxq-report-20260729.html（2740 字节）
+
+  [PASS] HTML 标签闭合平衡
+  [PASS] 含 5 个 .topic 主题行
+  [PASS] likes 全为 0 → 无 👍（0 值省略）
+  [PASS] 主题#3 comments=0 → 该行无 💬
+  [PASS] 主题#1 绑定 💬7 👀11
+  [PASS] 汇总 💬20 存在
+  [PASS] 汇总 👀56 存在
+[exit 0]
+
+校准：layout-single.md 的 body 320px / 卡片 / footer-row 结构可从规格直接生成
+结构良好的 HTML；数据绑定正确；「互动数据 0 值省略」规则逐行（主题#3 无 💬）
+与汇总条（likes 全 0 → 无 👍）均生效。
+
+
+------------------------------------------------------------------------------
+[用例7] 降级兜底 —— 浏览器不可用时保留 HTML 到用户目录（render-poster「兜底」）
+------------------------------------------------------------------------------
+（本环境正是"无 Playwright"这一兜底触发条件，故直接端到端验证兜底行为。）
+
+$ mkdir -p ./mock-downloads
+$ cp ./zsxq-report-20260729.html "./mock-downloads/日报-20260729140000.html"
+[exit 0]
+
+$ ls -l ./mock-downloads/
+-rw-r--r--@ 1 pigrun  staff  2944  7月 29 14:46 日报-20260729140000.html
+[exit 0]
+
+$ head -1 "./mock-downloads/日报-20260729140000.html"
+<!doctype html>
+[exit 0]
+
+$ grep -c 'class="topic"' "./mock-downloads/日报-20260729140000.html"
+5
+[exit 0]
+
+$ rm -rf ./mock-downloads ./zsxq-report-20260729.html    # 清理
+[exit 0]
+$ ls zsxq-report-20260729.html
+ls: zsxq-report-20260729.html: No such file or directory   # 已清理
+
+校准：降级兜底可用——HTML 以 `日报-<timestamp>.html` 命名落到（模拟）用户
+目录、可读、5 条主题完整。与 render-poster「截图失败兜底」1-3 步一致。
+
+
+------------------------------------------------------------------------------
+[用例8] Playwright 截图（正常路径的最后一环）—— 本环境未实测（能力缺失）
 ------------------------------------------------------------------------------
 本运行环境无 Playwright MCP 工具（无 browser_navigate / browser_resize /
-接受 async(page)=>{} 的截图工具），故 render-poster.md 的：
+接受 async(page)=>{} 的截图工具），故仅以下三段无法在本环境执行：
   - 浏览器可用性预检（browser_navigate → about:blank）
   - 2x zoom + page.screenshot 出 PNG
   - browser_close 清理
-三段无法在本环境执行，未实测。
 
-结论处理：报告结论定为「有条件通过（Playwright 截图路径未实测）」。该路径的
-文档系从原 zsxq-report skill 迁移而来、迁移中未改其命令语义；渲染前置链路
-（HTML 拼装依赖的数据/打分/二维码/HTTP 服务）已在用例1-5 覆盖。截图本身待有
-Playwright MCP 的环境补测。
+★ 边界厘清（本次补测的原因）：
+  首版报告把"整条渲染路径"标为未实测，掩盖了其中可测的部分。实际拆分：
+  - HTML 生成（用例6）：可测 → PASS
+  - 降级兜底（用例7）：可测 → PASS
+  - Playwright 截图（本用例）：真不可测（无 MCP）→ 未实测
+  截图段文档系从原 zsxq-report skill 原样迁移、迁移中未改命令语义；PNG 视觉
+  效果待有 Playwright MCP 的环境补测。
 
 ==============================================================================
 日志结束
