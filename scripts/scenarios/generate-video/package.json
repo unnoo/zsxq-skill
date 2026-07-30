@@ -1,0 +1,8 @@
+{
+  "name": "zsxq-video-scripts",
+  "version": "2.0.0",
+  "description": "知识星球视频渲染脚本（render.js 零依赖，record.js 需要 puppeteer）",
+  "optionalDependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}

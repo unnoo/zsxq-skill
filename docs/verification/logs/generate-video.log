@@ -1,0 +1,81 @@
+# verification log: generate-video
+# date: 2026-07-30
+# zsxq-cli: v0.4.9
+# node: v23.9.0
+# test group: 758421284
+
+--- 1. ENVIRONMENT PRE-CHECK ---
+$ node --version
+v23.9.0
+[exit 0]
+
+$ ls scripts/scenarios/generate-video/render.js
+-rw-r--r--@ 1 pigrun  staff  13578  7月 30 12:39 scripts/scenarios/generate-video/render.js
+[exit 0]
+
+$ ls scripts/scenarios/generate-video/record.js
+-rw-r--r--@ 1 pigrun  staff  4983  7月 30 12:39 scripts/scenarios/generate-video/record.js
+[exit 0]
+
+$ ls scripts/scenarios/generate-video/render-minimal.js
+-rw-r--r--@ 1 pigrun  staff  5821  7月 30 12:39 scripts/scenarios/generate-video/render-minimal.js
+[exit 0]
+
+$ which ffmpeg
+/opt/homebrew/bin/ffmpeg
+[exit 0]
+
+$ ls scripts/scenarios/generate-video/node_modules/puppeteer 2>&1
+ls: scripts/scenarios/generate-video/node_modules/puppeteer: No such file or directory
+[exit 1]
+
+--- 2. render.js (STRUCTURED TEMPLATE) ---
+$ node scripts/scenarios/generate-video/render.js \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.json \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.html
+✅ HTML 已生成: /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.html
+   场景数: 5  时长: 22s
+[exit 0]
+
+$ wc -l /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.html
+     358 /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.html
+[exit 0]
+
+--- 3. render-minimal.js (MINIMAL/QUOTE TEMPLATE) ---
+$ node scripts/scenarios/generate-video/render-minimal.js \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-minimal.json \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-minimal.html
+✅ 金句模板 HTML 已生成: /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-minimal.html
+   页数: 4  时长: 14s
+[exit 0]
+
+--- 4. CLI DATA FLOW (group +list / group +topics / topic +detail) ---
+$ zsxq-cli group +list --json | python3 -c "import sys,json;d=json.load(sys.stdin);groups=d.get('groups') or d.get('data') or []"
+[测试星球] group_id=758421284 name=研发测试
+[exit 0]
+
+$ zsxq-cli group +topics --group-id 758421284 --limit 10 --json | python3 -c "..."
+[主题数] 10
+  topic_id=14422151554128522 type=talk likes=0 comments=7 title=「文件」
+  topic_id=82255242821881882 type=talk likes=0 comments=1 title=这是通过 Beta (Go) ...
+  topic_id=82255225551824582 type=talk likes=0 comments=0 title=这是一条自动化集成测试主题，测...
+  topic_id=14422442228248252 type=talk likes=0 comments=1 title=这是一条自动化集成测试主题，测...
+  topic_id=45544554441458258 type=talk likes=0 comments=0 title=这是一条自动化集成测试主题，测...
+[exit 0]
+
+$ zsxq-cli topic +detail --topic-id 82255242821881882 --json | python3 -c "import sys,json;d=json.load(sys.stdin);t=d['resp_data']['topic'];print('content:',t.get('content','')[:200])"
+content: 这是通过 Beta (Go) MCP 服务器创建的验证主题。
+
+时间戳：1782121507
+验证项目：
+1. create_topic 标题正确
+2. topic_id 精度正确
+3. 读回内容一致
+[exit 0]
+
+--- 5. record.js (WITHOUT puppeteer — expected failure) ---
+$ node scripts/scenarios/generate-video/record.js \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video-sample.html \
+  /Users/pigrun/.claude/jobs/dc7ff25f/tmp/test-video.mp4 5
+Error: Cannot find module 'puppeteer'
+[exit 1]
