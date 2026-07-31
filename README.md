@@ -21,13 +21,14 @@
 
 ### 核心能力
 
-- **星球管理**：列出已加入的星球，搜索星球，查看标签和成员
+- **星球管理**：列出已加入的星球，搜索星球，查看标签、成员和专栏
 - **内容搜索**：按关键词搜索星球里的帖子、文章和提问
 - **主题查看**：查看主题详情、评论、点赞和标签信息
 - **发布互动**：发布主题、编辑主题、评论回复、回答提问
-- **标签操作**：查看标签，或为主题设置标签
+- **精华与标签**：设置/取消精华，为主题打标签，管理专栏收录
 - **个人笔记**：创建、编辑、查看、删除笔记
-- **账号信息**：查看个人资料和发帖足迹
+- **账号信息**：查看个人资料、发帖足迹、提交 NPS 反馈
+- **场景编排**：多步骤运营场景（每日巡场、评论运营、日报周报、海报/视频生成等）
 
 ### 典型使用场景
 
@@ -36,9 +37,17 @@
 - 查看某条主题的完整内容和评论互动
 - 帮我发一条新主题，或回复这条评论
 - 回答一个提问类主题
-- 给主题设置标签，或查看星球标签体系
+- 给主题设置标签、设为精华，或收录到专栏
 - 记一条个人笔记，稍后再整理
 - 查看我的账号信息和历史发帖足迹
+
+**场景化运营**（一句话触发多步骤编排）：
+
+- 「每日巡场」— 自动汇总今天新内容、待处理提问和评论
+- 「整理评论区问题给我回复」— 找出未回复评论并起草回复
+- 「做本周运营周报」— 统计新增/活跃/精华，生成结构化周报
+- 「生成星球日报海报」— 把内容精选做成 PNG 海报图片
+- 「把帖子做成视频」— 把星球内容转成竖版动画视频
 
 ## 适合谁用
 
@@ -112,11 +121,13 @@ zsxq-cli auth status
 | 能力 | 说明 |
 |-------|------|
 | 认证与错误排查 | 认证登录、诊断配置、常见错误处理 |
-| 星球管理 | 列出星球、浏览主题、查询标签、搜索成员 |
-| 主题操作 | 搜索主题、查看详情、发布主题、编辑主题、评论、回答提问、删除主题、设置精华和标签 |
-| 个人笔记 | 创建、编辑、查看、删除个人笔记 |
-| 用户信息 | 查看账号信息、查询跨星球发过的主题足迹 |
-| 场景编排 | 多步骤业务场景（如从旧版 5 个 Skill 迁移到单一 `zsxq`） |
+| 星球管理 | 列出星球、浏览主题、查询标签、搜索成员、管理专栏 |
+| 主题操作 | 搜索主题、查看详情、发布/编辑/删除主题、评论回复、回答提问、精华与标签管理、专栏收录 |
+| 个人笔记 | 创建、编辑、查看、删除笔记 |
+| 用户信息 | 查看账号信息、查询跨星球足迹、提交 NPS 反馈 |
+| 场景编排 | 12 个多步骤运营场景（巡场、评论运营、日报周报、海报/视频生成、负面监控等） |
+
+Skill 内部按三层路由执行：**场景模式**（命中场景 → 按编排执行）→ **原子操作**（命中已知命令 → 直接调用）→ **探索模式**（未命中 → 通过 CLI 发现能力）。所有命令细节和参数均由 28 个 reference 文档独立承载，SKILL.md 只负责路由和索引。
 
 > 从旧版（`zsxq-shared` / `zsxq-group` / `zsxq-topic` / `zsxq-user` / `zsxq-note` 五件套）升级的用户，安装新版后直接对 AI 说「检查并迁移旧版知识星球 skill」，AI 会先扫描报告、经你确认后再清理。
 
@@ -132,25 +143,70 @@ zsxq-cli group +topics --group-id <id>        # 浏览星球最新主题
 zsxq-cli group +hashtags --group-id <id>      # 查看星球所有标签
 ```
 
+**专栏与成员：**
+
+```bash
+# 专栏管理（通过 api raw）
+zsxq-cli api raw --method GET --path /v2/groups/<id>/columns         # 列出星球专栏
+zsxq-cli api raw --method POST --path /v2/groups/<id>/columns \      # 创建专栏 ⚠️
+  --body '{"name":"专栏名称"}'
+
+# 成员管理（通过 api raw）
+zsxq-cli api raw --method GET --path /v2/groups/<id>/members         # 查看成员列表
+```
+
+**API 调用：**
+
+```bash
+zsxq-cli api call search_groups --params '{"keyword":"搜索词"}'        # 搜索星球
+zsxq-cli api call search_group_members --params '{"group_id":<id>,"keyword":"昵称"}'  # 搜索成员
+```
+
 ### 主题操作（topic）
 
 ```bash
 zsxq-cli topic +search --group-id <id> --query "关键词"   # 搜索主题
 zsxq-cli topic +detail --topic-id <id>                    # 查看主题详情
-zsxq-cli topic +create --group-id <id> --text "内容"      # 发布新主题
-zsxq-cli topic +edit   --topic-id <id> --text "新内容"    # 编辑主题
-zsxq-cli topic +reply  --topic-id <id> --text "评论"      # 发表评论
-zsxq-cli topic +answer --topic-id <id> --text "回答"      # 回答提问
+zsxq-cli topic +create --group-id <id> --text "内容"      # 发布新主题 ⚠️
+zsxq-cli topic +edit   --topic-id <id> --text "新内容"    # 编辑主题 ⚠️
+zsxq-cli topic +reply  --topic-id <id> --text "评论"      # 发表评论 ⚠️
+zsxq-cli topic +answer --topic-id <id> --text "回答"      # 回答提问 ⚠️
 ```
+
+**精华、标签与专栏收录：**
+
+```bash
+# 精华管理（api call）
+zsxq-cli api call set_topic_digested \
+  --params '{"topic_id":<id>,"digested":true}'            # 设为精华 ⚠️
+zsxq-cli api call set_topic_digested \
+  --params '{"topic_id":<id>,"digested":false}'           # 取消精华 ⚠️
+
+# 标签设置（api call）
+zsxq-cli api call set_topic_tags \
+  --params '{"topic_id":<id>,"titles":["标签1","标签2"]}'  # 设置标签 ⚠️
+
+# 专栏收录（通过 api raw）
+zsxq-cli api raw --method GET \
+  --path /v2/topics/<id>/attached_columns                 # 读取主题所属专栏
+zsxq-cli api raw --method POST \
+  --path /v2/topics/<id>/attached_columns \
+  --body '{"column_ids":[...]}'                           # 设置主题专栏 ⚠️
+
+# 删除主题（通过 api raw，不可恢复）
+zsxq-cli api raw --method DELETE --path /v2/topics/<id>  # 删除主题 ⚠️
+```
+
+> ⚠️ = 写入操作，执行前需确认。
 
 ### 个人笔记（note）
 
 ```bash
 zsxq-cli note +list                              # 查看我的笔记列表
-zsxq-cli note +create --text "内容"              # 创建新笔记
+zsxq-cli note +create --text "内容"              # 创建新笔记 ⚠️
 zsxq-cli note +detail --note-id <id>              # 查看笔记详情
-zsxq-cli note +edit   --note-id <id> --text "新"  # 编辑笔记
-zsxq-cli note +delete --note-id <id>              # 删除笔记
+zsxq-cli note +edit   --note-id <id> --text "新"  # 编辑笔记 ⚠️
+zsxq-cli note +delete --note-id <id>              # 删除笔记 ⚠️
 ```
 
 ### 用户与足迹（user）
@@ -158,7 +214,29 @@ zsxq-cli note +delete --note-id <id>              # 删除笔记
 ```bash
 zsxq-cli user +info          # 查看我的账号信息
 zsxq-cli user +footprints    # 查看我在各星球发过的主题（跨星球足迹）
+zsxq-cli user +nps           # 提交 NPS 反馈与建议 ⚠️
 ```
+
+### 场景编排（Scenarios）
+
+场景将多个原子操作编排为完整的运营流程，一句话即可触发：
+
+| 场景 | 一句话触发 |
+|------|-----------|
+| 每日巡场 | 「看看今天有什么要处理的」 |
+| 评论区运营 | 「整理评论区问题给我回复」 |
+| 提问管理 | 「找出还没回答的提问」 |
+| 精华与标签整理 | 「哪些帖子值得设精华、打标签」 |
+| 运营日报 / 周报 / 复盘 | 「做本周运营周报」 |
+| 生成星球日报海报 | 「把今天内容做成海报」 |
+| 生成竖版动画视频 | 「把这篇帖子做成视频」 |
+| 负面内容监控 | 「巡查星球有没有风险内容」 |
+| 批量打标签 | 「用这些标签给最近主题打标」 |
+| 到期成员续费关怀 | 「查即将到期的成员，写续费话术」 |
+| 收录主题到专栏 | 「把最新主题批量收录进专栏」 |
+| 迁移旧版 skill | 「检查并迁移旧版知识星球 skill」 |
+
+> 场景只负责编排流程，具体命令参数以各原子操作文档为准。
 
 ### 认证
 
@@ -173,8 +251,11 @@ zsxq-cli doctor        # 诊断配置和认证是否正常
 ```bash
 zsxq-cli api list                                    # 列出所有可用工具
 zsxq-cli api call <tool> --params '<json>'           # 调用指定工具
-zsxq-cli api raw --method GET --path /v3/users/self  # 直接调用原始接口
+zsxq-cli api raw --method <METHOD> --path <path> \   # 直接调用原始 HTTP 接口
+  [--body '<json>'] [--query '<json>']
 ```
+
+`api call` 封装了常用高级操作（精华管理、标签设置、成员搜索等），`api raw` 则可调用任意知识星球接口（专栏管理、成员列表、删除主题等）。能力未命中时，Skill 会自动进入探索模式，通过 `api list` 和 `--help` 发现可用接口。
 
 ---
 
