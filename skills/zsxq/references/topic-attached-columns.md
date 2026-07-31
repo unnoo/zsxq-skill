@@ -22,7 +22,7 @@ zsxq-cli api raw --method GET --path /v2/topics/<topic_id>/attached_columns
 # ② 覆盖式设置主题所属的专栏集合（--body 会自动包装 req_data）
 zsxq-cli api raw --method POST \
   --path /v2/topics/<topic_id>/attached_columns \
-  --body '{"column_ids": [5585254544, 2212524241]}'
+  --body '{"column_ids": [888888888001, 888888888002]}'
 
 # 移出所有专栏：传空数组
 zsxq-cli api raw --method POST \
@@ -47,9 +47,9 @@ zsxq-cli api raw --method POST \
     "resp_data": {
       "columns": [
         {
-          "column_id": 5585254544,
-          "name": "哈哈哈",
-          "last_topic_attach_time": "2026-07-29T11:02:29.238+0800",
+          "column_id": 888888888001,
+          "name": "精华归档",
+          "last_topic_attach_time": "2025-06-01T00:00:00.000+0800",
           "statistics": { "topics_count": 5 }
         }
       ]

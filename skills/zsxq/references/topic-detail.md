@@ -59,7 +59,7 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 ## 说明
 
 - `+detail` 不含评论内容；如需评论列表，调用 `get_topic_comments`（见 [SKILL.md](../SKILL.md#主题管理topic) 的 API 表）
-- **主题标签没有独立字段**：标签内嵌在 `content` 正文里，形如 `<e type="hashtag" hid="741518288" title="%232%23" />`（`title` 为 URL 编码，`%23` 即 `#`）。判断主题现有标签、或在 `set_topic_tags`（覆盖式）打标签前合并旧标签，都需从 `content` 解析这些内嵌 token。
+- **主题标签没有独立字段**：标签内嵌在 `content` 正文里，形如 `<e type="hashtag" hid="888888888001" title="%232%23" />`（`title` 为 URL 编码，`%23` 即 `#`）。判断主题现有标签、或在 `set_topic_tags`（覆盖式）打标签前合并旧标签，都需从 `content` 解析这些内嵌 token。
 
 ## 错误说明
 

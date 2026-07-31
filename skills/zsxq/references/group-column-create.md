@@ -38,10 +38,10 @@ zsxq-cli api raw --method POST \
   "body": {
     "resp_data": {
       "column": {
-        "column_id": 518855188254,
+        "column_id": 888888888001,
         "name": "精华归档",
         "cover_url": "https://file.zsxq.com/column_cover.png",
-        "create_time": "2026-07-31T13:08:54.082+0800",
+        "create_time": "2025-01-01T00:00:00.000+0800",
         "statistics": {
           "topics_count": 0
         }

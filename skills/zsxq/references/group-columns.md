@@ -28,12 +28,12 @@ zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
     "resp_data": {
       "columns": [
         {
-          "column_id": 518818551584,
-          "name": "知识星球玩法",
+          "column_id": 888888888001,
+          "name": "精华归档",
           "cover_url": "https://file.zsxq.com/column_cover.png",
           "statistics": { "topics_count": 10 },
-          "create_time": "2023-08-09T14:29:50.908+0800",
-          "last_topic_attach_time": "2023-08-09T15:17:07.103+0800"
+          "create_time": "2025-01-01T00:00:00.000+0800",
+          "last_topic_attach_time": "2025-06-01T00:00:00.000+0800"
         }
       ]
     },

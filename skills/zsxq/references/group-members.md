@@ -9,11 +9,11 @@
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/members --query '{"count":20}'
 
 # 即将到期：普通成员按到期时间正序（最先到期在前），限定未来 14 天窗口
-zsxq-cli api raw --method GET --path /v2/groups/285184421/members \
+zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
   --query '{"scope":"regular","sort":"expired_time","order":"asc","begin_time":"2026-07-28T00:00:00.000+0800","end_time":"2026-08-11T23:59:59.999+0800","count":200}'
 
 # 已过期成员：按编号翻页
-zsxq-cli api raw --method GET --path /v2/groups/285184421/members \
+zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
   --query '{"scope":"expired","sort":"number","count":200}'
 ```
 
@@ -44,15 +44,15 @@ zsxq-cli api raw --method GET --path /v2/groups/285184421/members \
     "resp_data": {
       "members": [
         {
-          "group_id": 285184421,
-          "user_id": 527145127,
-          "name": "浪迹天涯1",
-          "join_time": "2018-09-08T14:25:21.684+0800",
-          "expired_time": "2286-11-21T01:46:39.999+0800",
-          "update_time": "2024-12-10T10:09:36.749+0800",
-          "login_time": "2026-07-28T19:50:14.556+0800",
+          "group_id": 888888888,
+          "user_id": 999999999,
+          "name": "测试成员",
+          "join_time": "2025-01-01T00:00:00.000+0800",
+          "expired_time": "2026-01-01T00:00:00.000+0800",
+          "update_time": "2025-06-01T00:00:00.000+0800",
+          "login_time": "2025-12-01T00:00:00.000+0800",
           "status": "joined",
-          "location": "广东",
+          "location": "北京",
           "isolated": false
         }
       ]
