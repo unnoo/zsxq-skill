@@ -140,6 +140,7 @@ User (user_id) — 已登录账户
 |------|----------|-----------|
 | 成员列表 | `api raw --method GET --path /v2/groups/<group_id>/members --query '<json>'` | [`group-members.md`](references/group-members.md) |
 | 专栏列表 | `api raw --method GET --path /v2/groups/<group_id>/columns` | [`group-columns.md`](references/group-columns.md) |
+| 创建专栏 | `api raw --method POST --path /v2/groups/<group_id>/columns --body '{"name":"…"}'` ⚠️ | [`group-column-create.md`](references/group-column-create.md) |
 
 > 成员列表的 `expired_time` 仅付费星球星主/管理员可见。主题的专栏归属为主题维度操作，见[主题管理](#主题管理topic)的原始 HTTP 调用。
 

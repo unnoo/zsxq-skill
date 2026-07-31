@@ -59,7 +59,7 @@ zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
 
 - 该接口未封装为 shortcut 或 `api call`，只能用 `api raw --method GET` 调用；成员（含已过期成员）可读。
 - **按专栏名找 `column_id`**：遍历 `columns[]`，把 `name` 与用户给出的专栏名称比对，取匹配项的 `column_id`。命中**多个同名**或**一个都没匹配到**时，列出候选（`column_id` + `name`）让用户确认，不要默认取第一个。
-- `columns[]` 为空数组表示该星球未开通专栏或暂无专栏，属正常返回、不是错误。
+- `columns[]` 为空数组表示该星球未开通专栏或暂无专栏，属正常返回、不是错误。需要创建专栏时见 [group-column-create](group-column-create.md)。
 - `columns[]` 已按服务端排好的展示顺序返回，无需再排序。
 
 ## 错误说明
@@ -68,6 +68,7 @@ zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
 
 ## 参考
 
+- [group-column-create](group-column-create.md) — 创建新专栏
 - [topic-attached-columns](topic-attached-columns.md) — 拿到 `column_id` 后读取/设置主题所属专栏
 - [group-list](group-list.md) — 获取 `group_id`
 - [批量收录主题到专栏](scenarios/archive-topics-to-column.md) — 组合本操作的场景
