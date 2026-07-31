@@ -14,7 +14,7 @@
 zsxq-cli api raw --method DELETE --path /v2/topics/<topic_id>
 
 # 示例
-zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
+zsxq-cli api raw --method DELETE --path /v2/topics/88888888888888
 ```
 
 ## 参数
@@ -27,10 +27,10 @@ zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
 
 ```bash
 # 第一步：确认主题内容，确保删对目标
-zsxq-cli topic +detail --topic-id 15522482218442
+zsxq-cli topic +detail --topic-id 88888888888888
 
 # 第二步：向用户确认后执行删除
-zsxq-cli api raw --method DELETE --path /v2/topics/15522482218442
+zsxq-cli api raw --method DELETE --path /v2/topics/88888888888888
 ```
 
 ## 失败语义
