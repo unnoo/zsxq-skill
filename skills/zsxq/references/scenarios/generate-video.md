@@ -4,7 +4,7 @@
 
 > **依赖**：本场景需 Node.js ≥ 18；MP4 录制另需 ffmpeg + puppeteer。详见「所需输入」环境依赖。
 >
-> **所有文件路径均相对于 skill 根目录**（即 `SKILL.md` 所在目录）。如场景文档位于 `references/scenarios/generate-video.md`，则 `../../scripts/` 指向 `scripts/scenarios/generate-video/`。
+> **所有文件路径均相对于 skill 根目录**（即 `SKILL.md` 所在目录），在代码块中直接使用。
 
 > [!CAUTION]
 > - **视频生成涉及 LLM 对内容的提炼和改写**：AI 提炼后的脚本可能改变原文语气或强调方向，生成前必须向用户展示脚本预览并等待确认
@@ -152,7 +152,7 @@ node scripts/scenarios/generate-video/render.js \
   <OUT_DIR>/script.json \
   <OUT_DIR>/output.html
 
-# 4. 浏览器预览
+# 4. 浏览器预览（macOS 用 open，Linux 用 xdg-open，Windows 用 start）
 open <OUT_DIR>/output.html
 ```
 
