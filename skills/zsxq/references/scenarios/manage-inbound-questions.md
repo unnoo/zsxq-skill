@@ -44,7 +44,7 @@ zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered",
 
 从返回 `topics_brief[]` 的每条提取：
 
-- `topic_id` —— 后续提交回答的目标
+- `topic_id` —— 后续提交回答的目标1
 - `content` —— 提问正文，用于生成"提问内容摘要"
 - `group.name` / `group.group_id` —— 来自哪个星球
 - `create_time` —— 提问时间

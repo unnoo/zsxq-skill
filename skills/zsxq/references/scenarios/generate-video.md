@@ -2,7 +2,7 @@
 
 把知识星球的帖子/文章内容转为**竖版动画视频**（2160×3840，9:16，~17-21s），适合发布到抖音、视频号、小红书。AI 提炼内容为结构化脚本，通过内置渲染脚本生成动画 HTML，可选录制 4K MP4。
 
-> **依赖**：本场景需 Node.js ≥ 18；MP4 录制另需 ffmpeg + puppeteer（`scripts/scenarios/generate-video/` 目录下 `npm install`）。详见「所需输入」环境依赖。
+> **依赖**：本场景需 Node.js ≥ 18；MP4 录制另需 ffmpeg + puppeteer。详见「所需输入」环境依赖。
 
 > [!CAUTION]
 > - **视频生成涉及 LLM 对内容的提炼和改写**：AI 提炼后的脚本可能改变原文语气或强调方向，生成前必须向用户展示脚本预览并等待确认
@@ -32,8 +32,8 @@
 |------|------|------|
 | 内容来源 | **是** | 用户提供一条具体的星球帖子（topic_id / 链接 / 标题）或直接粘贴文字。如说「帮我找」，则用 `group +topics` 浏览候选 |
 | 星球（group_id 或星球名） | 内容来源是帖子时**是** | 帖子所属的星球。只给名称时先用 `group +list` 解析 group_id |
-| 作者名 | 否 | 显示在视频封面上的作者昵称（取自 `topic +detail` 的 `owner` 字段，用户也可覆盖） |
-| 品牌色 | 否 | 视频主题色（十六进制，取自 topic +detail 的 `brand` 信息。用户不指定时用默认品牌色） |
+| 作者名 | 否 | 显示在视频封面上的作者昵称（取自 `topic +detail` 的 `owner.name` 或 `owner.alias`，用户也可覆盖） |
+| 品牌色 | 否 | 视频主题色（十六进制，不指定时用默认品牌色） |
 | 保存目录 | 否 | 默认 `~/Desktop/内容雷达/`；用户可指定其它路径 |
 
 **环境依赖（本场景专属，非全 skill 必需）**：
@@ -41,7 +41,7 @@
 | 依赖 | 必须？ | 安装方式 | 说明 |
 |------|--------|---------|------|
 | Node.js ≥ 18 | **是** | `node --version` 确认 | 运行渲染脚本 |
-| npm install（脚本依赖） | 否（仅 MP4） | `cd ~/.claude/skills/zsxq/scripts/scenarios/generate-video && npm install` | 安装 puppeteer（~200MB）。首次安装可用 `PUPPETEER_SKIP_DOWNLOAD=true npm install` 跳过 Chromium 下载，然后用系统已装的 Chrome（见录制步骤）|
+| npm install（脚本依赖） | 否（仅 MP4） | `cd ~/.claude/skills/zsxq/scripts/scenarios/generate-video && npm install` | 安装 puppeteer。首次安装可用 `PUPPETEER_SKIP_DOWNLOAD=true npm install` 跳过 Chromium 下载，然后用系统已装的 Chrome |
 | ffmpeg | 否（仅 MP4） | `brew install ffmpeg` | 视频编码 |
 
 ## 使用的原子操作
@@ -50,10 +50,10 @@
 |------|-----------|-----------------|
 | `group +list` | [../group-list.md](../group-list.md) | 过渡步骤：按星球名定位 group_id |
 | `group +topics --json` | [../group-topics.md](../group-topics.md) | 拉取候选帖子列表，通过 `counts`（likes/comments）辅助评分选帖 |
-| `topic +detail` | [../topic-detail.md](../topic-detail.md) | 取选定帖子的完整正文（`article.text` / `talk.text`）、作者、标题 |
+| `topic +detail` | [../topic-detail.md](../topic-detail.md) | 取选定帖子的完整正文（`content` 字段）、作者（`owner.name`/`owner.alias`）、标题（`title`） |
 | `topic +search` | [../topic-search.md](../topic-search.md) | 按关键词搜索特定内容 |
 
-场景专属处理（非 CLI 操作）：AI 内容提炼与 JSON 结构化（规则见下文「提炼铁律」）；渲染动画 HTML 与录制 MP4 由 `scripts/scenarios/generate-video/` 下内置脚本完成。
+场景专属处理（非 CLI 操作）：AI 内容提炼与 JSON 结构化（规则见 [refinement-rules](generate-video/refinement-rules.md)）；渲染动画 HTML 与录制 MP4 由本场景内置脚本完成。
 
 ## 执行流程
 
@@ -110,90 +110,10 @@ zsxq-cli topic +detail --topic-id <TOPIC_ID> --json
 
 **AI 独立完成提炼，不调外部 API。**
 
-按以下流程执行：
-
-1. **确定模板**：根据内容特点自动选择
-   - 长文（> 400 字）、多要点、有论证过程 → **结构化模板**（4 页 × 封面 2s + 内容 5s = 17s）
-   - 金句、短观点（≤ 400 字）、情绪共鸣 → **金句模板**（6 页 × 3.5s = 21s）
-
-2. **提炼为结构化 JSON**，schema 如下：
-
-```json
-{
-  "planet": "星球名称",
-  "author": "作者名（留空则不显示分隔符）",
-  "brand_color": "#品牌色十六进制",
-  "topic": "视频主题（≤8字）",
-  "topic_highlight": "topic中需高亮的关键词（1-3字）",
-
-  "cover": {
-    "chip": "星球名 · 第X期",
-    "h1": ["封面标题第1行（≤8字）", "封面标题第2行（≤8字）"],
-    "h1_accent": 1,
-    "sub": "封面副标题（≤20字）",
-    "trio": [
-      { "label": "关键词（2字）", "desc": "解释（≤5字）", "color": "orange" },
-      { "label": "关键词（2字）", "desc": "解释（≤5字）", "color": "orange" },
-      { "label": "关键词（2字）", "desc": "解释（≤5字）", "color": "cream" }
-    ]
-  },
-
-  "scenes": [
-    {
-      "chip": "场景标签（2-6字）",
-      "h1": ["标题第1行（≤8字）", "标题第2行（≤8字）"],
-      "h1_accent": 1,
-      "sub": "补充说明（≤25字）",
-      "items": ["要点1（≤18字）", "要点2（≤18字）", "要点3（≤18字）"]
-    }
-  ],
-
-  "finale": {
-    "chip": "结语标签",
-    "h1": ["结论第1行（≤8字）", "结论第2行（≤8字）"],
-    "sub": "结论展开（≤30字）",
-    "items": [],
-    "finale_text": "金句（≤15字×2行，用\\n换行）"
-  },
-
-  "cta": null
-}
-```
-
-3. **遵守提炼铁律**（违反任何一条 → 重写）：
-
-   - 结论先行 — 封面第一页就说核心观点，不要先铺垫再总结
-   - 主谓宾完整 — 每行标题必须独立成句，不省略主语（"我选择放弃"而非"选择放弃"）
-   - 不用符号代替语义 — 禁止 ≠、→、& 等符号，用文字表达
-   - 金句两行对仗或递进 — "做完不算 / 做通才算"、"五百万很多 / 一个事故更贵"
-   - trio 描述 ≤ 5 字 — 绝对不允许换行
-   - topic ≤ 8 字 — 超过必缩短
-   - items 单条 ≤ 18 字 — 超过必拆分或缩短
-   - 结语页不要 items — 只用大字金句（finale_text），清晰有力
-   - 数字具体 — "500 万"比"很多钱"好，"3 年"比"很久"好
-   - 系列编号 — chip 里带"第 X 期"，建立连续性
-
-4. **黑名单**（绝对不能出现）：
-
-   - ❌ 一个字单独掉到下一行
-   - ❌ "≠"、"→"、"&" 等符号做标题
-   - ❌ 没有主语的句子做标题
-   - ❌ 结语页带边框的居中文字
-   - ❌ "扫码加入"（视频里放不了码）
-   - ❌ trio 描述超过 5 个字
-   - ❌ 两行标题必须连起来才能理解的写法
-
-5. **质量自查**：生成 JSON 后逐项检查以下 7 项，任何一项不通过则修改后再输出：
-
-   | # | 检查项 | 标准 |
-   |---|--------|------|
-   | 1 | 每行主谓宾完整 | 遮住其他行，这一行单独能看懂 |
-   | 2 | trio 描述 ≤ 5 字 | 数字数 |
-   | 3 | topic ≤ 8 字 | 数字数 |
-   | 4 | 无禁用符号 | 无 ≠ → & |
-   | 5 | items 单条 ≤ 18 字 | 数字数 |
-   | 6 | 金句两行对仗 | 读出来有节奏感 |
-   | 7 | 封面结论先行 | 第一页就能抓住人 |
+1. 读取提炼规则：[`generate-video/refinement-rules.md`](generate-video/refinement-rules.md)（含模板选择、JSON schema、10 条铁律、7 项黑名单、7 项质量自查）
+2. 根据内容自动选择模板（结构化 vs 金句型），按对应 schema 提炼为 JSON
+3. 遵守全部铁律（违反任何一条 → 重写）
+4. 通过 7 项质量自查后才输出
 
 ### 第 4 步：展示脚本预览，等待用户确认
 
@@ -241,12 +161,7 @@ open ~/Desktop/内容雷达/<slug>.html
 
 用户想要最终视频文件时：
 
-> 需已安装 puppeteer + ffmpeg（见环境依赖）。如果系统已装有 Google Chrome，可跳过 Chromium 下载，用系统 Chrome 录制：
-> ```bash
-> PUPPETEER_SKIP_DOWNLOAD=true npm install  # 首次安装，跳过 Chromium 下载
-> PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
->   node ~/.claude/skills/zsxq/scripts/scenarios/generate-video/record.js ...
-> ```
+> 需已安装 puppeteer + ffmpeg（见环境依赖）。如果系统已装有 Google Chrome，可跳过 Chromium 下载，用系统 Chrome 录制。
 
 ```bash
 # 1. 封面截图
@@ -264,13 +179,6 @@ PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google
 ```
 
 录制使用虚拟时钟（确定性帧同步），约需 1–2 分钟。
-
-**模板与时长对照**：
-
-| 模板 | 脚本 | 适用内容 | 页数 | 总时长 |
-|------|------|----------|------|--------|
-| 结构化 | `render.js` | 长文、多要点、有论证过程 | 4 页 | 封面 2s + 内容 5s/page = 17s |
-| 金句型 | `render-minimal.js` | 金句、短观点、情绪共鸣 | 6 页 | 3.5s/page = 21s |
 
 ## 分支与停止条件
 
@@ -295,7 +203,7 @@ PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google
 
 ## 完成标准
 
-- AI 已按提炼铁律完成内容提炼，输出符合 schema 的结构化 JSON
+- AI 已按 [refinement-rules](generate-video/refinement-rules.md) 完成内容提炼，输出符合 schema 的结构化 JSON
 - 脚本预览已经用户确认（至少一轮确认通过）
 - `render.js` / `render-minimal.js` 成功输出动画 HTML 至用户目录（含 open 预览）
 - （可选）`record.js` 成功录制 4K MP4 至用户目录
@@ -311,7 +219,8 @@ PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google
 
 ## 附加资源
 
-- 渲染脚本路径：`scripts/scenarios/generate-video/render.js`（结构化模板）/ `render-minimal.js`（金句模板）/ `record.js`（录制）
+- 提炼铁律 / 黑名单 / 质量自查清单：[`generate-video/refinement-rules.md`](generate-video/refinement-rules.md)
+- 渲染脚本：`scripts/scenarios/generate-video/render.js`（结构化模板）/ `render-minimal.js`（金句模板）/ `record.js`（录制）
 - 脚本依赖安装：`cd ~/.claude/skills/zsxq/scripts/scenarios/generate-video && npm install`（仅录制 MP4 需要 puppeteer）；跳过 Chromium 下载用 `PUPPETEER_SKIP_DOWNLOAD=true npm install`
 - 拉帖子列表：[group-topics](../group-topics.md)；帖子详情：[topic-detail](../topic-detail.md)
 - 星球列表：[group-list](../group-list.md)；主题搜索：[topic-search](../topic-search.md)
