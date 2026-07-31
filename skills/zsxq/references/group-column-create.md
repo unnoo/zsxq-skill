@@ -18,7 +18,7 @@ zsxq-cli api raw --method POST \
 
 # 示例
 zsxq-cli api raw --method POST \
-  --path /v2/groups/758421284/columns \
+  --path /v2/groups/888888888/columns \
   --body '{"name":"精华归档"}'
 ```
 

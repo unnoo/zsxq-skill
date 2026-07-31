@@ -9,7 +9,7 @@
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns
 
 # 示例
-zsxq-cli api raw --method GET --path /v2/groups/758421284/columns
+zsxq-cli api raw --method GET --path /v2/groups/888888888/columns
 ```
 
 ## 参数
