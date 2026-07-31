@@ -64,7 +64,9 @@ def check_links(path):
 
 def walk_md(root):
     out = []
-    for dp, _, fs in os.walk(root):
+    for dp, ds, fs in os.walk(root):
+        # 跳过 node_modules（验证脚本不需要扫依赖）
+        ds[:] = [d for d in ds if d != "node_modules"]
         for fn in fs:
             if fn.endswith(".md"):
                 out.append(os.path.join(dp, fn))
@@ -127,6 +129,21 @@ for fn in write_refs:
     rid = fn[:-3]
     if not report_exists(rid):
         warns.append(f"写操作 references/{fn} 尚无验证报告 docs/verification/{rid}.md（新增/修改此操作时应补）")
+
+# 6. 目录结构：场景脚本必须放在 skills/zsxq/scripts/scenarios/，不能放项目根 scripts/scenarios/
+root_scenarios = os.path.join(ROOT, "scripts", "scenarios")
+if os.path.isdir(root_scenarios):
+    misplaced = []
+    for fn in os.listdir(root_scenarios):
+        fp = os.path.join(root_scenarios, fn)
+        # node_modules 是 .gitignore 的，不报错
+        if fn == "node_modules":
+            continue
+        misplaced.append(f"scripts/scenarios/{fn}")
+    if misplaced:
+        errors.append(
+            f"[目录层级] 项目根 scripts/scenarios/ 下有 {len(misplaced)} 个文件/目录，"
+            f"场景脚本应放在 skills/zsxq/scripts/scenarios/<id>/：{'、'.join(misplaced)}")
 
 # 汇总
 print(f"扫描 {len(all_md)} 个 md，校验 {checked_links} 条相对链接，"

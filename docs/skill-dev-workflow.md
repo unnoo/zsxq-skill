@@ -36,7 +36,7 @@
 ## ② 设计
 
 - **归类**（用 CLAUDE.md 的判据）：表达业务目标且需组合 ≥ 2 个独立操作 → 场景；否则 → 原子操作。查 ID、确认内容、验证结果是操作的前后置步骤，不单独算场景。
-- **列文件清单**：要新增/改动的 reference、场景入口、SKILL.md 注册点（Shortcuts/API/原始 HTTP 表、快速索引、场景表、frontmatter description）。
+- **列文件清单**：要新增/改动的 reference、场景入口、SKILL.md 注册点（Shortcuts/API/原始 HTTP 表、快速索引、场景表、frontmatter description）。**每条路径对照 CLAUDE.md 的架构图验证目录层级**——场景脚本放 `skills/zsxq/scripts/scenarios/<id>/`，子文档放 `references/scenarios/<id>/`，静态资源放 `assets/scenarios/<id>/`；不要凭感觉把 `scripts/` 放到项目根。
 - **读 vs 写**：判断是只读类还是写入/删除类——决定 reference 用哪种小节模板、是否需要 `> [!CAUTION]`、以及**验证阶段是否要走测试授权门**。
 - **写操作的安全边界**：这一步就想清楚「执行前要向用户确认哪些项」（写进 CAUTION）、以及验证时用哪种安全测试策略（见 ④）。
 - **退出判据**：文件清单 + 操作/场景归类 + 写操作确认项均已确定。复杂改动建议先把清单讲给用户过一遍。
