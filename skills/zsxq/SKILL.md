@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、笔记、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
   version: 2.0.0
   requires:
@@ -47,16 +47,20 @@ metadata:
 | 拼接知识星球分享链接 | → [`references/share-links.md`](references/share-links.md) |
 | 了解安全规则（写入/删除确认） | → [安全规则](#安全规则) |
 | 列出我加入的星球 / 获取 group_id | → [`references/group-list.md`](references/group-list.md) |
+| 修改星球名称 / 简介 / 背景图 / 亮点图 | → [`references/group-settings.md`](references/group-settings.md) |
 | 浏览星球内最新主题 | → [`references/group-topics.md`](references/group-topics.md) |
 | 查看星球标签 | → [`references/group-hashtags.md`](references/group-hashtags.md) |
 | 在星球内搜索内容 | → [`references/topic-search.md`](references/topic-search.md) |
 | 查看帖子详情 | → [`references/topic-detail.md`](references/topic-detail.md) |
-| 发帖 | → [`references/topic-create.md`](references/topic-create.md) |
+| 发帖（普通 / 投票 / 提问 / markdown / AI 声明） | → [`references/topic-create.md`](references/topic-create.md) |
 | 编辑帖子 | → [`references/topic-edit.md`](references/topic-edit.md) |
 | 评论 / 楼中楼回复 | → [`references/topic-reply.md`](references/topic-reply.md) |
-| 回答提问 | → [`references/topic-answer.md`](references/topic-answer.md) |
+| 回答提问（立即 / 定时 / 静默） | → [`references/topic-answer.md`](references/topic-answer.md) |
 | 删除主题 | → [`references/topic-delete.md`](references/topic-delete.md) |
-| 设为精华 / 取消精华（星主） | → [`references/topic-digest.md`](references/topic-digest.md) |
+| 定时发布主题 / 修改或取消定时任务 | → [`references/topic-schedule.md`](references/topic-schedule.md) |
+| 查看待执行的定时任务与配额 | → [`references/topic-scheduled.md`](references/topic-scheduled.md) |
+| 设为精华 / 置顶（星主） | → [`references/topic-set.md`](references/topic-set.md) |
+| 取消精华（底层接口 api call） | → [`references/topic-digest.md`](references/topic-digest.md) |
 | 给主题设置标签 | → [`references/topic-tags.md`](references/topic-tags.md) |
 | 读取 / 设置主题所属专栏（收录到专栏） | → [`references/topic-attached-columns.md`](references/topic-attached-columns.md) |
 | 查看自己的用户信息 | → [`references/user-info.md`](references/user-info.md) |
@@ -76,6 +80,7 @@ User (user_id) — 已登录账户
 │   │   │   └── 楼中楼 Reply (replied_comment_id)
 │   │   ├── Answer — q&a 类型专属
 │   │   └── Hashtag 标签
+│   ├── Scheduled Job (job_id) — 定时发布主题/回答，每星球上限 10
 │   └── Hashtag (hashtag_id)
 │       └── Topic 列表
 │
@@ -88,12 +93,13 @@ User (user_id) — 已登录账户
 - **主题（Topic）**：星球内的内容单元，类型：`talk`（帖子）、`q&a`（提问）、`task`（作业）、`solution`（作业答案）。
 - **笔记（Note）**：独立于星球的内容单元，**公开可见**，任何持有链接的人都能访问 —— 不是私密备忘录。
 - **评论（Comment）**：主题下的回复，支持楼中楼（`replied_comment_id`）。
-- **精华（Digested）**：星主可将优质主题设为精华。
+- **精华（Digested）/ 置顶（Sticky）**：有管理权限（星主 / 管理员 / 合伙人）可将主题设为精华或置顶，改变其在星球内的展示。
+- **定时任务（Scheduled Job）**：主题或回答可以定时在未来某个时间点自动发布（14 天窗口内），每星球上限 10 个。
 
 ## 安全规则
 
 - **禁止输出或传播认证 token** —— token 是登录凭证，不在终端明文输出，不分享给他人
-- **写入/删除操作前必须确认用户意图**（发帖、编辑、评论、回答、创建笔记、删除主题或笔记、提交 NPS 反馈等）
+- **写入/删除操作前必须确认用户意图**（发帖、编辑、评论、回答、定时发布、设置精华/置顶、修改星球资料、创建笔记、删除主题或笔记、取消定时任务、提交 NPS 反馈等）
 - 不确定 `group_id` / `topic_id` / `comment_id` / `note_id` 时，先用查询命令确认，再执行写入或删除
 - **笔记是公开内容**，任何持有链接的人均可访问 —— 涉及隐私或敏感信息不要写进笔记
 - `api raw` 写入不得绕过原子操作的安全约束；探索模式发现的写入接口同样需要用户确认
@@ -125,6 +131,7 @@ User (user_id) — 已登录账户
 | `zsxq-cli group +list` | 列出加入/创建的星球，获取 group_id | [`group-list.md`](references/group-list.md) |
 | `zsxq-cli group +topics` | 浏览星球最新主题（分页） | [`group-topics.md`](references/group-topics.md) |
 | `zsxq-cli group +hashtags` | 列出星球标签及主题数 | [`group-hashtags.md`](references/group-hashtags.md) |
+| `zsxq-cli group +settings` | 修改星球名称 / 简介 / 背景图 / 亮点图 ⚠️ | [`group-settings.md`](references/group-settings.md) |
 
 **API（`zsxq-cli api call`）：**
 
@@ -160,10 +167,14 @@ User (user_id) — 已登录账户
 |----------|------|-----------|
 | `zsxq-cli topic +search` | 在星球内全文搜索主题 | [`topic-search.md`](references/topic-search.md) |
 | `zsxq-cli topic +detail` | 获取主题完整详情 | [`topic-detail.md`](references/topic-detail.md) |
-| `zsxq-cli topic +create` | 发布新帖子（talk）⚠️ | [`topic-create.md`](references/topic-create.md) |
-| `zsxq-cli topic +edit` | 编辑自己的帖子 ⚠️ | [`topic-edit.md`](references/topic-edit.md) |
+| `zsxq-cli topic +create` | 发布新帖子（talk / q&a、投票、AI 声明、markdown）⚠️ | [`topic-create.md`](references/topic-create.md) |
+| `zsxq-cli topic +edit` | 编辑自己的帖子（正文 / 附件 / AI 声明 / 投票）⚠️ | [`topic-edit.md`](references/topic-edit.md) |
 | `zsxq-cli topic +reply` | 评论 / 楼中楼回复 ⚠️ | [`topic-reply.md`](references/topic-reply.md) |
-| `zsxq-cli topic +answer` | 回答提问 ⚠️ | [`topic-answer.md`](references/topic-answer.md) |
+| `zsxq-cli topic +answer` | 回答提问（支持定时 / 静默）⚠️ | [`topic-answer.md`](references/topic-answer.md) |
+| `zsxq-cli topic +set` | 设置精华 / 置顶 ⚠️ | [`topic-set.md`](references/topic-set.md) |
+| `zsxq-cli topic +schedule` | 定时发布主题（创建 / 修改）⚠️ | [`topic-schedule.md`](references/topic-schedule.md) |
+| `zsxq-cli topic +scheduled` | 查看待执行定时任务与配额 | [`topic-scheduled.md`](references/topic-scheduled.md) |
+| `zsxq-cli topic +unschedule` | 取消定时任务 ⚠️ | [`topic-unschedule.md`](references/topic-unschedule.md) |
 
 > ⚠️ = 写入操作，执行前必须向用户确认内容。
 

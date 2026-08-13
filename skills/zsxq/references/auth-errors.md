@@ -34,6 +34,7 @@ zsxq-cli 使用 **OAuth 2.0 设备授权码流程（RFC 8628）** 认证，token
 | `authentication failed (HTTP 401)` / `not logged in` | Token 无效、过期或未登录 | 运行 `zsxq-cli auth login` |
 | 403 / 无权限 / 不可访问 | 当前账户无访问权限 | 切换账户，或加入对应星球 |
 | 404 / 资源不存在 | group_id / topic_id / note_id 无效或已删除 | 用 `group +list`、`topic +search`、`note +list` 等核对 ID |
+| `MCP tool error: {"code":429,...}` / 操作过于频繁 | 短时间内写入/调用过密触发限流 | 等待几秒到几十秒后重试；批量操作时在命令间留间隔 |
 | `--<flag> is required` | 缺少必填参数 | 用对应查询命令获取后再填 |
 | `--end-time` 解析失败 | 分页时间格式错误 | 使用上一页 JSON 中返回的 `next_end_time` / `create_time` 原值 |
 

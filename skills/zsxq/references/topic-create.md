@@ -5,13 +5,17 @@
 在指定星球内发布一条新主题（帖子）。
 
 > [!IMPORTANT]
-> 仅支持发布 `talk`（普通帖子）类型主题。`q&a`、`task`、`solution` 类型暂不支持通过 CLI 创建。
+> - 支持 `talk`（普通帖子，默认）与 `q&a`（提问，需 `--ask`）两种类型；`task`、`solution` 类型暂不支持通过 CLI 创建。
+> - 投票（`--vote-title`）仅支持 `talk` 类型，不能与 `--ask` 提问同用。
+> - 提问（`--ask`）不能问自己；在配置了**提问费用**的星球（星主设置了最低提问金额）会创建失败 —— CLI 无法传提问金额参数，实测返回 `code 80105/80106`。
 
 > [!CAUTION]
 > 这是**公开写入操作** —— 发布后对星球成员可见。执行前必须向用户确认：
 > 1. 目标星球（group_id 和星球名称）
-> 2. 发布的内容
-> 3. 若对草稿做了排版或改写：把**完整确认稿**（标题、正文、标签、附件清单）交用户核对，待其明确表示“确认发布”后再执行
+> 2. 发布的内容与类型（普通帖子 / 投票 / 提问）
+> 3. 投票主题：投票标题与全部选项；提问主题：向谁提问（对方 user_id）、是否匿名
+> 4. 是否声明 AI 生成（`--ai` / `--ai-mode`）
+> 5. 若对草稿做了排版或改写：把**完整确认稿**（标题、正文、标签、附件清单）交用户核对，待其明确表示”确认发布”后再执行
 
 ## 命令
 
@@ -26,6 +30,34 @@ zsxq-cli topic +create \
   --group-id 123456789 \
   --text "示例内容" \
   --files photo.jpg,report.pdf
+
+# 声明内容为 AI 生成（等同 --ai-mode aigc）
+zsxq-cli topic +create --group-id 123456789 --text "AI 生成的内容" --ai
+
+# AI 声明模式：aigc / personal_perspective / none
+zsxq-cli topic +create --group-id 123456789 --text "内容" --ai-mode personal_perspective
+
+# 创建带投票的主题
+zsxq-cli topic +create \
+  --group-id 123456789 \
+  --text "大家来投票" \
+  --vote-title "你支持哪个方案？" \
+  --vote-options "方案A,方案B,方案C"
+
+# 向指定成员提问（q&a 主题）
+zsxq-cli topic +create \
+  --group-id 123456789 \
+  --ask 77777 \
+  --text "请问这个问题怎么解决？"
+
+# 匿名提问
+zsxq-cli topic +create --group-id 123456789 --ask 77777 --text "问题内容" --anonymous
+
+# 正文按 markdown 渲染
+zsxq-cli topic +create --group-id 123456789 --text "# 标题" --markdown
+
+# 读取本地 .md 文件作为正文（按 markdown 发布，非附件上传）
+zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 ```
 
 ## 参数
@@ -33,9 +65,19 @@ zsxq-cli topic +create \
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `--group-id <id>` | **是** | 目标星球 ID（从 `group +list` 获取） |
-| `--text <text>` | **是** | 主题正文内容，支持 `\n` 换行 |
-| `--files <paths>` | 否 | 附件路径，多个用逗号分隔（图片/文件） |
+| `--text <text>` | 否* | 主题正文内容，支持 `\n` 换行（提问时必填；与 `--markdown-file` 互斥） |
+| `--files <paths>` | 否 | 附件路径，多个用逗号分隔（图片/文件）；提问主题不支持 |
+| `--ai` | 否 | 声明内容为 AI 生成（等同 `--ai-mode aigc`），与 `--ai-mode` 互斥 |
+| `--ai-mode <mode>` | 否 | AI 声明模式：`aigc`（AI 生成）/ `personal_perspective`（个人观点）/ `none`（不声明） |
+| `--ask <user_id>` | 否 | 向指定成员提问，创建 `q&a` 主题；值为对方 user_id |
+| `--anonymous` | 否 | 匿名提问（仅与 `--ask` 同用） |
+| `--vote-title <title>` | 否 | 投票标题；提供时内联创建投票并关联主题（仅 talk，与 `--ask` 互斥） |
+| `--vote-options <list>` | 否 | 投票选项，逗号分隔、至少 2 个（选项内不能含逗号）；须与 `--vote-title` 同时提供 |
+| `--markdown` | 否 | 正文按 markdown 渲染 |
+| `--markdown-file <path>` | 否 | 读取本地 .md 文件作为正文发布（按 markdown，非附件上传）；与 `--text` 互斥 |
 | `--json` | 否 | 输出原始 JSON（含新建 topic_id） |
+
+\* `--text`、`--files`、`--vote-title` 至少提供其一。
 
 ## 输出
 
@@ -44,11 +86,17 @@ zsxq-cli topic +create \
 ```
 ✓ Topic created
 {
-  "topic_id": "111222333455",
-  "title": "示例主题标题",
-  "create_time": "2026-04-01T15:44:23.555+0800"
+  "success": true,
+  "topic": {
+    "topic_id": "45544144118151518",
+    "create_time": "2026-08-13T19:20:50.565+0800",
+    "text": "示例主题正文内容",
+    "title": "示例主题标题"
+  }
 }
 ```
+
+主题状态（类型、`creation_statement`、关联投票等）以 `topic +detail` 的返回为准。
 
 ## 推荐工作流
 
@@ -56,7 +104,7 @@ zsxq-cli topic +create \
 
 **① 明确主题类型与目标**
 
-确认要发的是 `talk` 普通帖子（本命令仅支持 talk，见上方 IMPORTANT），并明确本篇目标（分享观点 / 通知 / 引导讨论等）。同时确认目标星球：
+确认主题类型（见上方 IMPORTANT）：`talk` 普通帖子（默认）/ 带投票的帖子（`--vote-title`）/ `q&a` 提问（`--ask`），并明确本篇目标（分享观点 / 通知 / 引导讨论 / 收集意见 / 向成员提问等）。同时确认目标星球：
 
 ```bash
 zsxq-cli group +list
@@ -96,7 +144,24 @@ zsxq-cli topic +detail --topic-id <新建的 topic_id>
 
 ## 错误说明
 
-通用错误（401、`--group-id is required`、星球无权限发帖等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+| 错误 | 原因 |
+|------|------|
+| `--ai 和 --ai-mode 不能同时使用` | 两个 AI 声明参数同传 |
+| `--ai-mode 取值必须是 aigc、personal_perspective 或 none` | `--ai-mode` 值非法 |
+| `投票仅支持普通主题（talk），不能与 --ask 问答主题同时使用` | 投票与提问同用 |
+| `--vote-title 和 --vote-options 必须同时提供` | 投票只给了标题或只给了选项 |
+| `投票至少需要 2 个选项` / `投票选项不能为空` | 选项不足 2 个或含空项 |
+| `--anonymous 仅支持与 --ask 一起使用` | 没指定提问对象却要求匿名 |
+| `问答主题不支持上传附件，请仅提供 --text` | 提问带了 `--files` |
+| `问答主题必须提供 --text` | 提问没写内容 |
+| `问答内容不能超过 1000 字符` | 提问内容超长 |
+| `主题内容不能为空，请提供 --text、--files 或 --vote-title` | 内容、附件、投票全部为空 |
+| `--text 和 --markdown-file 不能同时使用` | 两种正文来源同传 |
+| `读取 markdown 文件失败: ...` | .md 文件读取失败 |
+| `MCP tool error: {"code":80105,...}` | 向自己提问（`--ask` 传了自己的 user_id） |
+| `MCP tool error: {"code":80106,...}` | 服务端拒绝创建提问（实测于配置提问费用的星球；CLI 无法传提问金额） |
+
+通用错误（401、`--group-id is required`、星球无权限发帖等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

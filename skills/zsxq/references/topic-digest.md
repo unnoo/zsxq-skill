@@ -2,6 +2,9 @@
 
 通过 `zsxq-cli api call set_topic_digested` 将某主题设为精华，或取消其精华状态。这是**管理权限（星主/管理员/合伙人）**的操作。
 
+> [!NOTE]
+> 日常加精 / 取消精华优先用封装命令 `topic +set --digested`（见 [topic-set](topic-set.md)），它同时支持置顶（`--sticky`）。本文件记录底层接口工具 `set_topic_digested` 的原始用法。
+
 > [!CAUTION]
 > 这是**写入操作** —— 会改变主题在星球内的展示（精华会进入精华列表）。执行前必须向用户确认：
 > 1. 目标主题（topic_id）及其内容
@@ -55,6 +58,7 @@ zsxq-cli api call set_topic_digested --params '{"topic_id":"123","digested":true
 
 ## 参考
 
+- [topic-set](topic-set.md) — 封装命令 `topic +set`（精华 + 置顶，日常优先用）
 - [topic-detail](topic-detail.md) — 操作前确认主题内容
 - [topic-tags](topic-tags.md) — 为主题设置标签（同为星主/作者写入类 api call）
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

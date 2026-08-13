@@ -129,5 +129,5 @@
 - [`../CLAUDE.md`](../CLAUDE.md) —— 项目结构、reference/场景模板、frontmatter、安全规则、Adding Operation/Scenario 步骤（模板唯一来源）
 - [`verification/_TEMPLATE.md`](verification/_TEMPLATE.md) —— 验证报告模板
 - [`verification/logs/_TEMPLATE.log`](verification/logs/_TEMPLATE.log) —— 原始日志模板
-- [`verification/topic-attached-columns.md`](verification/topic-attached-columns.md) —— 已填好的范例报告
+- [`verification/topic-set.md`](verification/topic-set.md) —— 已填好的范例报告
 - [`../scripts/check-docs.py`](../scripts/check-docs.py) —— 静态校验器

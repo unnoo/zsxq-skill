@@ -43,7 +43,7 @@ zsxq-cli topic +reply \
 | `--topic-id <id>` | **是** | 主题 ID |
 | `--text <text>` | **是** | 评论内容 |
 | `--reply-to <id>` | 否 | 被回复的评论 ID（楼中楼，即对评论的回复而非对主题的评论）；省略则为顶层评论 |
-| `--files <paths>` | 否 | 附件路径，多个用逗号分隔（如 `screenshot.png,log.txt`） |
+| `--files <path>` | 否 | 单个附件路径（仅支持上传 1 个文件：一张图片或一个文件） |
 | `--json` | 否 | 输出原始 JSON（含 comment_id、create_time 等） |
 
 ## 输出
@@ -85,7 +85,12 @@ zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 2
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+| 错误 | 原因 |
+|------|------|
+| `评论内容不能为空，请提供 --text 或 --files` | 内容与附件都为空 |
+| `评论仅支持上传 1 个文件` | `--files` 传了多个路径（逗号分隔） |
+
+通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
