@@ -50,7 +50,7 @@ skills/zsxq/
 name: zsxq
 description: "触发描述（中文，含关键词以便 AI 匹配触发）"
 metadata:
-  version: 2.0.0
+  version: 2.1.0
   requires:
     bins: ["zsxq-cli"]
   cliHelp: "zsxq-cli --help"
