@@ -105,8 +105,8 @@ User (user_id) — 已登录账户
 
 - **禁止输出或传播认证 token** —— token 是登录凭证，不在终端明文输出，不分享给他人
 - **写入/删除操作前必须确认用户意图**（发帖、编辑、评论、回答、定时发布、设置精华/置顶、修改星球资料、创建笔记、删除主题或笔记、取消定时任务、提交 NPS 反馈等）
-- **Skill Pay 仅支持 WorkBuddy 宿主**；在 Claude Code（CC）等非 WorkBuddy 环境中，必须在创建订单前说明不支持并停止，不得调用 `call_zsxq_api` 创建订单
-- **创建订单前必须按订单类型查询或计算价格，并确认类型、对象与实际应付金额；接口金额单位为“分”，向用户统一换算成“元”展示；付费提问和赞赏订单还要确认将传入接口的整数 `amount`，支付必须由用户本人授权**；`PAYMENT_REQUIRED` 仅表示待支付，不代表支付成功，禁止自动重试创建订单
+- **Skill Pay 仅支持 WorkBuddy 且宿主必须提供官方 `weixinpay_pay`**；任一条件不满足时，必须在创建订单前说明不支持并停止，不得调用 `call_zsxq_api` 创建订单
+- **创建订单前必须按原子 reference 查询或计算价格，并确认类型、对象与实际应付金额；固定价格不得由用户改写，支付必须由用户本人授权**；`PAYMENT_REQUIRED` 即使返回 `success: false` 也只表示待支付，不代表失败或支付成功，禁止自动重试创建订单
 - 不确定 `group_id` / `topic_id` / `comment_id` / `note_id` 时，先用查询命令确认，再执行写入或删除
 - **笔记是公开内容**，任何持有链接的人均可访问 —— 涉及隐私或敏感信息不要写进笔记
 - `api raw` 写入不得绕过原子操作的安全约束；探索模式发现的写入接口同样需要用户确认
@@ -134,16 +134,10 @@ User (user_id) — 已登录账户
 
 ## Skill Pay
 
-Skill Pay 仅支持在 WorkBuddy 中使用。处理购买意图时先确认当前宿主：若不是 WorkBuddy（如 Claude Code / CC），告知用户需切换到 WorkBuddy 并停止，不得创建订单；确认是 WorkBuddy 后，再读取对应 reference 并使用底层接口工具 `call_zsxq_api`。
+处理 Skill Pay 购买意图时，读取购买场景进行编排；创建订单、价格、支付授权和安全恢复的参数与错误语义只以原子 reference 为准。
 
-| 操作 | 工具与参数 | Reference |
-|------|------------|-----------|
-| 查询购买价格 | `call_zsxq_api`：按订单类型读取价格或续费折扣 | [`wechat-order-create.md#下单前查询价格`](references/wechat-order-create.md#下单前查询价格) |
-| 创建微信订单 / 触发 Skill Pay | `call_zsxq_api`：创建订单 ⚠️ | [`wechat-order-create.md`](references/wechat-order-create.md) |
-| 请求微信支付授权 | 宿主官方 `weixinpay_pay`：传入 `paymentCode` ⚠️ | [`wechat-order-create.md#宿主微信支付授权`](references/wechat-order-create.md#宿主微信支付授权) |
-| SkillHub 预下单安全恢复 | 使用 `payment_retry_token`，可带匹配的 `out_trade_no`；不重发 `body` ⚠️ | [`wechat-order-create.md`](references/wechat-order-create.md) |
-
-> ⚠️ 创建订单是财务相关写入。首次下单前按订单类型查询或计算价格，再确认类型、对象与实际应付金额；接口金额统一换算成“元”向用户展示，`1 元 = 1 星球币`。付费提问和赞赏订单还要确认将传入接口的整数 `amount`。支付卡片必须由用户本人确认。
+- 购买场景：[`scenarios/purchase-with-skill-pay.md`](references/scenarios/purchase-with-skill-pay.md)
+- 创建订单原子操作：[`wechat-order-create.md`](references/wechat-order-create.md)
 
 ## 星球管理（group）
 
