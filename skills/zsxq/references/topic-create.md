@@ -88,7 +88,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 {
   "success": true,
   "topic": {
-    "topic_id": "45544144118151518",
+    "topic_id": "111222333444",
     "create_time": "2026-08-13T19:20:50.565+0800",
     "text": "示例主题正文内容",
     "title": "示例主题标题"

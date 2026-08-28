@@ -1,8 +1,8 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）完整操作指南，涵盖星球与内容管理的全部场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、group_id、topic_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
-  version: 2.1.0
+  version: 2.2.0
   requires:
     bins: ["zsxq-cli"]
   cliHelp: "zsxq-cli --help"
@@ -10,9 +10,11 @@ metadata:
 
 # zsxq-cli 完整操作指南
 
-本 Skill 覆盖通过 zsxq-cli 操作知识星球的所有场景：认证、星球管理、主题管理、用户信息、笔记管理。
+本 Skill 覆盖通过 zsxq-cli 与底层接口操作知识星球的所有场景：认证、星球管理、主题管理、用户信息、笔记管理，以及 Skill Pay 微信支付。
 
 > **默认假设 zsxq-cli 已安装且已登录**，无需每次主动检查。只在命令执行报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
+
+> 本 Skill 所有示例中的 ID、订单号、支付码等标识均为模拟数据，不对应真实资源。执行操作时必须通过查询结果或用户输入取得并核对真实标识，不得直接复用示例值。
 
 ## 执行模式
 
@@ -43,6 +45,9 @@ metadata:
 | 到期成员续费关怀（识别即将到期成员、分层写话术） | → [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
 | 把最新主题批量收录进专栏 | → [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
 | 检查/迁移/清理旧版 zsxq skill | → [`references/scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
+| 使用 Skill Pay 付费加入 / 续期 / 购买 / 付费提问 / 赞赏 | → [`references/scenarios/purchase-with-skill-pay.md`](references/scenarios/purchase-with-skill-pay.md) |
+| 创建知识星球微信订单 / 处理支付挑战与安全恢复 | → [`references/wechat-order-create.md`](references/wechat-order-create.md) |
+| 查询加入、礼品卡、续费、轻读或星球邀请码价格 | → [`references/wechat-order-create.md#下单前查询价格`](references/wechat-order-create.md#下单前查询价格) |
 | 直接调底层 API / 探索未封装能力 | → [`references/cli-exploration.md`](references/cli-exploration.md) |
 | 拼接知识星球分享链接 | → [`references/share-links.md`](references/share-links.md) |
 | 了解安全规则（写入/删除确认） | → [安全规则](#安全规则) |
@@ -100,6 +105,8 @@ User (user_id) — 已登录账户
 
 - **禁止输出或传播认证 token** —— token 是登录凭证，不在终端明文输出，不分享给他人
 - **写入/删除操作前必须确认用户意图**（发帖、编辑、评论、回答、定时发布、设置精华/置顶、修改星球资料、创建笔记、删除主题或笔记、取消定时任务、提交 NPS 反馈等）
+- **Skill Pay 仅支持 WorkBuddy 宿主**；在 Claude Code（CC）等非 WorkBuddy 环境中，必须在创建订单前说明不支持并停止，不得调用 `call_zsxq_api` 创建订单
+- **创建订单前必须按订单类型查询或计算价格，并确认类型、对象与实际应付金额；接口金额单位为“分”，向用户统一换算成“元”展示；付费提问和赞赏订单还要确认将传入接口的整数 `amount`，支付必须由用户本人授权**；`PAYMENT_REQUIRED` 仅表示待支付，不代表支付成功，禁止自动重试创建订单
 - 不确定 `group_id` / `topic_id` / `comment_id` / `note_id` 时，先用查询命令确认，再执行写入或删除
 - **笔记是公开内容**，任何持有链接的人均可访问 —— 涉及隐私或敏感信息不要写进笔记
 - `api raw` 写入不得绕过原子操作的安全约束；探索模式发现的写入接口同样需要用户确认
@@ -123,6 +130,20 @@ User (user_id) — 已登录账户
 | 到期成员续费关怀 | 「查即将到期的成员」「做续费关怀 / 续费提醒」「按活跃度给到期成员写话术」 | [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
 | 收录主题到专栏 | 「把最新 N 条主题收录进专栏 XX」「批量把主题归档到专栏 / 整理专题合集」 | [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
 | 迁移旧版 skill | 「检查/清理/迁移旧版知识星球 skill」「升级 zsxq skill」 | [`scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
+| Skill Pay 购买 | 「用 Skill Pay / 微信支付加入或续期」「购买礼品卡 / 轻读」「付费提问 / 赞赏」 | [`scenarios/purchase-with-skill-pay.md`](references/scenarios/purchase-with-skill-pay.md) |
+
+## Skill Pay
+
+Skill Pay 仅支持在 WorkBuddy 中使用。处理购买意图时先确认当前宿主：若不是 WorkBuddy（如 Claude Code / CC），告知用户需切换到 WorkBuddy 并停止，不得创建订单；确认是 WorkBuddy 后，再读取对应 reference 并使用底层接口工具 `call_zsxq_api`。
+
+| 操作 | 工具与参数 | Reference |
+|------|------------|-----------|
+| 查询购买价格 | `call_zsxq_api`：按订单类型读取价格或续费折扣 | [`wechat-order-create.md#下单前查询价格`](references/wechat-order-create.md#下单前查询价格) |
+| 创建微信订单 / 触发 Skill Pay | `call_zsxq_api`：创建订单 ⚠️ | [`wechat-order-create.md`](references/wechat-order-create.md) |
+| 请求微信支付授权 | 宿主官方 `weixinpay_pay`：传入 `paymentCode` ⚠️ | [`wechat-order-create.md#宿主微信支付授权`](references/wechat-order-create.md#宿主微信支付授权) |
+| SkillHub 预下单安全恢复 | 使用 `payment_retry_token`，可带匹配的 `out_trade_no`；不重发 `body` ⚠️ | [`wechat-order-create.md`](references/wechat-order-create.md) |
+
+> ⚠️ 创建订单是财务相关写入。首次下单前按订单类型查询或计算价格，再确认类型、对象与实际应付金额；接口金额统一换算成“元”向用户展示，`1 元 = 1 星球币`。付费提问和赞赏订单还要确认将传入接口的整数 `amount`。支付卡片必须由用户本人确认。
 
 ## 星球管理（group）
 
