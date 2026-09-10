@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、查成员列表 / 成员到期时间 / 专栏 column 列表，或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
+description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、查成员列表 / 成员到期时间 / 专栏 column 列表，或询问知识星球产品规则与常见问题（退款条件 / 退款要多久 / 手续费多少 / 费率是多少 / 提现多久到账 / 怎么开发票 / 企业认证要什么材料 / 分享有赏比例 / 为什么审核不通过 / 为什么打不开 / 违规封禁规则 / 用户协议隐私政策等，读官方帮助中心 doc.zsxq.com 后回答），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发。"
 metadata:
   version: 2.2.0
   requires:
@@ -44,6 +44,7 @@ metadata:
 | 按给定标签批量给主题打标 | → [`scenarios/batch-tag-topics.md`](references/scenarios/batch-tag-topics.md) |
 | 到期成员续费关怀（识别即将到期成员、分层写话术） | → [`scenarios/care-expiring-members.md`](references/scenarios/care-expiring-members.md) |
 | 把最新主题批量收录进专栏 | → [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
+| 问产品规则/功能/常见问题（退款、费率、开票、认证、审核、封禁…） | → [`references/scenarios/answer-product-docs.md`](references/scenarios/answer-product-docs.md) |
 | 检查/迁移/清理旧版 zsxq skill | → [`references/scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
 | 使用 Skill Pay 付费加入 / 续期 / 购买 / 付费提问 / 赞赏 | → [`references/scenarios/purchase-with-skill-pay.md`](references/scenarios/purchase-with-skill-pay.md) |
 | 创建知识星球微信订单 / 处理支付挑战与安全恢复 | → [`references/wechat-order-create.md`](references/wechat-order-create.md) |
@@ -131,6 +132,7 @@ User (user_id) — 已登录账户
 | 收录主题到专栏 | 「把最新 N 条主题收录进专栏 XX」「批量把主题归档到专栏 / 整理专题合集」 | [`scenarios/archive-topics-to-column.md`](references/scenarios/archive-topics-to-column.md) |
 | 迁移旧版 skill | 「检查/清理/迁移旧版知识星球 skill」「升级 zsxq skill」 | [`scenarios/migrate-legacy-skills.md`](references/scenarios/migrate-legacy-skills.md) |
 | Skill Pay 购买 | 「用 Skill Pay / 微信支付加入或续期」「购买礼品卡 / 轻读」「付费提问 / 赞赏」 | [`scenarios/purchase-with-skill-pay.md`](references/scenarios/purchase-with-skill-pay.md) |
+| 回答产品文档问题 | 「星球怎么退款 / 退款要多久」「手续费多少 / 费率是多少」「怎么开票 / 企业认证要什么材料」「为什么审核不通过 / 违规封禁规则」 | [`scenarios/answer-product-docs.md`](references/scenarios/answer-product-docs.md) |
 
 ## Skill Pay
 
