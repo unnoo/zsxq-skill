@@ -1,13 +1,25 @@
 # topic +scheduled（查看定时任务）
 
-对应命令：`zsxq-cli topic +scheduled`。
+对应命令：CLI 通道 `zsxq-cli topic +scheduled`；MCP 通道见下方命令块。
 
 列出星球内**待执行的定时任务**（定时发布主题与定时回答），并显示配额统计（每星球上限 10 个）。
 
 ## 命令
 
+**CLI 通道：**
+
 ```bash
 zsxq-cli topic +scheduled --group-id 123456789
+```
+
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/scheduled_jobs"}
+```
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/scheduled_jobs/statistics"}
 ```
 
 ## 参数
@@ -17,7 +29,15 @@ zsxq-cli topic +scheduled --group-id 123456789
 | `--group-id <id>` | **是** | 星球 ID |
 | `--json` | 否 | 输出原始 JSON（不含配额统计） |
 
-## 输出（表格模式）
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/groups/{group_id}/scheduled_jobs`（任务列表）与 `/v2/groups/{group_id}/scheduled_jobs/statistics`（配额） |
+
+## 输出
+
+CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 ```
 JOB ID   SCHEDULED TIME                  TYPE    DIGEST
@@ -26,6 +46,8 @@ JOB ID   SCHEDULED TIME                  TYPE    DIGEST
 
 待执行定时任务：2 个（每星球上限 10）
 ```
+
+CLI 通道在非 `--json` 时自动合并配额行；MCP 通道需**两次调用**（任务列表 + 配额统计）后自行合并，配额数字在 statistics 响应的 `scheduled_jobs_count`。
 
 ## 说明
 
