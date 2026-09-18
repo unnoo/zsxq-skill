@@ -5,8 +5,8 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 通用约定：
 
 - 写接口的 body 必须显式包 `req_data`：`body: {"req_data": {...}}`（工具不会自动包装）。
-- 响应信封：`{success, status_code, body}`；业务数据在 `body.resp_data`，业务失败看 `body.succeeded == false` 与 `body.code` / `body.error`。
-- 分页：列表接口用 `count` 控制条数、`end_time` 翻页；取本页最后一条的 `create_time` 原值作为下一页 `end_time`（评论接口用返回的 `index` 作下一页 `index`）。
+- 响应信封：`{success, status_code, body}`；业务数据在 `body.resp_data`，业务失败看 `body.succeeded == false` 与 `body.code` / `body.error`。权限拒绝（未开通 Skill 权限、查他人足迹等）不走信封，直接返回 `{success: false, error: "…"}`，无 `status_code`/`body`。
+- 分页：列表接口用 `count` 控制条数、`end_time` 翻页；取本页最后一条的 `create_time` 原值作为下一页 `end_time`（评论接口用返回的 `index` 作下一页 `index`）。实测翻页边界会重复本页末条，需按 `topic_id` 去重。
 - 时间格式：`scheduled_time` 等时间为 `2006-01-02T15:04:05.000+0800`（UTC+8，毫秒三位）。
 - 下文 `{base}` 省略不写，path 以 `/v2/` 或 `/v3/` 开头。
 
@@ -28,12 +28,12 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 星球内搜索主题 | GET | `/v2/search/groups/{group_id}/topics` | `keyword`、`count=20`。注意：这是官方搜索，与 CLI `topic +search` 的语义排序不同（CLI 走增强检索编排） |
 | 我发起的提问 | GET | `/v2/users/self/topics/questions` | `filter`（`unanswered`/`answered`）、`count`、`end_time` 可选 |
 | 向我发起的提问 | GET | `/v2/users/self/topics/answers` | 同上 |
-| 定时任务列表 | GET | `/v2/groups/{group_id}/scheduled_jobs` | 无 |
-| 定时任务配额统计 | GET | `/v2/groups/{group_id}/scheduled_jobs/statistics` | 无 |
+| 定时任务列表 | GET | `/v2/groups/{group_id}/scheduled_jobs` | 无；任务数组在 `body.resp_data.jobs[]` |
+| 定时任务配额统计 | GET | `/v2/groups/{group_id}/scheduled_jobs/statistics` | 无；需星主/管理员，否则 `权限不足` |
 | 笔记详情 | GET | `/v2/notes/{note_id}` | 无 |
 | 星球成员列表 | GET | `/v2/groups/{group_id}/members` | query 字段见 [group-members](group-members.md) |
 | 星球专栏列表 | GET | `/v2/groups/{group_id}/columns` | 无 |
-| 主题所属专栏 | GET | `/v2/topics/{topic_id}/attached_columns` | 无 |
+| 主题所属专栏 | GET | `/v2/topics/{topic_id}/attached_columns` | 无；需星主/管理员，否则 `权限不足` |
 | 星球公开信息（查价） | GET | `/v2/groups/{group_id}/public_info` | 见 [wechat-order-create](wechat-order-create.md#下单前查询价格) |
 | 星球详情（续费查价） | GET | `/v2/groups/{group_id}` | 同上 |
 | 轻读详情（查价） | GET | `/v2/groups/{group_id}/back_issues/{back_issue_id}` | 同上 |
@@ -50,9 +50,9 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 回答提问 | POST | `/v2/topics/{topic_id}/answer` | `text`、`image_ids:[]` |
 | 设置精华/置顶 | PUT | `/v2/topics/{topic_id}` | `digested:true/false` 或 `sticky:true/false`（只传要改的字段） |
 | 设置主题标签 | PUT | `/v2/topics/{topic_id}` | `annotation`：把每个标签拼接为 `<e type="hashtag" hid="0" title="%23标签%23" />`（标签去空白、补 `#`、URL 编码后串联）；为完整标签集合，全量替换 |
-| 定时发布主题 | POST | `/v2/groups/{group_id}/scheduled_jobs` | `topic:{text, image_ids?, file_ids?}`、`scheduled_time` |
+| 定时发布主题 | POST | `/v2/groups/{group_id}/scheduled_jobs` | `topic:{text, image_ids?, file_ids?}`、`scheduled_time`。创建成功返回空 `resp_data`，`job_id` 需从列表接口读取 |
 | 修改定时任务 | PUT | `/v2/groups/{group_id}/scheduled_jobs/{job_id}` | 同上；先 GET 列表找到该 job，保留未提供字段 |
-| 定时回答 | POST | `/v2/groups/{group_id}/scheduled_jobs` | `answer:{topic_id, text, image_ids?, silenced?}`、`scheduled_time`；`group_id` 从主题详情读取 |
+| 定时回答 | POST | `/v2/groups/{group_id}/scheduled_jobs` | `answer:{topic_id, text, image_ids?, silenced?}`、`scheduled_time`；`group_id` 从主题详情读取。创建成功返回空 `resp_data`，`job_id` 从列表接口读取 |
 | 取消定时任务 | DELETE | `/v2/groups/{group_id}/scheduled_jobs/{job_id}` | 无 body |
 | 删除主题 | DELETE | `/v2/topics/{topic_id}` | 无 body，不可恢复 |
 | 设置主题所属专栏 | POST | `/v2/topics/{topic_id}/attached_columns` | `column_ids:[...]`，全量替换 |
