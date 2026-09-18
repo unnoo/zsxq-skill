@@ -1,5 +1,7 @@
 # 创建微信订单（底层接口工具 `call_zsxq_api`）
 
+> **通道：仅 MCP 通道**。CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
+
 通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。不要用 `zsxq-cli api raw` 代替本操作，CLI 无法保证把支付所需的 `_meta` 交给支付宿主。
 
 > [!CAUTION]
@@ -92,6 +94,8 @@
 - 轻读响应缺少 `body.resp_data.back_issue.amount`（或业务响应体中的 `resp_data.back_issue.amount`），或返回的 `group_id` / `back_issue_id` 与用户选择不一致。
 
 ## 命令
+
+**MCP 通道（`call_zsxq_api`）：**
 
 以下为底层接口工具调用参数，不是 shell 命令。
 

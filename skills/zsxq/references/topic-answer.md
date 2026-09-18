@@ -76,7 +76,7 @@ zsxq-cli topic +answer \
 |------|------|------|
 | `--topic-id <id>` | **是** | 主题 ID（必须是 `q&a` 类型） |
 | `--text <text>` | **是** | 回答正文 |
-| `--files <paths>` | 否 | 附件路径，多个用逗号分隔 |
+| `--files <paths>` | 否 | 附件路径，仅支持 1 张图片 |
 | `--scheduled-time <time>` | 否 | 定时发布时间，如 `"2026-08-14 12:00"`；不传则立即回答 |
 | `--silenced` | 否 | 静默回答：仅提醒提问者（仅与 `--scheduled-time` 同用） |
 | `--json` | 否 | 输出原始 JSON |
@@ -87,7 +87,7 @@ zsxq-cli topic +answer \
 |----------|-----------|
 | `--topic-id` | path `/v2/topics/{topic_id}/answer`（立即回答）；`req_data.answer.topic_id`（定时回答） |
 | `--text` | `req_data.text`（立即）；`req_data.answer.text`（定时） |
-| `--files`（多个逗号分隔） | **仅 CLI 通道**（附件上传缺口，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
+| `--files`（仅 1 张图片） | **仅 CLI 通道**（附件上传缺口，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
 | `--scheduled-time` | `req_data.scheduled_time`（UTC+8 毫秒格式，如 `2026-09-20T10:00:00.000+0800`；14 天窗口限制不变） |
 | `--silenced` | `req_data.answer.silenced` |
 
@@ -138,6 +138,7 @@ MCP 通道对应调用：
 |------|------|
 | `问题已回答` | 该主题已有官方回答，每题只能回答一次 |
 | `topic is not q&a` | 主题类型不是提问，应使用 `+reply` 发评论 |
+| `回答仅支持上传 1 张图片`（仅 CLI 通道的本地校验；MCP 通道由 agent 自行遵守单图限制） | `--files` 传了多张图片（逗号分隔） |
 | `--silenced 仅支持与 --scheduled-time 一起使用` | 立即回答却要求静默 |
 | `定时回答仅支持问答主题（当前: <type>），普通主题请使用 topic +reply 或 topic +schedule` | 定时回答只用于 `q&a` |
 | `无法解析时间 "..."，请使用 "2026-08-14 10:00" 或 "2026-08-14T10:00:00" 格式` | 时间格式不对 |
