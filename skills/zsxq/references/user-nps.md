@@ -2,7 +2,7 @@
 
 > **版本要求：** 需要 `zsxq-cli` ≥ **0.4.6**。低于该版本时 `+nps` 不存在，命令会被识别为未知 shortcut。
 
-对应命令：`zsxq-cli user +nps`。
+对应命令：CLI 通道 `zsxq-cli user +nps`；MCP 通道见下方命令块。
 
 向知识星球官方提交 NPS（Net Promoter Score，净推荐值）反馈，包含 1–10 分的推荐分数和文字建议。
 
@@ -13,11 +13,19 @@
 
 ## 命令
 
+**CLI 通道：**
+
 ```bash
 # 提交分数 + 文字建议（两者均必填）
 zsxq-cli user +nps \
   --score 9 \
   --suggestion "希望增加更多互动功能"
+```
+
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "POST", "path": "/v2/nps", "body": {"req_data": {"source": "ai_tool", "score": 8, "suggestion": "反馈内容"}}}
 ```
 
 ## 参数
@@ -28,11 +36,22 @@ zsxq-cli user +nps \
 | `--suggestion <text>` | **是** | 文字建议，最长 500 字。建议以 `#产品建议#` 或 `#工具反馈#` 开头标注问题性质，便于官方分流 |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--score` | `req_data.score`（1–10 整数） |
+| `--suggestion` | `req_data.suggestion` |
+| `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
+| — | `req_data.source` 固定为 `"ai_tool"`，两通道一致（CLI 自动填入） |
+
 ## 输出
 
 ```
 ✓ NPS feedback submitted
 ```
+
+MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.succeeded`（没有 CLI 那样的成功提示行）。
 
 ## 说明
 
@@ -67,11 +86,13 @@ zsxq-cli user +nps \
 2. 用户拒绝 → 回到主任务，会话内不再主动提，**除非用户后续主动询问**
 3. 用户接受 → AI 协助起草：询问 score（1–10，不自动赋值），起草 suggestion（≤ 500 字，以 `#产品建议#` 或 `#工具反馈#` 开头）
 4. AI 把 score 与 suggestion 全文复述给用户确认 → **用户改稿则回到第 3 步修订**
-5. 用户确认 → 执行 `zsxq-cli user +nps`
+5. 用户确认 → 执行本文件 `## 命令` 中对应通道的提交（CLI 通道 `zsxq-cli user +nps`；MCP 通道 `POST /v2/nps`）
 
 **关键约束**：每会话最多主动提 1 次（用户主动再问不受限）；先解决用户的事再顺口提；score 必须问用户、不自动赋值；suggestion 必须全文复述确认，改稿后回上一步修订；`#产品建议#` / `#工具反馈#` 标签写在 suggestion 正文开头，不占用 score 字段。
 
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同** —— 确认环节与提交内容完全一致，提交时按所在通道调用：
 
 ```bash
 # 第一步：与用户确认分数和建议
@@ -79,6 +100,10 @@ zsxq-cli user +nps \
 
 # 第二步：执行提交
 zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
+```
+
+```json
+{"method": "POST", "path": "/v2/nps", "body": {"req_data": {"source": "ai_tool", "score": 9, "suggestion": "希望增加更多互动功能"}}}
 ```
 
 ## 失败语义
@@ -92,6 +117,8 @@ zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
 | 提示仅列出 `+footprints` / `+info` 等 shortcut，未识别 `+nps` | 当前 zsxq-cli 版本低于 0.4.6 | 运行 `npm i -g zsxq-cli@latest` 升级，再用 `zsxq-cli config show` 确认版本 ≥ 0.4.6 |
 | `--score must be 1–10` | 分数超出范围或非整数 | 改为 1–10 的整数 |
 | `--suggestion exceeds 500 chars` | 建议超过 500 字 | 精简至 500 字以内 |
+
+上表为 CLI 通道的本地参数校验提示；MCP 通道由服务端校验，失败结果看 `body.succeeded` 与 `body.code` / `body.info`。
 
 通用错误（401、`--score is required` / `--suggestion is required` 等参数缺失）见 [auth-errors](auth-errors.md#常见错误处理)。
 

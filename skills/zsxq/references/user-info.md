@@ -1,10 +1,12 @@
 # user +info（查看个人资料）
 
-对应命令：`zsxq-cli user +info`。
+对应命令：CLI 通道 `zsxq-cli user +info`；MCP 通道见下方命令块。
 
 获取当前登录账户的完整个人资料，包括 user_id、昵称、地区、认证状态、订阅信息等。
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 查看个人资料（JSON 输出）
@@ -14,13 +16,27 @@ zsxq-cli user +info
 zsxq-cli user +info --json
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "GET", "path": "/v2/users/self"}
+```
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `--json` | 否 | 输出原始 JSON（+info 默认即 JSON 输出） |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
+
 ## 输出字段说明
+
+CLI 通道直接输出业务数据（`+info` 始终为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`，`user_id` 位于 `body.resp_data.user.user_id`。
 
 ```json
 {
@@ -52,6 +68,7 @@ zsxq-cli user +info --json
 ## 说明
 
 - 常用于获取 `user_id` 给其他命令使用，或在切换账户后核对当前登录身份
+- MCP 通道下凡是需要 `user_id` 的操作（`user +footprints`、`note +list` 等）先调本接口（`GET /v2/users/self`）取得，CLI 通道则由工具自己读本地 config，无需显式传
 
 ## 错误说明
 
