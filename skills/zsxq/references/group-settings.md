@@ -1,6 +1,6 @@
 # group +settings（修改星球资料）
 
-对应命令：`zsxq-cli group +settings`。
+对应命令：CLI 通道 `zsxq-cli group +settings`；MCP 通道见下方命令块。
 
 修改星球的公开资料：名称、简介、背景图、亮点图（最多 3 张）。未提供的字段保持不变。
 
@@ -15,6 +15,8 @@
 > - 背景图与亮点图均为**替换**语义：新图覆盖旧图；亮点图用 `--clear-promo-images` 清空
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 修改名称与简介
@@ -33,6 +35,14 @@ zsxq-cli group +settings --group-id 123456789 --promo-images a.png,b.png,c.png
 zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "PUT", "path": "/v2/groups/123456789", "body": {"req_data": {"name": "新名称", "description": "新简介"}}}
+```
+
+> 背景图 / 亮点图涉及本地上传，仅 CLI 通道支持；MCP 通道只能修改名称与简介。
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -45,11 +55,24 @@ zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 | `--clear-promo-images` | 否 | 清空全部亮点图（不能与 `--promo-images` 同用） |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/groups/{group_id}` |
+| `--name` | `req_data.name` |
+| `--description` | `req_data.description` |
+| `--background` | `req_data.background_url`（图片需先上传，仅 CLI 通道） |
+| `--promo-images` | `req_data.promo_image_ids`（图片需先上传，仅 CLI 通道） |
+| `--clear-promo-images` | `req_data.promo_image_ids: []` 清空（仅 CLI 通道） |
+
 ## 输出
 
-成功后输出 `✓ Group settings updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。
+成功后输出 `✓ Group settings updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`；MCP 通道只能修改名称与简介（背景图 / 亮点图涉及本地上传，仅 CLI 通道支持）。
 
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：查星球用 `group +list` / `GET /v2/groups`，写入用上方对应通道的命令。
 
 ```bash
 # 第一步：确认目标星球与当前资料

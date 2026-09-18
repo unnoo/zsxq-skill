@@ -2,7 +2,11 @@
 
 列出指定星球的全部专栏，用于按专栏名称找到 `column_id`（收录主题、浏览专栏主题都要用到）。CLI 未封装该能力，通过 `api raw` 调用原始 HTTP 接口获取。
 
+对应命令：CLI 通道 `zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns`；MCP 通道见下方命令块。
+
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 获取星球的专栏列表
@@ -12,11 +16,23 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns
 zsxq-cli api raw --method GET --path /v2/groups/888888888/columns
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/columns"}
+```
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `<group_id>` | **是** | 星球 ID（拼接到 URL 路径中，从 `group +list` 获取） |
+
+### 通道映射
+
+| CLI 形式 | HTTP 字段 |
+|----------|-----------|
+| `<group_id>`（路径） | path `/v2/groups/{group_id}/columns` |
 
 ## 输出
 
@@ -55,9 +71,11 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/columns
 | `last_topic_attach_time` | 最近一次添加主题到专栏的时间（可选，仅在部署 v2.25.0 后添加过主题时返回） |
 | `cover_url` | 专栏封面图链接 |
 
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`（结构与上方一致）。
+
 ## 说明
 
-- 该接口未封装为 shortcut 或 `api call`，只能用 `api raw --method GET` 调用；成员（含已过期成员）可读。
+- 该接口未封装为 shortcut 或 `api call`：CLI 通道只能用 `api raw --method GET` 调用，MCP 通道用 `call_zsxq_api` 以同一 path 调用；成员（含已过期成员）可读。
 - **按专栏名找 `column_id`**：遍历 `columns[]`，把 `name` 与用户给出的专栏名称比对，取匹配项的 `column_id`。命中**多个同名**或**一个都没匹配到**时，列出候选（`column_id` + `name`）让用户确认，不要默认取第一个。
 - `columns[]` 为空数组表示该星球未开通专栏或暂无专栏，属正常返回、不是错误。需要创建专栏时见 [group-column-create](group-column-create.md)。
 - `columns[]` 已按服务端排好的展示顺序返回，无需再排序。
