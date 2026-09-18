@@ -7,7 +7,7 @@
   1. 相对链接可达（skills/ 与 docs/ 下所有 md 的 [..](rel) 链接不死链）
   2. 场景文件含 H1 + CLAUDE.md 规定的 10 个小节
   3. 写入/删除类 reference（含 > [!CAUTION]）结构完整（命令/参数/错误说明/参考）
-  3.5 操作性 reference 双通道块齐全（**CLI 通道/**MCP 通道，或「仅 X 通道」标注）
+  3.5 操作性 reference 双通道块齐全（「## 命令」节内含 **CLI 通道/**MCP 通道块，或有「仅 X 通道」标注）
   4. 验证报告与日志：已存在的 docs/verification/<id>.md 结构完整、其引用的日志文件存在
   5. 提示（warning，不失败）：带 CAUTION 的写操作 reference 尚无验证报告
 
@@ -43,6 +43,16 @@ def read(path):
 
 def rel(path):
     return os.path.relpath(path, ROOT)
+
+
+def command_section(txt):
+    """截取「## 命令」小节正文（该标题到下一个 `## ` 之间）；无此标题则返回空串。"""
+    m = re.search(r"^## 命令[ \t]*$", txt, re.M)
+    if not m:
+        return ""
+    rest = txt[m.end():]
+    nxt = re.search(r"^## ", rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
 
 
 def check_links(path):
@@ -112,15 +122,18 @@ for fn in sorted(os.listdir(REF)):
         if sec not in txt:
             errors.append(f"[缺节] references/{fn} 缺 {sec}")
 
-# 3.5 双通道块：每个操作性 reference 必须同时覆盖 CLI 与 MCP 两个维度
+# 3.5 双通道块：每个操作性 reference 必须同时覆盖 CLI 与 MCP 两个维度。
+#     通道块标记只认「## 命令」节内的，防止别处顺笔一提「仅 CLI 通道」就蒙混过关；
+#     「仅 X 通道」豁免标注则允许出现在全文件任意处。
 CHANNEL_EXEMPT = {"auth-errors.md", "cli-exploration.md", "share-links.md",
                   "endpoint-catalog.md"}
 for fn in sorted(os.listdir(REF)):
     if not fn.endswith(".md") or fn.startswith("_") or fn in CHANNEL_EXEMPT:
         continue
     txt = read(os.path.join(REF, fn))
-    cli_ok = "**CLI 通道" in txt or "仅 MCP 通道" in txt
-    mcp_ok = "**MCP 通道" in txt or "仅 CLI 通道" in txt
+    cmd = command_section(txt)
+    cli_ok = "**CLI 通道" in cmd or "仅 MCP 通道" in txt
+    mcp_ok = "**MCP 通道" in cmd or "仅 CLI 通道" in txt
     if not (cli_ok and mcp_ok):
         errors.append(f"[缺通道块] references/{fn} 需含双通道块（**CLI 通道/**MCP 通道）或「仅 X 通道」标注")
 

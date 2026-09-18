@@ -14,9 +14,13 @@ zsxq-cli topic +scheduled --group-id 123456789
 
 **MCP 通道（`call_zsxq_api`）：**
 
+定时任务列表：
+
 ```json
 {"method": "GET", "path": "/v2/groups/123456789/scheduled_jobs"}
 ```
+
+配额统计：
 
 ```json
 {"method": "GET", "path": "/v2/groups/123456789/scheduled_jobs/statistics"}
