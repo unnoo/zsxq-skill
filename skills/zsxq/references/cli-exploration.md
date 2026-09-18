@@ -1,6 +1,8 @@
-# CLI 探索与直接调用 API
+# 探索模式（CLI 通道）
 
-当用户需求未命中已注册的场景或原子操作时，进入探索模式：通过 CLI 帮助和 API 列表发现能力。CLI 是能力真相源。
+当用户需求未命中已注册的场景或原子操作时，进入探索模式：通过 CLI 帮助和 API 列表发现能力。CLI 通道下 CLI 是能力真相源；MCP 通道下 [endpoint-catalog](endpoint-catalog.md) 是能力真相源。
+
+CLI 通道按下文探索；MCP 通道没有 `api list` / `--help`，能力底表为上文 endpoint-catalog：底表与 [SKILL.md](../SKILL.md) 索引均未覆盖即视为平台暂无此能力，停止并考虑提示 NPS 反馈，不得臆造 path。
 
 ## 探索顺序
 
@@ -39,6 +41,7 @@ zsxq-cli api raw --method PUT --path /v2/topics/123 --body '{"text":"新内容"}
 
 - 探索发现的**写入接口**仍须执行用户确认，`api raw` 写入不得绕过原子操作的安全约束（见 [SKILL.md 安全规则](../SKILL.md#安全规则)）
 - 动态发现的结果不自动视为正式文档 —— 如某个探索出的用法值得沉淀，应新增原子操作 reference
+- MCP 通道探索发现的写法若值得沉淀，应先在 [endpoint-catalog](endpoint-catalog.md) 登记端点，再新增/更新原子 reference
 - 探索多次失败、确认平台没有该能力时，考虑提示用户提交 NPS 反馈（见 [user-nps](user-nps.md)）
 
 ## 参考
