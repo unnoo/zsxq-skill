@@ -1,6 +1,6 @@
 # note +delete（删除笔记）
 
-对应命令：`zsxq-cli note +delete`。
+对应命令：CLI 通道 `zsxq-cli note +delete`；MCP 通道见下方命令块。
 
 删除指定笔记。删除后**不可恢复**。
 
@@ -11,9 +11,17 @@
 
 ## 命令
 
+**CLI 通道：**
+
 ```bash
 # 删除笔记
 zsxq-cli note +delete --note-id 444555666777
+```
+
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "DELETE", "path": "/v2/notes/555666777"}
 ```
 
 ## 参数
@@ -22,7 +30,15 @@ zsxq-cli note +delete --note-id 444555666777
 |------|------|------|
 | `--note-id <id>` | **是** | 笔记 ID（从 `note +list` 获取） |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--note-id` | path `/v2/notes/{note_id}`（DELETE，无 body） |
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：先读内容确认，再向用户确认后删除。
 
 ```bash
 # 第一步：确认笔记内容
@@ -30,6 +46,16 @@ zsxq-cli note +detail --note-id 444555666777
 
 # 第二步：向用户确认后执行删除
 zsxq-cli note +delete --note-id 444555666777
+```
+
+MCP 通道：
+
+```json
+{"method": "GET", "path": "/v2/notes/555666777"}
+```
+
+```json
+{"method": "DELETE", "path": "/v2/notes/555666777"}
 ```
 
 ## 失败语义

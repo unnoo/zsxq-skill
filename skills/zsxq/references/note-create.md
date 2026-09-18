@@ -1,6 +1,6 @@
 # note +create（创建笔记）
 
-对应命令：`zsxq-cli note +create`。
+对应命令：CLI 通道 `zsxq-cli note +create`；MCP 通道见下方命令块。
 
 在知识星球创建一条公开笔记，支持文本和图片附件。任何人通过笔记链接均可访问。
 
@@ -10,6 +10,8 @@
 > 2. 附件列表（如有）
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 创建一条笔记
@@ -25,6 +27,12 @@ zsxq-cli note +create --text "示例笔记内容" --json
 zsxq-cli note +create --text "记录" --files idea.jpg
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "POST", "path": "/v2/notes", "body": {"req_data": {"text": "笔记内容", "image_ids": []}}}
+```
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -32,6 +40,14 @@ zsxq-cli note +create --text "记录" --files idea.jpg
 | `--text <text>` | **是** | 笔记内容 |
 | `--files <paths>` | 否 | 附件路径，多个用逗号分隔（仅图片） |
 | `--json` | 否 | 输出原始 JSON（含 note_id、create_time） |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--text` | `req_data.text` |
+| `--files`（仅图片） | `req_data.image_ids`（**图片上传仅 CLI 通道**，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
+| `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
 
 ## 输出
 
@@ -44,7 +60,11 @@ zsxq-cli note +create --text "记录" --files idea.jpg
 }
 ```
 
+MCP 通道恒为 `{success, status_code, body}` 信封，新建笔记信息（`note_id`、`create_time`）在 `body.resp_data`。
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：确认内容、创建、回读校验三步一致，调用按所在通道进行。
 
 ```bash
 # 第一步：与用户确认笔记内容（公开可访问，避免写入隐私）
@@ -54,6 +74,12 @@ zsxq-cli note +create --text "笔记内容"
 # 第三步：（可选）拿到 note_id 后立即查看，确认内容正确
 zsxq-cli note +detail --note-id <新建的 note_id>
 ```
+
+```json
+{"method": "POST", "path": "/v2/notes", "body": {"req_data": {"text": "笔记内容", "image_ids": []}}}
+```
+
+创建后回读用 `GET /v2/notes/<新建的 note_id>`（见 [note-detail](note-detail.md)）。
 
 ## 失败语义
 
