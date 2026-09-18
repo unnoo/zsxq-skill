@@ -2,12 +2,8 @@
 name: zsxq
 description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、知识星球 MCP 接入 / api-key、查成员列表 / 成员到期时间 / 专栏 column 列表，或询问知识星球产品规则与常见问题（退款条件 / 退款要多久 / 手续费多少 / 费率是多少 / 提现多久到账 / 怎么开发票 / 企业认证要什么材料 / 分享有赏比例 / 为什么审核不通过 / 为什么打不开 / 违规封禁规则 / 用户协议隐私政策等，读官方帮助中心 doc.zsxq.com 后回答），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发"
 metadata:
-  version: 3.0.0
-  channels:
-    cli:
-      bins: ["zsxq-cli"]
-    mcp:
-      tools: ["call_zsxq_api"]
+  version: "3.0.0"
+  channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
 

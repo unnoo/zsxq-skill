@@ -48,17 +48,15 @@ skills/zsxq/
 ```yaml
 ---
 name: zsxq
-description: "触发描述（中文，含关键词以便 AI 匹配触发）"
+description: "触发描述（中文，含关键词以便 AI 匹配触发；上限 1024 字符）"
 metadata:
-  version: 3.0.0
-  channels:
-    cli:
-      bins: ["zsxq-cli"]
-    mcp:
-      tools: ["call_zsxq_api"]
+  version: "3.0.0"
+  channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
 ```
+
+> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
 
 `description` 字段直接决定 AI 何时触发该 skill，修改时确保包含所有相关操作的关键词（含场景触发语）。
 

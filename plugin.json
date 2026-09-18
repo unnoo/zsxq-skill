@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "zsxq",
+  "version": "3.0.0",
+  "description": "知识星球官方插件：通过 CLI 或 MCP 通道管理星球与内容（发帖、评论、精华、标签、专栏、笔记、运营场景编排等）",
+  "author": {
+    "name": "知识星球",
+    "url": "https://zsxq.com"
+  },
+  "homepage": "https://github.com/unnoo/zsxq-skill",
+  "repository": "https://github.com/unnoo/zsxq-skill",
+  "license": "MIT",
+  "keywords": ["zsxq", "知识星球", "cli", "mcp"]
+}
