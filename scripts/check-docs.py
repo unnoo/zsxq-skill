@@ -7,6 +7,7 @@
   1. 相对链接可达（skills/ 与 docs/ 下所有 md 的 [..](rel) 链接不死链）
   2. 场景文件含 H1 + CLAUDE.md 规定的 10 个小节
   3. 写入/删除类 reference（含 > [!CAUTION]）结构完整（命令/参数/错误说明/参考）
+  3.5 操作性 reference 双通道块齐全（**CLI 通道/**MCP 通道，或「仅 X 通道」标注）
   4. 验证报告与日志：已存在的 docs/verification/<id>.md 结构完整、其引用的日志文件存在
   5. 提示（warning，不失败）：带 CAUTION 的写操作 reference 尚无验证报告
 
@@ -78,6 +79,9 @@ all_md = []
 for base in (SKILL, os.path.join(ROOT, "docs")):
     if os.path.isdir(base):
         all_md += walk_md(base)
+# docs/superpowers 是 .gitignore 的本地草稿，历史草稿的死链不应让校验失败
+drafts_dir = os.path.join(ROOT, "docs", "superpowers") + os.sep
+all_md = [p for p in all_md if not p.startswith(drafts_dir)]
 for p in all_md:
     if os.path.basename(p).startswith("_"):
         continue
@@ -107,6 +111,18 @@ for fn in sorted(os.listdir(REF)):
     for sec in WRITE_REF_SECTIONS:
         if sec not in txt:
             errors.append(f"[缺节] references/{fn} 缺 {sec}")
+
+# 3.5 双通道块：每个操作性 reference 必须同时覆盖 CLI 与 MCP 两个维度
+CHANNEL_EXEMPT = {"auth-errors.md", "cli-exploration.md", "share-links.md",
+                  "endpoint-catalog.md"}
+for fn in sorted(os.listdir(REF)):
+    if not fn.endswith(".md") or fn.startswith("_") or fn in CHANNEL_EXEMPT:
+        continue
+    txt = read(os.path.join(REF, fn))
+    cli_ok = "**CLI 通道" in txt or "仅 MCP 通道" in txt
+    mcp_ok = "**MCP 通道" in txt or "仅 CLI 通道" in txt
+    if not (cli_ok and mcp_ok):
+        errors.append(f"[缺通道块] references/{fn} 需含双通道块（**CLI 通道/**MCP 通道）或「仅 X 通道」标注")
 
 # 5. 验证报告：已存在的报告结构完整 + 引用的日志存在；写操作缺报告→warn
 def report_exists(rid):
@@ -153,7 +169,7 @@ if errors:
     for e in errors:
         print("  -", e)
 else:
-    print("✓ 无死链、场景 10 节齐全、写操作 reference 结构完整、验证报告与日志配套。")
+    print("✓ 无死链、场景 10 节齐全、写操作 reference 结构完整、reference 双通道块齐全、验证报告与日志配套。")
 if warns:
     print("\n⚠️ 提示（不影响退出码）：")
     for w in warns:
