@@ -1,6 +1,6 @@
 # note +edit（编辑笔记）
 
-对应命令：`zsxq-cli note +edit`。
+对应命令：CLI 通道 `zsxq-cli note +edit`；MCP 通道见下方命令块。
 
 编辑已有笔记的内容。未修改的字段自动保留。
 
@@ -14,12 +14,28 @@
 
 ## 命令
 
+**CLI 通道：**
+
 ```bash
 # 修改笔记内容
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 
 # JSON 格式输出
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容" --json
+```
+
+**MCP 通道（`call_zsxq_api`）：**
+
+先读当前笔记（`image_ids` 无变动且当前为空时，第二步不发送该字段）：
+
+```json
+{"method": "GET", "path": "/v2/notes/555666777"}
+```
+
+再写入新内容：
+
+```json
+{"method": "PUT", "path": "/v2/notes/555666777", "body": {"req_data": {"text": "新内容"}}}
 ```
 
 ## 参数
@@ -32,7 +48,21 @@ zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容" --json
 | `--clear-files` | 否 | 清除所有附件 |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--note-id` | path `/v2/notes/{note_id}`（GET 读当前值、PUT 写入同一路径） |
+| `--text` | `req_data.text` |
+| `--files` | `req_data.image_ids`（整体替换；**图片上传仅 CLI 通道**） |
+| `--clear-files` | `req_data.image_ids: []`（置空） |
+| `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
+
+MCP 通道的 `image_ids` 须先 `GET /v2/notes/{note_id}` 读出当前值后原样回传（先读后写，避免误清空附件）；当前值为空且本次不改附件时**不要发送** `image_ids`。
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：先读当前内容确认，再写入。
 
 ```bash
 # 第一步：确认当前笔记内容
@@ -40,6 +70,16 @@ zsxq-cli note +detail --note-id 444555666777
 
 # 第二步：确认无误后执行编辑
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
+```
+
+MCP 通道：
+
+```json
+{"method": "GET", "path": "/v2/notes/555666777"}
+```
+
+```json
+{"method": "PUT", "path": "/v2/notes/555666777", "body": {"req_data": {"text": "新的笔记内容"}}}
 ```
 
 ## 失败语义

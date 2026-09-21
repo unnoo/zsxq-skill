@@ -1,6 +1,6 @@
 # topic +edit（编辑主题）
 
-对应命令：`zsxq-cli topic +edit`。
+对应命令：CLI 通道 `zsxq-cli topic +edit`；MCP 通道见下方命令块。
 
 编辑自己发布的主题内容或附件。未修改的字段自动保留。
 
@@ -16,6 +16,8 @@
 > - **AI 声明一经设置不可修改**（实测）：对已有声明（aigc / personal_perspective）的主题，`--ai` / `--ai-mode` 修改会被服务端静默忽略 —— 命令返回成功但声明保持原值。仅在主题**尚无** AI 声明时可首次设置
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 修改正文
@@ -49,6 +51,22 @@ zsxq-cli topic +edit --topic-id 111222333444 --ai-mode none
 zsxq-cli topic +edit --topic-id 111222333444 --vote-id 777888999000
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+MCP 通道是**三步**（读 → 合并 → 写）。第一步读当前值：
+
+```json
+{"method": "GET", "path": "/v2/topics/111222333444/info"}
+```
+
+第二步把要改的字段合并进 `req_data`，第三步写入（`group_id` 取自详情里的 `topic.group.group_id`）：
+
+```json
+{"method": "PUT", "path": "/v2/groups/123456789/topics/111222333444", "body": {"req_data": {"type": "talk", "text": "新内容", "image_ids": [], "file_ids": [], "mentioned_user_ids": [], "creation_statement": "none"}}}
+```
+
+写入是**全量字段合并**：`req_data` 里省略的字段不等于「保持原值」，因此必须先读再合并（CLI 通道由命令内部完成同样的读取与合并，只写一次命令即可）。
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -62,7 +80,22 @@ zsxq-cli topic +edit --topic-id 111222333444 --vote-id 777888999000
 | `--vote-id <id>` | 否 | 更换主题关联的投票（vote uid，仅 talk）；不传则保留原投票 |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--topic-id` | path `/v2/topics/{topic_id}/info`（读）、`/v2/groups/{group_id}/topics/{topic_id}`（写） |
+| （无对应 flag） | `group_id` 从详情 `topic.group.group_id` 读取（写路径需要） |
+| `--text` | `req_data.text` |
+| `--files` / `--clear-files` | `req_data.image_ids` / `req_data.file_ids`（整体替换 / 置空；**附件上传仅 CLI 通道**） |
+| `--ai` / `--ai-mode` | `req_data.creation_statement` |
+| `--vote-id` | `req_data.vote_uid` |
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：读详情用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；写入用上方对应通道的命令（MCP 通道需自行完成「读 → 合并 → 写」三步，CLI 通道内部自动合并）。
+
+**仅 `talk` 主题可编辑**：`q&a` 主题不支持编辑，两个通道一致（见上方 IMPORTANT）。
 
 ```bash
 # 第一步：确认当前主题内容

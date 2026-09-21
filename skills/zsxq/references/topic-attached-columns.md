@@ -2,6 +2,8 @@
 
 读取一条主题当前所属的专栏列表，或覆盖式设置它所属的专栏集合。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口（action `group_topic/attachedcolumns` 读取、`group_topic/attachtopicstocolumn` 设置）。**「把主题加入某专栏」= 先读现有专栏 → 并入目标 → 整表回设**。
 
+对应命令：CLI 通道 `zsxq-cli api raw --method GET|POST --path /v2/topics/<topic_id>/attached_columns`；MCP 通道见下方命令块。
+
 > [!CAUTION]
 > 设置操作是**替换性写入** —— 会改变主题的专栏归属。执行前必须向用户确认：
 > 1. 目标主题（`topic_id`）
@@ -10,10 +12,12 @@
 > 4. 操作身份具备权限（星主、合伙人或管理员）
 
 > [!IMPORTANT]
-> - **替换语义**：`POST` 的 `column_ids` 是**全量替换**，不在列表中的原有专栏会被取消；传空数组 `[]` = 把该主题移出**所有**专栏。要「新增」而非「替换」，必须先 `GET` 读出现有 `column_ids`、并入目标、去重后再整表 `POST`。
+> - **替换语义**：`POST` 的 `column_ids` 是**全量替换**，不在列表中的原有专栏会被取消；传空数组 `[]` = 把该主题移出**所有**专栏。要「新增」而非「替换」，必须先 `GET` 读出现有 `column_ids`、并入目标、去重后再整表 `POST`。**MCP 通道同样先读后并入回设**，替换语义与 CLI 通道完全一致。
 > - **每专栏 100 主题上限**：`column_ids` 中未超限的专栏会设置成功，已超限的专栏设置失败；若结果里存在超限专栏，接口返回错误 code。
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # ① 读取主题当前所属的专栏列表
@@ -30,12 +34,31 @@ zsxq-cli api raw --method POST \
   --body '{"column_ids": []}'
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "GET", "path": "/v2/topics/111222333444/attached_columns"}
+```
+
+```json
+{"method": "POST", "path": "/v2/topics/111222333444/attached_columns", "body": {"req_data": {"column_ids": ["555666777"]}}}
+```
+
+> CLI 通道的 `api raw --body` 会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`（移出所有专栏时 `req_data.column_ids` 传 `[]`）。
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `<topic_id>` | **是** | 主题 ID（路径参数，从 `group +topics` / `topic +search` 获取） |
 | `column_ids` | **是** | 设置后该主题应所属的**完整**专栏 ID 列表（请求体，全量替换）。`column_id` 从 [group-columns](group-columns.md) 获取；空数组表示移出所有专栏 |
+
+### 通道映射
+
+| CLI 形式 | HTTP 字段 |
+|----------|-----------|
+| `<topic_id>`（路径） | path `/v2/topics/{topic_id}/attached_columns` |
+| `--body '{"column_ids":[…]}` | `body.req_data.column_ids`（MCP 通道需显式包 `req_data`） |
 
 ## 输出
 
@@ -71,7 +94,11 @@ zsxq-cli api raw --method POST \
 }
 ```
 
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`（读取在 `body.resp_data.columns[]`，设置成功时 `resp_data` 为空对象，以 `body.succeeded` 判断）。
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：步骤 1 的 `group +list` → `GET /v2/groups`、专栏列表 → `GET /v2/groups/{group_id}/columns`；步骤 2、4 见上方 MCP 块（`GET` 读、`POST` 整表回设）。
 
 把主题加入目标专栏（保留原有归属）：
 

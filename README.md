@@ -82,6 +82,15 @@ zsxq-cli auth login
 
 命令会输出一个链接和验证码，用手机或浏览器打开链接完成授权即可。
 
+### 方式二：接入 MCP（免安装 CLI）
+
+1. 打开知识星球密钥管理页，创建密钥
+2. 复制含 api-key 的 MCP 链接
+3. 用页面提供的「Add to Codex / Claude / Cursor」按钮一键接入，或把链接手动添加到宿主的 MCP 配置
+4. 安装 Skill（同方式一第 2 步）
+
+接入后 AI 会通过 MCP 通道操作知识星球；本机同时装有 zsxq-cli 时优先走 CLI 通道。
+
 ### 快速开始（AI Agent）
 
 > 以下步骤面向 AI Agent，部分步骤需要用户在手机或浏览器中配合完成。
@@ -127,6 +136,8 @@ zsxq-cli auth status
 | 用户信息 | 查看账号信息、查询跨星球足迹、提交 NPS 反馈 |
 | 场景编排 | 12 个多步骤运营场景（巡场、评论运营、日报周报、海报/视频生成、负面监控等） |
 
+所有能力支持 CLI / MCP 双通道，Skill 自动判定：本机有 zsxq-cli 走 CLI，否则走 MCP 的 `call_zsxq_api`。
+
 Skill 内部按三层路由执行：**场景模式**（命中场景 → 按编排执行）→ **原子操作**（命中已知命令 → 直接调用）→ **探索模式**（未命中 → 通过 CLI 发现能力）。所有命令细节和参数均由 28 个 reference 文档独立承载，SKILL.md 只负责路由和索引。
 
 > 从旧版（`zsxq-shared` / `zsxq-group` / `zsxq-topic` / `zsxq-user` / `zsxq-note` 五件套）升级的用户，安装新版后直接对 AI 说「检查并迁移旧版知识星球 skill」，AI 会先扫描报告、经你确认后再清理。
@@ -134,6 +145,8 @@ Skill 内部按三层路由执行：**场景模式**（命中场景 → 按编�
 ---
 
 ## 功能详情
+
+> MCP 通道的等效调用见 Skill 内各 reference。
 
 ### 星球管理（group）
 
@@ -245,6 +258,8 @@ zsxq-cli auth login    # 登录知识星球账号
 zsxq-cli auth status   # 查看当前登录状态
 zsxq-cli doctor        # 诊断配置和认证是否正常
 ```
+
+> MCP 通道用 api-key 鉴权；401 时在知识星球密钥管理页重建密钥并更新宿主配置。
 
 ### 高级：直接调用 API
 

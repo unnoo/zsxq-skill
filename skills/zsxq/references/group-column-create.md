@@ -2,6 +2,8 @@
 
 在指定星球中创建新专栏。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口。
 
+对应命令：CLI 通道 `zsxq-cli api raw --method POST --path /v2/groups/<group_id>/columns`；MCP 通道见下方命令块。
+
 > [!CAUTION]
 > 创建专栏是**写入操作**，执行前必须向用户确认：
 > 1. 目标星球（`group_id` + 名称）
@@ -9,6 +11,8 @@
 > 3. 操作身份具备权限（星主、合伙人或管理员）
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 创建专栏
@@ -22,12 +26,27 @@ zsxq-cli api raw --method POST \
   --body '{"name":"精华归档"}'
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "POST", "path": "/v2/groups/123456789/columns", "body": {"req_data": {"name": "专栏名称"}}}
+```
+
+> CLI 通道的 `api raw --body` 会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`。
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `<group_id>` | **是** | 星球 ID（拼接到 URL 路径中，从 `group +list` 获取） |
 | `name` | **是** | 专栏名称（请求体字段） |
+
+### 通道映射
+
+| CLI 形式 | HTTP 字段 |
+|----------|-----------|
+| `<group_id>`（路径） | path `/v2/groups/{group_id}/columns` |
+| `--body '{"name":…}'` | `body.req_data.name`（MCP 通道需显式包 `req_data`） |
 
 ## 输出
 
@@ -64,7 +83,11 @@ zsxq-cli api raw --method POST \
 | `create_time` | 专栏创建时间 |
 | `cover_url` | 专栏默认封面图链接 |
 
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data.column`。
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：各步骤的两种调用形式见上方「命令」块。
 
 ```bash
 # 1. 确定目标星球

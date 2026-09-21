@@ -1,6 +1,6 @@
 # topic +unschedule（取消定时任务）
 
-对应命令：`zsxq-cli topic +unschedule`。
+对应命令：CLI 通道 `zsxq-cli topic +unschedule`；MCP 通道见下方命令块。
 
 删除一条待执行的定时任务（定时发布主题或定时回答），删除后到点**不会**发布。
 
@@ -14,9 +14,19 @@
 
 ## 命令
 
+**CLI 通道：**
+
 ```bash
 zsxq-cli topic +unschedule --group-id 123456789 --job-id 888
 ```
+
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "DELETE", "path": "/v2/groups/123456789/scheduled_jobs/777888999"}
+```
+
+`--group-id` 与 `--job-id` 都拼进 path；DELETE 请求无 body。
 
 ## 参数
 
@@ -26,11 +36,20 @@ zsxq-cli topic +unschedule --group-id 123456789 --job-id 888
 | `--job-id <id>` | **是** | 要删除的定时任务 ID（从 `topic +scheduled` 获取） |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/groups/{group_id}/scheduled_jobs/{job_id}` |
+| `--job-id` | path `/v2/groups/{group_id}/scheduled_jobs/{job_id}` |
+
 ## 输出
 
-成功后输出 `✓ Scheduled job deleted`；`--json` 模式仅输出服务端返回的 JSON。
+成功后输出 `✓ Scheduled job deleted`；`--json` 模式仅输出服务端返回的 JSON。MCP 通道恒为 `{success, status_code, body}` 信封（DELETE 无业务 body）。
 
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：核对任务用 CLI `topic +scheduled` / MCP `GET /v2/groups/{group_id}/scheduled_jobs`；删除用上方对应通道的命令。
 
 ```bash
 # 第一步：列出待执行任务，核对要删的 job_id 与内容

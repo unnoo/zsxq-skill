@@ -48,14 +48,15 @@ skills/zsxq/
 ```yaml
 ---
 name: zsxq
-description: "触发描述（中文，含关键词以便 AI 匹配触发）"
+description: "触发描述（中文，含关键词以便 AI 匹配触发；上限 1024 字符）"
 metadata:
-  version: 2.1.0
-  requires:
-    bins: ["zsxq-cli"]
+  version: "3.0.0"
+  channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
 ```
+
+> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
 
 `description` 字段直接决定 AI 何时触发该 skill，修改时确保包含所有相关操作的关键词（含场景触发语）。
 
@@ -72,8 +73,8 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 > [!CAUTION]   <-- 写入/删除必须有，列出执行前需向用户确认的项目
 > [!IMPORTANT] <-- 如有特殊约束（如"只能编辑自己的"、"每题只能回答一次"）
 
-## 命令              <-- 至少给一个最小可用示例；多文件、多形式按需补充
-## 参数              <-- 表格：参数 / 必填 / 说明
+## 命令              <-- 双块：**CLI 通道：** 在前（bash 示例），**MCP 通道（call_zsxq_api）：** 在后（JSON 示例）；仅单通道支持时写「仅 X 通道」标注 + 原因
+## 参数              <-- 表格：参数 / 必填 / 说明；其后紧跟「通道映射」小表：CLI flag ↔ HTTP 字段（path/query/req_data.xxx），无对应字段的 flag（如 --markdown-file）注明 MCP 通道替代做法
 ## 输出              <-- 如非纯成功提示则给示例（JSON 示例避免 // 注释）
 ## 推荐工作流        <-- 一个标准流程；过渡步骤（"获取 X"、"查找待 X"）作为这一节的子步骤
 ## 失败语义          <-- 一句话描述失败是否原子回滚
@@ -86,8 +87,8 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 ```
 # 标题
 描述
-## 命令
-## 参数
+## 命令              <-- 双块：**CLI 通道：** 在前（bash 示例），**MCP 通道（call_zsxq_api）：** 在后（JSON 示例）；仅单通道支持时写「仅 X 通道」标注 + 原因
+## 参数              <-- 表格：参数 / 必填 / 说明；其后紧跟「通道映射」小表：CLI flag ↔ HTTP 字段（path/query/req_data.xxx），无对应字段的 flag（如 --markdown-file）注明 MCP 通道替代做法
 ## 输出（表格模式）  <-- 表头与 CLI 实际输出一致
 ## 说明              <-- 命令特性、限制、与近义命令的差异（如 footprints vs group +topics）
 ## 错误说明          <-- 仅列特有错误；末尾 fallback 一行到 auth-errors.md#常见错误处理
@@ -95,6 +96,8 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 ```
 
 > JSON 示例不写 `// 注释`，因为标准 JSON 不支持。需要解释字段时另起一段或用列表说明。
+
+> 仅支持单一通道的操作（如 MCP-only 的 `wechat-order-create`）可省略「通道映射」小表——没有 CLI flag ↔ HTTP 字段的对应关系可列；但「## 命令」节仍须写明「仅 X 通道」及原因。
 
 ### 错误说明信息分层
 
@@ -104,14 +107,18 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 - 表格末尾追加一行 fallback：「通用错误（401、参数缺失等）见 `[auth-errors](auth-errors.md#常见错误处理)`。」
 - 如果该命令没有任何特有错误，错误说明节只写 fallback 一行
 
-### Two types of CLI operations
+### 调用形式与通道
+
+CLI 通道有三类调用形式：
 
 1. **Shortcuts** (`zsxq-cli <domain> +<verb>`) — 高级封装命令，有专属 reference doc，在 SKILL.md 对应 domain 的 Shortcuts 表注册
 2. **API calls** — 分两种：
    - `zsxq-cli api call <tool> --params '<json>'` — 调用底层接口工具，在 SKILL.md 的 API 表注册
    - `zsxq-cli api raw --method <METHOD> --path <path>` — 原始 HTTP 调用（如 DELETE），单列「原始 HTTP 调用」小节并链接 reference doc
 
-> 措辞约定：不使用「MCP 工具」/「MCP 未封装」等内部实现术语，统一用「底层接口工具」/「原始 HTTP 接口」面向用户描述。
+每个原子操作同时文档化 MCP 通道的 `call_zsxq_api` 等效调用；能力底表为 `references/endpoint-catalog.md`。
+
+> 措辞约定：通道命名为「CLI 通道」「MCP 通道」；MCP 侧调用统一称「底层接口工具 `call_zsxq_api`」。
 
 ### Safety rules
 
@@ -123,7 +130,7 @@ reference 顶部不加"前置条件"行；认证/登录相关内容统一在 `au
 
 ## Adding a New Operation
 
-1. 在 `skills/zsxq/references/` 下创建 `<domain>-<verb>.md`，按"Reference doc 统一模板"组织小节顺序
+1. 在 `skills/zsxq/references/` 下创建 `<domain>-<verb>.md`，按"Reference doc 统一模板"组织小节顺序；reference 必须含双通道块（或显式「仅 X 通道」标注），`check-docs.py` 会校验
 2. 在 `skills/zsxq/SKILL.md` 中注册：
    - Shortcut 加到对应 domain 的 Shortcuts 表
    - 通过 `api call` 暴露的高级操作加到 API 表

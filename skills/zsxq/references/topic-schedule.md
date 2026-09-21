@@ -1,6 +1,6 @@
 # topic +schedule（定时发布主题）
 
-对应命令：`zsxq-cli topic +schedule`。
+对应命令：CLI 通道 `zsxq-cli topic +schedule`；MCP 通道见下方命令块。
 
 创建或修改一条**定时发布任务**，让主题在未来指定时间自动发布到星球。带 `--job-id` 时为修改已有任务（未提供的字段保持原值），不带则创建新任务。
 
@@ -16,6 +16,8 @@
 > - 定时发布仅支持 `talk` 普通主题；定时**回答**用 `topic +answer --scheduled-time`（见 [topic-answer](topic-answer.md)）
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 创建定时发布任务
@@ -38,6 +40,20 @@ zsxq-cli topic +schedule \
   --scheduled-time "2026-08-21 09:00"
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+创建定时任务：
+
+```json
+{"method": "POST", "path": "/v2/groups/123456789/scheduled_jobs", "body": {"req_data": {"topic": {"text": "定时发布的主题内容"}, "scheduled_time": "2026-09-20T10:00:00.000+0800"}}}
+```
+
+修改已有任务（先 `GET /v2/groups/{group_id}/scheduled_jobs` 找到该 job，未提供的字段按原值保留）：
+
+```json
+{"method": "PUT", "path": "/v2/groups/123456789/scheduled_jobs/777888999", "body": {"req_data": {"topic": {"text": "更新后的内容"}, "scheduled_time": "2026-09-21T10:00:00.000+0800"}}}
+```
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -49,11 +65,23 @@ zsxq-cli topic +schedule \
 | `--scheduled-time <time>` | 创建时**是** | 发布时间，如 `"2026-08-20 10:00"` 或 `"2026-08-20T10:00:00"` |
 | `--json` | 否 | 输出原始 JSON |
 
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/groups/{group_id}/scheduled_jobs` |
+| `--job-id` | path（修改模式）`/v2/groups/{group_id}/scheduled_jobs/{job_id}` |
+| `--text` | `req_data.topic.text` |
+| `--files` | `req_data.topic.image_ids` / `req_data.topic.file_ids`（**附件上传仅 CLI 通道**，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
+| `--scheduled-time` | `req_data.scheduled_time`（UTC+8 毫秒格式，如 `2026-09-20T10:00:00.000+0800`；14 天窗口不变） |
+
 ## 输出
 
-成功后输出 `✓ Scheduled job saved` 及服务端返回的 JSON（`resp_data` 为空，**不含 job_id** —— 用 `topic +scheduled` 查看新任务的 job_id）；`--json` 模式仅输出 JSON。
+成功后输出 `✓ Scheduled job saved` 及服务端返回的 JSON（`resp_data` 为空，**不含 job_id** —— 用 `topic +scheduled` 查看新任务的 job_id）；`--json` 模式仅输出 JSON。MCP 通道恒为 `{success, status_code, body}` 信封，同样**不返回 job_id**，job_id 需用 `topic +scheduled` / `GET /v2/groups/{group_id}/scheduled_jobs` 查询。
 
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：查看任务用 CLI `topic +scheduled` / MCP `GET /v2/groups/{group_id}/scheduled_jobs`；创建或修改用上方对应通道的命令。
 
 ```bash
 # 第一步：查看现有定时任务与配额

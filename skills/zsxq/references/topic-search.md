@@ -1,10 +1,12 @@
 # topic +search（搜索主题）
 
-对应命令：`zsxq-cli topic +search`。
+对应命令：CLI 通道 `zsxq-cli topic +search`；MCP 通道见下方命令块。
 
 在指定星球内进行全文搜索，返回匹配的主题列表。搜索使用 RAG 服务，结果按相关性排序。
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 在星球内搜索关键词（表格显示）
@@ -17,6 +19,12 @@ zsxq-cli topic +search --group-id 123456789 --query "产品设计"
 zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "GET", "path": "/v2/search/groups/123456789/topics", "query": {"keyword": "关键词", "count": 20}}
+```
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -25,7 +33,16 @@ zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 | `--query <text>` | **是** | 搜索关键词，支持中英文 |
 | `--json` | 否 | 输出原始 JSON |
 
-## 输出（表格模式）
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/search/groups/{group_id}/topics` |
+| `--query` | `query.keyword` |
+
+## 输出
+
+CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 | TOPIC ID | TYPE | TITLE / DIGEST | CREATED AT |
 |----------|------|----------------|------------|
@@ -34,13 +51,16 @@ zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 ## 说明
 
 - 搜索范围限定在单个星球内，不支持跨星球搜索
-- 结果数量由服务端决定，不支持 `--limit` 参数
+- 结果数量由服务端决定，CLI 通道不支持 `--limit` 参数（MCP 通道用 `count` 指定条数，见上方命令块）
 - 若需要按时间浏览（而非搜索），改用 `group +topics`
 - 获得 `topic_id` 后，用 `topic +detail` 查看完整内容
 - 搜索为语义/模糊匹配（RAG 服务），可能漏召（相关内容没被命中）或误召（命中弱相关内容），检索结果需人工复核相关性后再采用
 - 无翻页与游标机制：要扩大召回请用多个近义/相关关键词分别检索再合并，不要指望单次结果覆盖全部
+- MCP 通道走官方搜索端点，排序语义与 CLI 通道的增强检索不同，结果顺序可能不一致；需要 CLI 的排序质量时改用 CLI 通道
 
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：`group +list` 对应 `GET /v2/groups`，本命令对应上方 MCP 块，`topic +detail` 对应 `GET /v2/topics/{topic_id}/info`。
 
 **历史内容检索 / 资料合集**——围绕一个主题（如"如何做用户增长"）把星球里讲过的相关内容捞出来，去重归类后产出一份带分享链接的合集清单或要点摘要，用于避免重复回答、整理专题合集、旧内容二次发布、给新成员补历史资料。
 

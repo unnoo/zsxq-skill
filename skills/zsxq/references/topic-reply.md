@@ -1,6 +1,6 @@
 # topic +reply（发表评论）
 
-对应命令：`zsxq-cli topic +reply`。
+对应命令：CLI 通道 `zsxq-cli topic +reply`；MCP 通道见下方命令块。
 
 对指定主题发表评论，支持楼中楼（回复某条评论）。
 
@@ -10,6 +10,8 @@
 > 2. 评论内容
 
 ## 命令
+
+**CLI 通道：**
 
 ```bash
 # 对主题发表顶层评论
@@ -36,6 +38,14 @@ zsxq-cli topic +reply \
   --files screenshot.png
 ```
 
+**MCP 通道（`call_zsxq_api`）：**
+
+```json
+{"method": "POST", "path": "/v2/topics/111222333444/comments", "body": {"req_data": {"text": "评论内容", "image_ids": [], "mentioned_user_ids": []}}}
+```
+
+楼中楼加 `"replied_comment_id": "888999"`（对应 CLI 通道的 `--reply-to`）。
+
 ## 参数
 
 | 参数 | 必填 | 说明 |
@@ -45,6 +55,15 @@ zsxq-cli topic +reply \
 | `--reply-to <id>` | 否 | 被回复的评论 ID（楼中楼，即对评论的回复而非对主题的评论）；省略则为顶层评论 |
 | `--files <path>` | 否 | 单个附件路径（仅支持上传 1 个文件：一张图片或一个文件） |
 | `--json` | 否 | 输出原始 JSON（含 comment_id、create_time 等） |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--topic-id` | path `/v2/topics/{topic_id}/comments` |
+| `--text` | `req_data.text` |
+| `--reply-to` | `req_data.replied_comment_id` |
+| `--files`（仅 1 个） | **仅 CLI 通道**（附件上传缺口，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
 
 ## 输出
 
@@ -57,7 +76,11 @@ zsxq-cli topic +reply \
 }
 ```
 
+MCP 通道恒为 `{success, status_code, body}` 信封，新评论信息（`comment_id`、`create_time`）在 `body.resp_data`。
+
 ## 推荐工作流
+
+**两通道步骤相同，仅调用形式不同**：读主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；读评论列表用 CLI `api call get_topic_comments` / MCP `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方对应通道的命令（MCP 通道不能带附件）。
 
 顶层评论：
 
