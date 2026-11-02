@@ -6,7 +6,7 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 
 - 写接口的 body 必须显式包 `req_data`：`body: {"req_data": {...}}`（工具不会自动包装）。
 - 响应信封：`{success, status_code, body}`；业务数据在 `body.resp_data`，业务失败看 `body.succeeded == false` 与 `body.code` / `body.error`。权限拒绝（未开通 Skill 权限、查他人足迹等）不走信封，直接返回 `{success: false, error: "…"}`，无 `status_code`/`body`。
-- 响应裁剪（可选，需新版服务端）：`shape` 按命名预设裁剪 `body.resp_data` 的主实体（`topic.brief`、`topic.excerpt`、`comment.brief`、`member.brief`、`hashtag.brief`、`checkin.brief`、`column.brief`、`file.brief`、`image.brief`、`article.brief`、`group.brief`、`note.brief`、`user.brief`；实体不存在时原样返回）；`fields` 为逗号分隔的点路径字段投影（相对于 `body.resp_data`，如 `topics.topic_id,topics.title`，数组自动逐元素投影，未匹配路径进 `_unknown_fields` 而不报错）。两者可叠加（先 shape 后 fields）。**它们是 `call_zsxq_api` 的顶层参数，不是上游 HTTP 参数——不得放进 `query` 或 `body`**（会被透传给上游并静默忽略）；旧版服务端不认识时同样静默忽略、不报错。
+- 响应裁剪（可选）：`shape` 按命名预设裁剪 `body.resp_data` 的主实体（`topic.brief`、`topic.excerpt`、`comment.brief`、`member.brief`、`hashtag.brief`、`checkin.brief`、`column.brief`、`file.brief`、`image.brief`、`article.brief`、`group.brief`、`note.brief`、`user.brief`；实体不存在时原样返回）；`fields` 为逗号分隔的点路径字段投影（相对于 `body.resp_data`，如 `topics.topic_id,topics.title`，数组自动逐元素投影，未匹配路径进 `_unknown_fields` 而不报错）。两者可叠加（先 shape 后 fields）。**它们是 `call_zsxq_api` 的顶层参数，不是上游 HTTP 参数——不得放进 `query` 或 `body`**（会被透传给上游并静默忽略）。
 - 分页：列表接口用 `count` 控制条数、`end_time` 翻页；取本页最后一条的 `create_time` 原值作为下一页 `end_time`（评论接口用返回的 `index` 作下一页 `index`）。实测翻页边界会重复本页末条，需按 `topic_id` 去重。
 - 时间格式：`scheduled_time` 等时间为 `2006-01-02T15:04:05.000+0800`（UTC+8，毫秒三位）。
 - 下文 `{base}` 省略不写，path 以 `/v2/` 或 `/v3/` 开头。

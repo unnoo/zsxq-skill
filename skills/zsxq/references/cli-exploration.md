@@ -28,7 +28,7 @@ zsxq-cli api call get_user_footprints --params '{"user_id":"123456"}'
 
 ### 响应裁剪（shape / fields）
 
-底层接口工具 `call_zsxq_api` 支持两个可选的响应裁剪参数（需新版服务端；旧版会静默忽略、不报错），用于压缩大响应、节省上下文：
+底层接口工具 `call_zsxq_api` 支持两个可选的响应裁剪参数，用于压缩大响应、节省上下文：
 
 ```bash
 # shape：按命名预设裁剪主实体（全部预设：topic.brief、topic.excerpt、
