@@ -401,7 +401,7 @@ def build(config: dict, check_only: bool = False) -> Report:
                 "files": files,
                 "total_bytes": total,
                 "limits": asdict(limits),
-                "dropped_rows": [],
+                "dropped_rows": dropped,
                 "merged_params": merged_params,
             }, ensure_ascii=False, indent=2),
             encoding="utf-8",
