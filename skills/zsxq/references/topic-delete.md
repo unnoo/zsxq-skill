@@ -31,7 +31,7 @@ zsxq-cli api raw --method DELETE --path /v2/topics/88888888888888
 {"method": "DELETE", "path": "/v2/topics/111222333444"}
 ```
 
-MCP 通道就是同一次 `DELETE /v2/topics/{topic_id}` 请求，删除后**不可恢复**。
+MCP 通道发出的也是同一次 `DELETE /v2/topics/{topic_id}` 请求，删除后**不可恢复**。
 
 <!-- cli-only:start -->
 CLI 通道的 `api raw` 与 MCP 通道**仅外壳不同**，请求语义完全相同。
@@ -54,7 +54,7 @@ CLI 通道的 `api raw` 与 MCP 通道**仅外壳不同**，请求语义完全�
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
 <!-- cli-only:end -->
-确认主题用 `GET /v2/topics/{topic_id}/info`；删除用上方 MCP 调用块。
+MCP 通道确认主题用 `GET /v2/topics/{topic_id}/info`；删除用上方「## 命令」的调用块。
 
 <!-- cli-only:start -->
 

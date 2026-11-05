@@ -78,7 +78,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：`group +list` 对应 `GET /v2/groups`，`topic +detail` 对应 `GET /v2/topics/{topic_id}/info`。
 <!-- cli-only:end -->
-找星球用 `GET /v2/groups`；本命令见上方 MCP 调用块；查看主题详情用 `GET /v2/topics/{topic_id}/info`。
+MCP 通道找星球用 `GET /v2/groups`；本命令见上方「## 命令」的调用块；查看主题详情用 `GET /v2/topics/{topic_id}/info`。
 
 **历史内容检索 / 资料合集**——围绕一个主题（如"如何做用户增长"）把星球里讲过的相关内容捞出来，去重归类后产出一份带分享链接的合集清单或要点摘要，用于避免重复回答、整理专题合集、旧内容二次发布、给新成员补历史资料。
 

@@ -87,7 +87,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，新评论信息（`comm
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：读主题用 CLI `topic +detail`；读评论列表用 CLI `api call get_topic_comments`。
 <!-- cli-only:end -->
-读主题用 `GET /v2/topics/{topic_id}/info`；读评论列表用 `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方 MCP 调用块（MCP 通道不能带附件）。
+MCP 通道读主题用 `GET /v2/topics/{topic_id}/info`；读评论列表用 `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方「## 命令」的调用块（不能带附件）。
 
 顶层评论：
 

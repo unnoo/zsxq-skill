@@ -94,7 +94,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，同样**不返回 job_i
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：查看任务用 CLI `topic +scheduled`。
 <!-- cli-only:end -->
-查看任务用 `GET /v2/groups/{group_id}/scheduled_jobs`；创建或修改用上方 MCP 调用块。
+MCP 通道查看任务用 `GET /v2/groups/{group_id}/scheduled_jobs`；创建或修改用上方「## 命令」的调用块。
 
 <!-- cli-only:start -->
 

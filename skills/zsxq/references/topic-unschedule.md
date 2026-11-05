@@ -62,7 +62,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封（DELETE 无业务 body�
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：核对任务用 CLI `topic +scheduled`。
 <!-- cli-only:end -->
-核对任务用 `GET /v2/groups/{group_id}/scheduled_jobs`；删除用上方 MCP 调用块。
+MCP 通道核对任务用 `GET /v2/groups/{group_id}/scheduled_jobs`；删除用上方「## 命令」的调用块。
 
 <!-- cli-only:start -->
 

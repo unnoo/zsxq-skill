@@ -20,10 +20,7 @@ metadata:
 
 ## 执行通道
 
-<!-- cli-only:start -->
-本 Skill 的所有能力有 CLI / MCP 两条执行通道，先判定通道再路由：
-<!-- cli-only:end -->
-本 Skill 通过 MCP 通道执行，先确认宿主已接入再路由：
+本 Skill 的所有能力通过宿主提供的执行通道调用，先判定通道再路由：
 
 <!-- cli-only:start -->
 1. 宿主可执行 `zsxq-cli` → **CLI 通道**（优先；shortcut 有参数校验与本地编排，行为最可控）

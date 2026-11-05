@@ -104,7 +104,7 @@ CLI 通道由命令内部完成同样的读取与合并，只写一次命令即�
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：读详情用 CLI `topic +detail`；写入用上方 CLI 命令块，命令内部自动合并。
 <!-- cli-only:end -->
-读详情用 `GET /v2/topics/{topic_id}/info`；写入用上方 MCP 调用块，需自行完成「读 → 合并 → 写」三步。
+MCP 通道读详情用 `GET /v2/topics/{topic_id}/info`；写入用上方「## 命令」的调用块，需自行完成「读 → 合并 → 写」三步。
 
 **仅 `talk` 主题可编辑**：`q&a` 主题不支持编辑（见上方 IMPORTANT）。
 

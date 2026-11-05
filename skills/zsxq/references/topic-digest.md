@@ -70,7 +70,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
 <!-- cli-only:end -->
-确认主题用 `GET /v2/topics/{topic_id}/info`；设为 / 取消精华用上方 MCP 调用块。
+MCP 通道确认主题用 `GET /v2/topics/{topic_id}/info`；设为 / 取消精华用上方「## 命令」的调用块。
 
 <!-- cli-only:start -->
 

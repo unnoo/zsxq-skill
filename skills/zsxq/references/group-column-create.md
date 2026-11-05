@@ -95,7 +95,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 推荐工作流
 
-各步骤的调用形式见上方「命令」中的 MCP 调用块。
+各步骤的调用形式见上方「## 命令」的调用块。
 
 <!-- cli-only:start -->
 

@@ -102,7 +102,7 @@ zsxq-cli topic +answer \
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：查主题类型用 CLI 通道的 `topic +detail`。
 <!-- cli-only:end -->
-查主题类型用 `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方 MCP 调用块（MCP 通道不能带附件）。
+MCP 通道查主题类型用 `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方「## 命令」的调用块（不能带附件）。
 
 <!-- cli-only:start -->
 

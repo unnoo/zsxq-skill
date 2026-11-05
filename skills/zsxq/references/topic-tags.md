@@ -64,7 +64,7 @@ MCP 通道没有 `titles` 数组，需自行把标签构造为 `annotation`：
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：查看现有标签用 CLI `topic +detail`。
 <!-- cli-only:end -->
-查看现有标签用 `GET /v2/topics/{topic_id}/info`；设置标签用上方 MCP 调用块（需先按规则构造 `annotation`）。
+MCP 通道查看现有标签用 `GET /v2/topics/{topic_id}/info`；设置标签用上方「## 命令」的调用块（需先按规则构造 `annotation`）。
 
 <!-- cli-only:start -->
 

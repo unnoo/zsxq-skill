@@ -113,7 +113,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：步骤 1 的 `group +list` → `GET /v2/groups`、专栏列表 → `GET /v2/groups/{group_id}/columns`。
 <!-- cli-only:end -->
-步骤 1 取 `GET /v2/groups`、专栏列表用 `GET /v2/groups/{group_id}/columns`；步骤 2、4 见上方 MCP 块（`GET` 读、`POST` 整表回设）。
+MCP 通道：步骤 1 取 `GET /v2/groups`、专栏列表用 `GET /v2/groups/{group_id}/columns`；步骤 2、4 见上方「## 命令」的调用块（`GET` 读、`POST` 整表回设）。
 
 把主题加入目标专栏（保留原有归属）：
 
