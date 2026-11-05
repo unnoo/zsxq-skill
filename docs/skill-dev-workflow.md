@@ -1,6 +1,6 @@
 # Skill 开发工作流
 
-在 zsxq-skill 里**新增或修改**一个「原子操作」或「场景」时遵循的标准生命周期。模板细节（reference 小节顺序、场景 10 节、frontmatter、安全规则）以 [`../CLAUDE.md`](../CLAUDE.md) 为唯一来源，本文档不重复；它负责把这些散落的约定**串成阶段**、给出每阶段的**退出判据**，并补上 CLAUDE.md 缺失的一环——**验证协议**（测试用例、真实输出、可提交的验证报告与原始日志）。
+在 zsxq-skill 里**新增或修改**一个「原子操作」或「场景」时遵循的标准生命周期。模板细节（reference 小节顺序、场景 10 节、frontmatter、安全规则）以 [`../CLAUDE.md`](../CLAUDE.md) 为唯一来源，本文档不重复；它负责把这些散落的约定**串成阶段**、给出每阶段的**退出判据**，并补上 CLAUDE.md 缺失的一环——**验证协议**（测试用例、真实输出、本地验证报告与原始日志）。
 
 > 面向所有 agent（Claude Code、Codex、Cursor、OpenClaw 等），文中 "Claude Code" 泛指当前所用 agent。
 
@@ -24,7 +24,7 @@
 | ① 理解 | 摸清 CLI 真实能力与现有文档，不基于陈旧假设动手 | 已确认目标命令 / 接口真实存在，且现有文档未覆盖或需修改 |
 | ② 设计 | 确定归为操作还是场景、落到哪些文件、写入类的安全边界 | 文件清单、操作/场景归类、写操作的确认项都已想清 |
 | ③ 实现 | 按 CLAUDE.md 模板写 / 改文档并在 SKILL.md 注册 | 文档结构合规、SKILL.md 四处注册齐全（见下）|
-| ④ 验证 | 用**真实运行**校准文档，产出可提交的报告 + 日志 | 验证报告结论为「通过」或「有条件通过」，日志已留存 |
+| ④ 验证 | 用**真实运行**校准文档，产出本地验证报告与日志 | 验证报告结论为「通过」或「有条件通过」，日志已留存 |
 | ⑤ 验收收尾 | 跑静态校验与官方版构建校验、提交、把验收材料交到用户面前 | `check-docs.py` 与 `build-official-skill.py --check` 通过、已提交、已向用户呈现验收清单 |
 
 ## ① 理解
@@ -119,7 +119,7 @@
 
 1. 跑静态校验：`python3 scripts/check-docs.py`（死链、场景 10 节、写入类 CAUTION、写操作报告缺失提示等），修到通过。
 2. 跑官方版构建校验：`python3 scripts/build-official-skill.py --check`（在内存里构建官方版并校验 Console 预算，不写 `dist/`）。新增/修改参数表时确认 `### 通道映射` 同步更新，否则构建失败；新增 MCP 专用 reference 时在 `## 参数` 前加 `<!-- params:mcp-only -->`。
-3. 提交：文档改动 + 验证报告 + 日志一并提交。**开源仓库：功能确认完成前不开 PR（含 draft），只 commit + push 分支。**
+3. 提交：只提交文档改动；验证报告与日志留在本地 `docs/verification/`（该目录被 `.gitignore` 排除，不入库）。**开源仓库：功能确认完成前不开 PR（含 draft），只 commit + push 分支。**
 4. **向用户呈现验收清单**（见下），把「读什么就能验收」直接递到面前，不让用户翻工具日志。
 
 ### 交给用户的验收清单
@@ -137,10 +137,10 @@
 ## 参考
 
 - [`../CLAUDE.md`](../CLAUDE.md) —— 项目结构、reference/场景模板、frontmatter、安全规则、Adding Operation/Scenario 步骤（模板唯一来源）
-- `docs/verification/_TEMPLATE.md` —— 验证报告模板
-- `docs/verification/logs/_TEMPLATE.log` —— 原始日志模板
-- `docs/verification/topic-set.md` —— 已填好的范例报告
+- `docs/verification/_TEMPLATE.md` —— 验证报告模板（本地约定，首次验证时自建，不入库）
+- `docs/verification/logs/_TEMPLATE.log` —— 原始日志模板（同上的本地约定）
+- `docs/verification/topic-set.md` —— 已填好的范例报告（本地产物）
 - [`../scripts/check-docs.py`](../scripts/check-docs.py) —— 静态校验器
 - [`../scripts/build-official-skill.py`](../scripts/build-official-skill.py) —— 官方版（Console）构建与预算校验
 
-> `docs/verification/` 属于**本地工作区**：验证报告与日志留在本机供用户验收，被 `.gitignore` 排除，仓库里没有这三个文件——所以上面写的是路径而不是链接，clone 后要自己产出。首次写验证材料时从模板复制成 `docs/verification/<id>.md` 与 `docs/verification/logs/<id>.log`。
+> `docs/verification/` 与 `docs/verification/logs/` 是**本地工作区**：按需创建、被 `.gitignore` 排除、从不入库，clone 下来并不存在，所以上面写的是路径而不是链接。里面按被验证的操作 reference 名或场景 id（`<id>`）放两份配套材料——报告 `docs/verification/<id>.md`（测试用例、预期 vs 实际、校准的假设、结论）与原始日志 `docs/verification/logs/<id>.log`（命令原样、完整输出、退出码）；模板只是一次性本地约定，仓库里没有。
