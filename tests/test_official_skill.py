@@ -75,6 +75,30 @@ class ConfigTest(unittest.TestCase):
             og.validate_sizes({"SKILL.md": "x", "a.md": "y", "b.md": "z"}, limits)
 
 
+class NamingTest(unittest.TestCase):
+    def test_load_config_requires_output_basename_equal_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "skill-package.json"
+            path.write_text(json.dumps(config_for(root), ensure_ascii=False),
+                            encoding="utf-8")
+            self.assertEqual(
+                og.load_config(path)["official"]["output"], "dist/official/zsxq")
+            path.write_text(
+                json.dumps(config_for(root, output="dist/official/zsxq-official"),
+                           ensure_ascii=False), encoding="utf-8")
+            with self.assertRaises(og.BuildError):
+                og.load_config(path)
+
+    def test_build_rejects_frontmatter_name_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write(root / "skills/zsxq/SKILL.md",
+                  SKILL.replace("name: zsxq", "name: zsxq-legacy"))
+            with self.assertRaises(og.BuildError):
+                og.build(config_for(root))
+
+
 class BuildTest(unittest.TestCase):
     def test_build_writes_only_markdown_and_skips_excluded(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -161,6 +185,50 @@ RAW_PARAMS = """## 参数
 | `--query` JSON | 同名 query 参数 |
 """
 
+ESCAPED_PIPE_PARAMS = """## 参数
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--topic-id <id>` | **是** | 主题 ID |
+| `--digested true\\|false` | 否 | 是否设为精华（`true` 设置 / `false` 取消）；不传则保持现状 |
+| `--sticky true\\|false` | 否 | 是否置顶（`true` 置顶 / `false` 取消）；不传则保持现状 |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--topic-id` | path `/v2/topics/{topic_id}` |
+| `--digested true\\|false` | `req_data.digested` |
+| `--sticky true\\|false` | `req_data.sticky` |
+"""
+
+NON_FIELD_PARAMS = """## 参数
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--limit <n>` | 否 | 最多返回数量 |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--limit` | 不上送（由工具在本地校验与截断） |
+"""
+
+DUP_FIELD_PARAMS = """## 参数
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--ai` | 否 | 声明 AI 生成 |
+| `--ai-mode <mode>` | 否 | 声明模式：`aigc` / `none` |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--ai` / `--ai-mode` | `req_data.creation_statement` |
+"""
+
 
 class ParamMergeTest(unittest.TestCase):
     def test_cli_flags_merge_to_fields_and_cli_only_rows_drop(self):
@@ -199,6 +267,41 @@ class ParamMergeTest(unittest.TestCase):
         )
         merged = og.merge_official_params(text, "checkins.md")
         self.assertIn("`query.scope`", merged)
+
+    def test_escaped_pipe_keeps_cells_and_fields(self):
+        merged = og.merge_official_params(ESCAPED_PIPE_PARAMS, "topic-set.md")
+        self.assertIn("| `req_data.digested` | 否 | 是否设为精华", merged)
+        self.assertIn("| `req_data.sticky` | 否 | 是否置顶", merged)
+        self.assertNotIn("`false` | false`", merged)
+        rows = [line for line in merged.split("\n")
+                if line.startswith("|") and not line.startswith("|---")
+                and not line.startswith("| 字段 / 位置")]
+        self.assertEqual(len(rows), 3)
+        for row in rows:
+            self.assertEqual(len(og._split_row(row)), 3, row)
+
+    def test_non_field_mapping_drops_row(self):
+        merged = og.merge_official_params(NON_FIELD_PARAMS, "group-list.md")
+        self.assertNotIn("不上送", merged)
+        self.assertIn("该操作无额外 MCP 参数", merged)
+
+    def test_duplicate_field_rows_merge_into_one(self):
+        merged = og.merge_official_params(DUP_FIELD_PARAMS, "topic.md")
+        hits = [line for line in merged.split("\n")
+                if line.startswith("| `req_data.creation_statement`")]
+        self.assertEqual(len(hits), 1)
+        self.assertIn("声明 AI 生成", hits[0])
+        self.assertIn("声明模式：`aigc` / `none`", hits[0])
+
+    def test_merged_table_keeps_blank_line_before_next_heading(self):
+        text = RAW_PARAMS + "\n## 输出\n\n正文\n"
+        merged = og.merge_official_params(text, "checkins.md")
+        self.assertIn("\n\n## 输出", merged)
+
+    def test_shape_check_rejects_wrong_column_count(self):
+        with self.assertRaises(og.BuildError):
+            og._check_shape([["a", "b"]], "x.md")
+        og._check_shape([["a", "b", "c"]], "x.md")
 
 
 class LinkAndResidualTest(unittest.TestCase):

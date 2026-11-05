@@ -76,6 +76,10 @@ def load_config(path: Path) -> dict:
     official["limits"] = Limits(**official["limits"])
     if not re.fullmatch(r"[a-z0-9-]{1,64}", official["name"]):
         raise BuildError("official.name 必须是小写字母、数字、连字符")
+    if posixpath.basename(official["output"].rstrip("/")) != official["name"]:
+        raise BuildError(
+            "official.output 的目录名必须等于 official.name"
+            f"（Console 要求上传目录名与 skill 名一致）: {official['output']}")
     if "\n" in official["description"] or '"' in official["description"]:
         raise BuildError("official.description 必须是单行且不含双引号")
     desc_bytes = len(official["description"].encode("utf-8"))
@@ -166,8 +170,34 @@ def sanitize_frontmatter(text: str, description: str) -> str:
     return "\n".join([lines[0], *out, *lines[end:]])
 
 
+CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
+
+
+def _frontmatter_name(text: str) -> str | None:
+    lines = text.split("\n")
+    if not lines or lines[0] != "---":
+        return None
+    try:
+        end = lines.index("---", 1)
+    except ValueError:
+        return None
+    for line in lines[1:end]:
+        if line.startswith("name:"):
+            return line.split(":", 1)[1].strip().strip('"')
+    return None
+
+
 def _split_row(line: str) -> list[str]:
-    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+    body = line.strip()
+    if body.startswith("|"):
+        body = body[1:]
+    if body.endswith("|") and not body.endswith("\\|"):
+        body = body[:-1]
+    return [cell.strip().replace("\\|", "|") for cell in CELL_SPLIT_RE.split(body)]
+
+
+def _escape_cell(cell: str) -> str:
+    return cell.replace("|", "\\|")
 
 
 def _parse_table(block: str) -> list[list[str]]:
@@ -178,15 +208,51 @@ def _parse_table(block: str) -> list[list[str]]:
     return [_split_row(line) for line in lines[2:]]
 
 
+def _render_cells(cells: list[str]) -> str:
+    return "| " + " | ".join(_escape_cell(cell) for cell in cells) + " |"
+
+
 def _render_table(header: list[str], rows: list[list[str]]) -> str:
-    out = ["| " + " | ".join(header) + " |",
+    out = [_render_cells(header),
            "|" + "|".join("---" for _ in header) + "|"]
-    out.extend("| " + " | ".join(row) + " |" for row in rows)
+    out.extend(_render_cells(row) for row in rows)
     return "\n".join(out)
 
 
 def _flags(cell: str) -> list[str]:
     return re.findall(r"--[a-z][a-z0-9-]*", cell)
+
+
+NON_FIELD_PREFIXES = ("不上送", "无对应字段")
+
+
+def _is_non_field(cell: str) -> bool:
+    return cell.strip().startswith(NON_FIELD_PREFIXES)
+
+
+def _dedupe_rows(rows: list[list[str]]) -> list[list[str]]:
+    out: list[list[str]] = []
+    index: dict[str, int] = {}
+    for row in rows:
+        if row[0] not in index:
+            index[row[0]] = len(out)
+            out.append(list(row))
+            continue
+        head = out[index[row[0]]]
+        if "是" in row[1] and "是" not in head[1]:
+            head[1] = row[1]
+        desc = row[2]
+        if desc in head[2]:
+            continue
+        head[2] = desc if head[2] in desc else f"{head[2]}；{desc}"
+    return out
+
+
+def _check_shape(rows: list[list[str]], rel: str) -> None:
+    for row in rows:
+        if len(row) != 3:
+            raise BuildError(
+                f"{rel}: 合并后的参数行不是 3 列: {' | '.join(row)}")
 
 
 def merge_official_params(text: str, rel: str) -> str:
@@ -232,8 +298,10 @@ def merge_official_params(text: str, rel: str) -> str:
             if "仅 CLI 通道" in field:
                 skip = True
                 break
+            if _is_non_field(field):
+                continue
             fields.append(field)
-        if skip:
+        if skip or not fields:
             continue
         merged.append([" / ".join(dict.fromkeys(fields)), row[1], row[2]])
 
@@ -243,19 +311,22 @@ def merge_official_params(text: str, rel: str) -> str:
             continue
         if all(flag in COMPOSITE_FLAGS for flag in flags):
             continue
-        if "hidden" in row[0] or "不上送" in row[1] or "无对应字段" in row[1]:
+        if "hidden" in row[0] or _is_non_field(row[1]):
             continue
         merged.append([row[1], "—", "通道映射补充字段"])
 
+    merged = _dedupe_rows(merged)
+
     if not merged:
         merged = [["—", "—", "该操作无额外 MCP 参数，字段见调用示例"]]
+    _check_shape(merged, rel)
 
     without_mapping = text[: mapping.start()] + text[mapping.end():]
     without_mapping = re.sub(r"\n{3,}", "\n\n", without_mapping)
     param = re.search(r"(## 参数[ \t]*\n\n)(" + TABLE_RE + ")", without_mapping)
     if not param:
         raise BuildError(f"{rel}: 移除通道映射后找不到参数表")
-    table = _render_table(["字段 / 位置", "必填", "说明"], merged)
+    table = _render_table(["字段 / 位置", "必填", "说明"], merged) + "\n"
     return (without_mapping[: param.start(2)] + table
             + without_mapping[param.end(2):])
 
@@ -375,6 +446,11 @@ def build(config: dict, check_only: bool = False) -> Report:
     texts = {rel: strip_cli_regions(text) for rel, text in texts.items()}
     texts["SKILL.md"] = sanitize_frontmatter(
         texts["SKILL.md"], config["official"]["description"])
+    name = _frontmatter_name(texts["SKILL.md"])
+    if name != official["name"]:
+        raise BuildError(
+            f"SKILL.md frontmatter name={name!r} 与 official.name "
+            f"{official['name']!r} 不一致")
 
     texts, dropped = prune_table_rows(texts, set(excluded))
     texts = {rel: re.sub(r"\n{3,}", "\n\n", text)
@@ -416,7 +492,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(description="构建 Console 官方版 zsxq skill")
     parser.add_argument("--check", action="store_true",
-                        help="在临时目录构建并校验，不写 dist/")
+                        help="在内存中构建并校验，不写 dist/")
     parser.add_argument("--config", default=str(ROOT / "skill-package.json"))
     args = parser.parse_args()
     try:

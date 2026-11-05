@@ -83,8 +83,7 @@ CLI 通道由命令内部完成同样的读取与合并，只写一次命令即�
 | `--text <text>` | 否 | 新正文（不传则保留原内容） |
 | `--files <paths>` | 否 | 新附件，多个用逗号分隔（替换原有附件） |
 | `--clear-files` | 否 | 清除所有附件（与附件替换互斥） |
-| `--ai` | 否 | 将 AI 声明设为 aigc（与声明模式互斥；仅对尚无 AI 声明的主题生效） |
-| `--ai-mode <mode>` | 否 | 将 AI 声明设为 `aigc` / `personal_perspective` / `none`；不传则保留原声明（仅对尚无 AI 声明的主题生效） |
+| `--ai` / `--ai-mode <mode>` | 否 | AI 声明：取值 `aigc` / `personal_perspective` / `none`；简写开关等同 `aigc`；不传则保留原声明（仅对尚无 AI 声明的主题生效） |
 | `--vote-id <id>` | 否 | 更换主题关联的投票（vote uid，仅 talk）；不传则保留原投票 |
 | `--json` | 否 | 输出原始 JSON |
 

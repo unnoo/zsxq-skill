@@ -183,7 +183,7 @@ Skill 内部按三层路由执行：**场景模式**（命中场景 → 按编�
 python3 scripts/build-official-skill.py
 ```
 
-产物在 `dist/official/zsxq/`，用 Console 的目录选择上传（不是 zip）。构建过程同时校验 Console 硬上限：SKILL.md ≤ 32768 字节、单个资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节。GitHub 安装仍使用 `skills/zsxq/`，包含 CLI、MCP 与场景脚本。
+产物在 `dist/official/zsxq/`，用 Console 的目录选择上传（不是 zip；目录名必须等于 skill 的 `name`）。构建过程同时校验 Console 硬上限：SKILL.md ≤ 32768 字节、单个资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节。GitHub 安装仍使用 `skills/zsxq/`，包含 CLI、MCP 与场景脚本。
 
 > 从旧版（`zsxq-shared` / `zsxq-group` / `zsxq-topic` / `zsxq-user` / `zsxq-note` 五件套）升级的用户，安装新版后直接对 AI 说「检查并迁移旧版知识星球 skill」，AI 会先扫描报告、经你确认后再清理。
 

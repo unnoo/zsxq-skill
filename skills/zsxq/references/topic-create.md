@@ -108,8 +108,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 | `--group-id <id>` | **是** | 目标星球 ID（从 `group +list` 获取） |
 | `--text <text>` | 否* | 主题正文内容，支持 `\n` 换行（提问时必填；与本地文件发布互斥） |
 | `--files <paths>` | 否 | 附件路径，多个用逗号分隔（图片/文件）；提问主题不支持 |
-| `--ai` | 否 | 声明内容为 AI 生成，与 AI 声明模式参数互斥 |
-| `--ai-mode <mode>` | 否 | AI 声明模式：`aigc`（AI 生成）/ `personal_perspective`（个人观点）/ `none`（不声明） |
+| `--ai` / `--ai-mode <mode>` | 否 | AI 声明：取值 `aigc`（AI 生成）/ `personal_perspective`（个人观点）/ `none`（不声明）；简写开关等同 `aigc` |
 | `--ask <user_id>` | 否 | 向指定成员提问，创建 `q&a` 主题；值为对方 user_id |
 | `--anonymous` | 否 | 匿名提问（仅提问主题可用） |
 | `--vote-title <title>` | 否 | 投票标题；提供时内联创建投票并关联主题（仅 talk，与提问互斥） |

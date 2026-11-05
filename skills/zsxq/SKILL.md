@@ -12,9 +12,10 @@ metadata:
 本 Skill 覆盖通过知识星球 API 操作星球的全部场景：认证、星球管理、主题管理、用户信息、笔记管理，以及 Skill Pay 微信支付。
 
 <!-- cli-only:start -->
-> **默认假设 zsxq-cli 已安装且已登录**，无需每次主动检查。只在命令执行报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
+> **CLI 通道细节**：默认假设 `zsxq-cli` 已安装且已登录，无需主动检查安装状态或登录状态。
 <!-- cli-only:end -->
-> **默认假设宿主已接入知识星球 MCP（`call_zsxq_api`）**，无需每次主动检查。只在调用报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
+
+> **默认假设执行通道已就绪** —— CLI 已登录，或宿主已接入知识星球 MCP（`call_zsxq_api`）；无需每次主动检查，只在执行报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
 
 > 本 Skill 所有示例中的 ID、订单号、支付码等标识均为模拟数据，不对应真实资源。执行操作时必须通过查询结果或用户输入取得并核对真实标识，不得直接复用示例值。
 
@@ -23,19 +24,19 @@ metadata:
 本 Skill 的所有能力通过宿主提供的执行通道调用，先判定通道再路由：
 
 <!-- cli-only:start -->
-1. 宿主可执行 `zsxq-cli` → **CLI 通道**（优先；shortcut 有参数校验与本地编排，行为最可控）
-2. 否则宿主工具列表中存在 `call_zsxq_api` → **MCP 通道**
-3. 两者都没有 → 停止并提醒用户：安装 CLI（见 [`references/auth-errors.md`](references/auth-errors.md)）或在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入），由用户选择
+- 宿主可执行 `zsxq-cli` → **CLI 通道**（优先；shortcut 有参数校验与本地编排，行为最可控）；未安装时按 [`references/auth-errors.md`](references/auth-errors.md) 安装
 <!-- cli-only:end -->
-1. 宿主工具列表中存在 `call_zsxq_api` → **MCP 通道**
-2. 否则停止并提醒用户：在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入）
+- 宿主工具列表中存在 `call_zsxq_api` → **MCP 通道**
+- 两条路都没有 → 停止并提醒用户：在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入），或安装 CLI，由用户选择
 
-- 通道判定是一次性环境探测；选定后一致使用，不混用。某操作只支持单一通道时，按其 reference 的「仅 X 通道」标注处理。
+- 通道判定是一次性环境探测；选定后一致使用，不混用。
 - MCP 通道下所有调用都通过底层接口工具 `call_zsxq_api`（参数 `{method, path, query?, body?}`）；**不得臆造未文档化的 method/path**——能力底表见 [`references/endpoint-catalog.md`](references/endpoint-catalog.md)，未覆盖即视为不支持。
-- 「执行模式」路由（场景 → 原子 → 探索）不因通道而变；各 reference 的「## 命令」节给出对应调用块。
+- 「执行模式」路由（场景 → 原子 → 探索）不因调用形式而变；各 reference 的「## 命令」节给出对应调用块。
 <!-- cli-only:start -->
-- **CLI 通道的调用形式**：Shortcut 写作 `zsxq-cli <domain> +<verb>`（如 `zsxq-cli group +list`）；API 工具写作 `zsxq-cli api call <tool> --params '<json>'`；原始 HTTP 写作 `zsxq-cli api raw --method <METHOD> --path <PATH> [--query '<json>'] [--body '<json>']`。下文各表只列操作名与方法/路径，命令细节见各 reference 的「## 命令」节。
+- **CLI 通道的调用形式**：Shortcut 写作 `zsxq-cli <domain> +<verb>`（如 `zsxq-cli group +list`）；API 工具写作 `zsxq-cli api call <tool> --params '<json>'`；原始 HTTP 写作 `zsxq-cli api raw --method <METHOD> --path <PATH> [--query '<json>'] [--body '<json>']`。下文各表只列操作名与方法/路径，命令细节见各 reference 的「## 命令」节。个别操作只支持单一通道，按其 reference 的「仅 X 通道」标注处理。
 <!-- cli-only:end -->
+
+> **命名约定**：`group +list`、`topic +detail` 这类 `+verb` 写法只是本索引中的操作名，实际调用见对应 reference 的 MCP 调用块。表中出现的 API 工具名（如 `search_groups`）只用于定位能力，调用形式始终是 `{method, path, query?, body?}`。
 
 ## 执行模式
 
@@ -49,10 +50,11 @@ metadata:
 > CLI 通道的探索方式见 [`references/cli-exploration.md`](references/cli-exploration.md)：通过 CLI 帮助和 API 列表动态发现能力。
 <!-- cli-only:end -->
 
-<!-- cli-only:start -->
-> 原子操作和场景执行时**不得**预先运行无关的 `doctor`、`--help` 或 `api list`。仅在能力不匹配或调用失败时回退到探索模式。
-<!-- cli-only:end -->
 > 原子操作和场景执行时**不得**预先探测无关能力或枚举全部接口。仅在能力不匹配或调用失败时回退到探索模式。
+
+<!-- cli-only:start -->
+> CLI 通道下同样**不得**预先运行无关的 `doctor`、`--help` 或 `api list`。
+<!-- cli-only:end -->
 
 ## 快速索引
 
@@ -235,8 +237,8 @@ User (user_id) — 已登录账户
 | `get_topic_comments` | `topic_id`, `limit`, `index` | 获取主题评论列表（分页） | — |
 | `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ | [`topic-digest.md`](references/topic-digest.md) |
 | `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（titles 为完整标签集合）⚠️ | [`topic-tags.md`](references/topic-tags.md) |
-| `get_self_question_topics` | `topic_filter`, `count`, `end_time` | 查看自己发起的提问 | — |
-| `get_self_answer_topics` | `topic_filter`（`unanswered`/`answered`）, `count`, `end_time` | 查看别人向我发起的提问（账号级，返回项带 `group` 字段，需按星球过滤） | — |
+| `get_self_question_topics` | `filter`, `count`, `end_time` | 查看自己发起的提问 | — |
+| `get_self_answer_topics` | `filter`（`unanswered`/`answered`）, `count`, `end_time` | 查看别人向我发起的提问（账号级，返回项带 `group` 字段，需按星球过滤） | — |
 
 > ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容），执行前必须向用户确认，并遵守[安全规则](#安全规则)与对应 reference 的 `> [!CAUTION]` 块。
 
