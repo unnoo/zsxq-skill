@@ -64,6 +64,7 @@ MCP 通道返回 `body.resp_data.groups[]`（含 owner、statistics 等完整字
 
 - 返回结果同时包含用户**加入**和**创建**的星球
 - `group_id` 是纯数字字符串，后续 `+topics`、`+hashtags` 等命令均需要此值
+- 用户只给星球名称时按名称匹配：命中多个相似星球要列出候选（`group_id` + 名称）让用户确认，**不默认取第一个**；一个都没命中则请用户核对名称或直接给 `group_id`
 <!-- cli-only:start -->
 - 如需在结果中区分"加入 / 创建"，使用 `--json` 查看完整字段
 <!-- cli-only:end -->

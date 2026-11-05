@@ -134,7 +134,13 @@ MCP 通道对应调用：
 {"method": "GET", "path": "/v2/users/self/topics/answers", "query": {"filter": "unanswered", "count": 20}}
 ```
 
-> `get_self_question_topics` / `get_self_answer_topics` 还支持 `topic_filter:"answered"` 查看已回答记录。
+> 两个查询都支持在 `query` 里传 `filter: "answered"` 查看已回答记录。
+
+<!-- cli-only:start -->
+
+> CLI 通道对应 `get_self_question_topics` / `get_self_answer_topics` 的 `topic_filter:"answered"`。
+
+<!-- cli-only:end -->
 
 ## 失败语义
 
