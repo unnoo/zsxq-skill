@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -20,6 +22,8 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
 zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
   --query '{"scope":"expired","sort":"number","count":200}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

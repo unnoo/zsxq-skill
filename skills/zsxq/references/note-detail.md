@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -15,6 +17,8 @@ zsxq-cli note +detail --note-id 444555666777
 # JSON 格式输出
 zsxq-cli note +detail --note-id 444555666777 --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -16,6 +16,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -34,6 +36,8 @@ zsxq-cli group +settings --group-id 123456789 --promo-images a.png,b.png,c.png
 # 清空全部亮点图
 zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -18,6 +20,8 @@ zsxq-cli topic +search --group-id 123456789 --query "产品设计"
 # JSON 格式输出（含完整 topic 字段）
 zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

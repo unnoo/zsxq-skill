@@ -13,6 +13,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -21,6 +23,8 @@ zsxq-cli user +nps \
   --score 9 \
   --suggestion "希望增加更多互动功能"
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

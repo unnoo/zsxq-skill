@@ -17,6 +17,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -50,6 +52,8 @@ zsxq-cli topic +edit --topic-id 111222333444 --ai-mode none
 # 更换关联投票
 zsxq-cli topic +edit --topic-id 111222333444 --vote-id 777888999000
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -11,6 +11,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -26,6 +28,8 @@ zsxq-cli note +create --text "示例笔记内容" --json
 # 带图片的笔记
 zsxq-cli note +create --text "记录" --files idea.jpg
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

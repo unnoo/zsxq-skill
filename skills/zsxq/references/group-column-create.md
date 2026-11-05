@@ -12,6 +12,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -25,6 +27,8 @@ zsxq-cli api raw --method POST \
   --path /v2/groups/888888888/columns \
   --body '{"name":"精华归档"}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

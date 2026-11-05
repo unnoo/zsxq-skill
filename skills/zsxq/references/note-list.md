@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -21,6 +23,8 @@ zsxq-cli note +list --json
 # 翻页（使用上一页返回的 create_time 作为游标）
 zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800"
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

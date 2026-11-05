@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -21,6 +23,8 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
   --query '{"scope":"all","end_time":"2026-01-01T00:00:00.000+0800","count":100}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

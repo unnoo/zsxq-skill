@@ -17,6 +17,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -26,6 +28,8 @@ zsxq-cli api call set_topic_digested --params '{"topic_id":"123","digested":true
 # 取消精华
 zsxq-cli api call set_topic_digested --params '{"topic_id":"123","digested":false}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

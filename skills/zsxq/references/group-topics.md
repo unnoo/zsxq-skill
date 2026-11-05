@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -21,6 +23,8 @@ zsxq-cli group +topics --group-id 123456789 --end-time "2025-12-01T00:00:00.000+
 # JSON 格式（含完整 topic 字段、内容、点赞数等）
 zsxq-cli group +topics --group-id 123456789 --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

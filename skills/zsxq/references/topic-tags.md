@@ -14,12 +14,16 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
 # 为主题设置标签（数组形式，可多个）
 zsxq-cli api call set_topic_tags --params '{"topic_id":"123","titles":["标签1","标签2"]}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

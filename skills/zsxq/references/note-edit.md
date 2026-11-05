@@ -14,6 +14,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -23,6 +25,8 @@ zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 # JSON 格式输出
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容" --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -17,6 +17,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -39,6 +41,8 @@ zsxq-cli topic +schedule \
   --job-id 888 \
   --scheduled-time "2026-08-21 09:00"
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

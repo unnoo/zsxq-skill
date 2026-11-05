@@ -22,6 +22,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -55,6 +57,8 @@ zsxq-cli topic +answer \
   --scheduled-time "2026-08-14 12:00" \
   --silenced
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

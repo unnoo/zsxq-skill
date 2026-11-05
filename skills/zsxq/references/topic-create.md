@@ -20,6 +20,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -68,6 +70,8 @@ zsxq-cli topic +create --group-id 123456789 --text "# 标题" --markdown
 # 读取本地 .md 文件作为正文（按 markdown 发布，非附件上传）
 zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

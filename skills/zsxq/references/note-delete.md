@@ -11,12 +11,16 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
 # 删除笔记
 zsxq-cli note +delete --note-id 444555666777
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

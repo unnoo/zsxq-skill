@@ -15,6 +15,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -27,6 +29,8 @@ zsxq-cli topic +set --topic-id 111222333444 --sticky false
 # 同时设置精华与置顶
 zsxq-cli topic +set --topic-id 111222333444 --digested true --sticky true
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -11,6 +11,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -20,6 +22,8 @@ zsxq-cli api raw --method DELETE --path /v2/topics/<topic_id>
 # 示例
 zsxq-cli api raw --method DELETE --path /v2/topics/88888888888888
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -18,6 +20,8 @@ zsxq-cli group +list --limit 50
 # JSON 格式输出（含完整字段）
 zsxq-cli group +list --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

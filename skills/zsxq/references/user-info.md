@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -15,6 +17,8 @@ zsxq-cli user +info
 # 使用 --json 标志（效果相同，+info 始终输出 JSON）
 zsxq-cli user +info --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

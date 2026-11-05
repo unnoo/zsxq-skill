@@ -6,6 +6,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -15,6 +17,8 @@ zsxq-cli group +hashtags --group-id 123456789
 # JSON 格式（含 hashtag_id、owner 等完整字段）
 zsxq-cli group +hashtags --group-id 123456789 --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 

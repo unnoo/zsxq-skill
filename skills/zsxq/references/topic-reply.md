@@ -11,6 +11,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -37,6 +39,8 @@ zsxq-cli topic +reply \
   --text "示例评论内容" \
   --files screenshot.png
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
