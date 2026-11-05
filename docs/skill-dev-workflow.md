@@ -25,7 +25,7 @@
 | ② 设计 | 确定归为操作还是场景、落到哪些文件、写入类的安全边界 | 文件清单、操作/场景归类、写操作的确认项都已想清 |
 | ③ 实现 | 按 CLAUDE.md 模板写 / 改文档并在 SKILL.md 注册 | 文档结构合规、SKILL.md 四处注册齐全（见下）|
 | ④ 验证 | 用**真实运行**校准文档，产出可提交的报告 + 日志 | 验证报告结论为「通过」或「有条件通过」，日志已留存 |
-| ⑤ 验收收尾 | 跑静态校验、提交、把验收材料交到用户面前 | `check-docs.py` 通过、已提交、已向用户呈现验收清单 |
+| ⑤ 验收收尾 | 跑静态校验与官方版构建校验、提交、把验收材料交到用户面前 | `check-docs.py` 与 `build-official-skill.py --check` 通过、已提交、已向用户呈现验收清单 |
 
 ## ① 理解
 
@@ -118,8 +118,9 @@
 ## ⑤ 验收收尾
 
 1. 跑静态校验：`python3 scripts/check-docs.py`（死链、场景 10 节、写入类 CAUTION、写操作报告缺失提示等），修到通过。
-2. 提交：文档改动 + 验证报告 + 日志一并提交。**开源仓库：功能确认完成前不开 PR（含 draft），只 commit + push 分支。**
-3. **向用户呈现验收清单**（见下），把「读什么就能验收」直接递到面前，不让用户翻工具日志。
+2. 跑官方版构建校验：`python3 scripts/build-official-skill.py --check`（在内存里构建官方版并校验 Console 预算，不写 `dist/`）。新增/修改参数表时确认 `### 通道映射` 同步更新，否则构建失败；新增 MCP 专用 reference 时在 `## 参数` 前加 `<!-- params:mcp-only -->`。
+3. 提交：文档改动 + 验证报告 + 日志一并提交。**开源仓库：功能确认完成前不开 PR（含 draft），只 commit + push 分支。**
+4. **向用户呈现验收清单**（见下），把「读什么就能验收」直接递到面前，不让用户翻工具日志。
 
 ### 交给用户的验收清单
 
@@ -130,6 +131,7 @@
 - 原始日志路径 `docs/verification/logs/<id>.log` —— 供逐条核对
 - 写操作用了哪种安全策略、授权来源、是否净零复原
 - `check-docs.py` 结果
+- `build-official-skill.py --check` 结果（官方版总字节与各项预算）
 - 未覆盖 / 已知风险
 
 ## 参考
@@ -139,3 +141,4 @@
 - [`verification/logs/_TEMPLATE.log`](verification/logs/_TEMPLATE.log) —— 原始日志模板
 - [`verification/topic-set.md`](verification/topic-set.md) —— 已填好的范例报告
 - [`../scripts/check-docs.py`](../scripts/check-docs.py) —— 静态校验器
+- [`../scripts/build-official-skill.py`](../scripts/build-official-skill.py) —— 官方版（Console）构建与预算校验
