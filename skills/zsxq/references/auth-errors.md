@@ -45,6 +45,7 @@ MCP 通道使用 api-key 鉴权（密钥管理页创建密钥后复制含 key �
 | 404 / 资源不存在 | 两通道 | group_id / topic_id / note_id 无效或已删除 | 用 `group +list`、`topic +search`、`note +list` 等核对 ID |
 | `MCP tool error: {"code":429,...}` / 操作过于频繁 | 仅 CLI 通道（MCP 通道看响应 `body.succeeded` / `status_code`） | 短时间内写入/调用过密触发限流 | 等待几秒到几十秒后重试；批量操作时在命令间留间隔 |
 | `--<flag> is required` | 仅 CLI 通道 | 缺少必填参数 | 用对应查询命令获取后再填 |
+| `body.code 1004` / `参数错误` | 两通道（`api raw` / `call_zsxq_api` 的响应 body） | query / body 缺必填字段或取值非法 | 对照对应 reference 的「参数」表补齐后重试 |
 | `--end-time` 解析失败 | 仅 CLI 通道 | 分页时间格式错误 | 使用上一页 JSON 中返回的 `next_end_time` / `create_time` 原值 |
 
 ## CLI 通道：未安装恢复流程

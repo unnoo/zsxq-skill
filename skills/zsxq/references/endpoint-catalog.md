@@ -34,6 +34,7 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 笔记详情 | GET | `/v2/notes/{note_id}` | 无 |
 | 星球成员列表 | GET | `/v2/groups/{group_id}/members` | query 字段见 [group-members](group-members.md) |
 | 星球专栏列表 | GET | `/v2/groups/{group_id}/columns` | 无 |
+| 星球打卡任务列表 | GET | `/v2/groups/{group_id}/checkins` | `scope`（`all`/`ongoing`/`over`/`closed`，默认 `all`）、`count`（≤100，必填）、`end_time` 可选（翻页游标）；详见 [group-checkins](group-checkins.md) |
 | 主题所属专栏 | GET | `/v2/topics/{topic_id}/attached_columns` | 无；需星主/管理员，否则 `权限不足` |
 | 星球公开信息（查价） | GET | `/v2/groups/{group_id}/public_info` | 见 [wechat-order-create](wechat-order-create.md#下单前查询价格) |
 | 星球详情（续费查价） | GET | `/v2/groups/{group_id}` | 同上 |
