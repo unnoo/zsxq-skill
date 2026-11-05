@@ -12,10 +12,10 @@ metadata:
 本 Skill 覆盖通过知识星球 API 操作星球的全部场景：认证、星球管理、主题管理、用户信息、笔记管理，以及 Skill Pay 微信支付。
 
 <!-- cli-only:start -->
-> **CLI 通道细节**：默认假设 `zsxq-cli` 已安装且已登录，无需主动检查安装状态或登录状态。
+> **CLI 通道细节**：默认假设 CLI 已登录、`zsxq-cli` 已安装，无需主动检查登录状态或安装状态。
 <!-- cli-only:end -->
 
-> **默认假设执行通道已就绪** —— CLI 已登录，或宿主已接入知识星球 MCP（`call_zsxq_api`）；无需每次主动检查，只在执行报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
+> **默认假设执行通道已就绪** —— 宿主已提供可用的调用通道，无需每次主动检查；只在执行报错时才按需处理（见 [`references/auth-errors.md`](references/auth-errors.md)）。
 
 > 本 Skill 所有示例中的 ID、订单号、支付码等标识均为模拟数据，不对应真实资源。执行操作时必须通过查询结果或用户输入取得并核对真实标识，不得直接复用示例值。
 
@@ -27,7 +27,10 @@ metadata:
 - 宿主可执行 `zsxq-cli` → **CLI 通道**（优先；shortcut 有参数校验与本地编排，行为最可控）；未安装时按 [`references/auth-errors.md`](references/auth-errors.md) 安装
 <!-- cli-only:end -->
 - 宿主工具列表中存在 `call_zsxq_api` → **MCP 通道**
-- 两条路都没有 → 停止并提醒用户：在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入），或安装 CLI，由用户选择
+- 通道不可用 → 停止并提醒用户：在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入）
+<!-- cli-only:start -->
+- 用户也可以选择安装 CLI：按 [`references/auth-errors.md`](references/auth-errors.md) 安装后重试
+<!-- cli-only:end -->
 
 - 通道判定是一次性环境探测；选定后一致使用，不混用。
 - MCP 通道下所有调用都通过底层接口工具 `call_zsxq_api`（参数 `{method, path, query?, body?}`）；**不得臆造未文档化的 method/path**——能力底表见 [`references/endpoint-catalog.md`](references/endpoint-catalog.md)，未覆盖即视为不支持。
