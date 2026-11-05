@@ -1,6 +1,6 @@
 # group +settings（修改星球资料）
 
-对应命令：CLI 通道 `zsxq-cli group +settings`；MCP 通道见下方命令块。
+对应操作：`group +settings`；MCP 调用见下方命令块。
 
 修改星球的公开资料：名称、简介、背景图、亮点图（最多 3 张）。未提供的字段保持不变。
 

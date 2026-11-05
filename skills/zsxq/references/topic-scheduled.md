@@ -1,6 +1,6 @@
 # topic +scheduled（查看定时任务）
 
-对应命令：CLI 通道 `zsxq-cli topic +scheduled`；MCP 通道见下方命令块。
+对应操作：`topic +scheduled`；MCP 调用见下方命令块。
 
 列出星球内**待执行的定时任务**（定时发布主题与定时回答），并显示配额统计（每星球上限 10 个）。
 

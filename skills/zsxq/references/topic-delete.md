@@ -2,7 +2,7 @@
 
 通过 `zsxq-cli api raw` 删除指定主题。删除后**不可恢复**。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method DELETE --path /v2/topics/<topic_id>`；MCP 通道见下方命令块。
+对应操作：`DELETE /v2/topics/<topic_id>`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 这是**不可逆的破坏性操作** —— 删除后主题及其所有评论、回答将永久消失，无法恢复。执行前必须向用户确认：

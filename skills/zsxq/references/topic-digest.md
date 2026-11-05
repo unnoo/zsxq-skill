@@ -2,7 +2,7 @@
 
 通过 `zsxq-cli api call set_topic_digested` 将某主题设为精华，或取消其精华状态。这是**管理权限（星主/管理员/合伙人）**的操作。
 
-对应命令：CLI 通道 `zsxq-cli api call set_topic_digested`；MCP 通道见下方命令块。
+对应操作：底层接口工具 `set_topic_digested`；MCP 调用见下方命令块。
 
 > [!NOTE]
 > 日常加精 / 取消精华优先用封装命令 `topic +set --digested`（见 [topic-set](topic-set.md)），它同时支持置顶（`--sticky`）。本文件记录底层接口工具 `set_topic_digested` 的原始用法。

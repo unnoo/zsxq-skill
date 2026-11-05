@@ -1,6 +1,6 @@
 # topic +detail（查看主题详情）
 
-对应命令：CLI 通道 `zsxq-cli topic +detail`；MCP 通道见下方命令块。
+对应操作：`topic +detail`；MCP 调用见下方命令块。
 
 获取单条主题的完整详情，包括内容正文、发布者、点赞数、评论数等。
 

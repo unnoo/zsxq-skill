@@ -2,7 +2,7 @@
 
 在指定星球中创建新专栏。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method POST --path /v2/groups/<group_id>/columns`；MCP 通道见下方命令块。
+对应操作：`POST /v2/groups/<group_id>/columns`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 创建专栏是**写入操作**，执行前必须向用户确认：

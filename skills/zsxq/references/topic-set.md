@@ -1,6 +1,6 @@
 # topic +set（设置精华/置顶）
 
-对应命令：CLI 通道 `zsxq-cli topic +set`；MCP 通道见下方命令块。
+对应操作：`topic +set`；MCP 调用见下方命令块。
 
 设置或取消主题的**精华**（digested）和**置顶**（sticky）状态，直调官方「设置主题」接口。日常加精/取消精华优先用本命令，底层接口工具见 [topic-digest](topic-digest.md)。
 

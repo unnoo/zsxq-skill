@@ -1,6 +1,6 @@
 # topic +schedule（定时发布主题）
 
-对应命令：CLI 通道 `zsxq-cli topic +schedule`；MCP 通道见下方命令块。
+对应操作：`topic +schedule`；MCP 调用见下方命令块。
 
 创建或修改一条**定时发布任务**，让主题在未来指定时间自动发布到星球。带 `--job-id` 时为修改已有任务（未提供的字段保持原值），不带则创建新任务。
 

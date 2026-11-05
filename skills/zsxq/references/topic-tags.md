@@ -2,7 +2,7 @@
 
 通过 `zsxq-cli api call set_topic_tags` 为某主题设置标签（hashtag），返回更新后的主题简要信息。
 
-对应命令：CLI 通道 `zsxq-cli api call set_topic_tags`；MCP 通道见下方命令块。
+对应操作：底层接口工具 `set_topic_tags`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 这是**写入操作** —— 会改变主题的标签。执行前必须向用户确认：

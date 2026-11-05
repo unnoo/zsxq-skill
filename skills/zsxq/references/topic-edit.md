@@ -1,6 +1,6 @@
 # topic +edit（编辑主题）
 
-对应命令：CLI 通道 `zsxq-cli topic +edit`；MCP 通道见下方命令块。
+对应操作：`topic +edit`；MCP 调用见下方命令块。
 
 编辑自己发布的主题内容或附件。未修改的字段自动保留。
 

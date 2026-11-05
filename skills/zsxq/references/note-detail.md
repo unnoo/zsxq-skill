@@ -1,6 +1,6 @@
 # note +detail（查看笔记详情）
 
-对应命令：CLI 通道 `zsxq-cli note +detail`；MCP 通道见下方命令块。
+对应操作：`note +detail`；MCP 调用见下方命令块。
 
 获取单条笔记的完整详情，包括内容正文、创建时间等。
 

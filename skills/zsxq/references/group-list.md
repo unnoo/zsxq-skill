@@ -1,6 +1,6 @@
 # group +list（列出星球）
 
-对应命令：CLI 通道 `zsxq-cli group +list`；MCP 通道见下方命令块。
+对应操作：`group +list`；MCP 调用见下方命令块。
 
 列出当前登录用户**加入或创建**的所有知识星球。常用于获取 `group_id` 供后续操作使用。
 

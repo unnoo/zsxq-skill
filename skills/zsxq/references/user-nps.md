@@ -2,7 +2,7 @@
 
 > **版本要求：** 需要 `zsxq-cli` ≥ **0.4.6**。低于该版本时 `+nps` 不存在，命令会被识别为未知 shortcut。
 
-对应命令：CLI 通道 `zsxq-cli user +nps`；MCP 通道见下方命令块。
+对应操作：`user +nps`；MCP 调用见下方命令块。
 
 向知识星球官方提交 NPS（Net Promoter Score，净推荐值）反馈，包含 1–10 分的推荐分数和文字建议。
 

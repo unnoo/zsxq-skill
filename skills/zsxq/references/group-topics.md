@@ -1,6 +1,6 @@
 # group +topics（浏览星球主题）
 
-对应命令：CLI 通道 `zsxq-cli group +topics`；MCP 通道见下方命令块。
+对应操作：`group +topics`；MCP 调用见下方命令块。
 
 列出指定星球内最新发布的主题，按时间倒序排列，支持分页。
 

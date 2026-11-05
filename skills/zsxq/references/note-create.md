@@ -1,6 +1,6 @@
 # note +create（创建笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +create`；MCP 通道见下方命令块。
+对应操作：`note +create`；MCP 调用见下方命令块。
 
 在知识星球创建一条公开笔记，支持文本和图片附件。任何人通过笔记链接均可访问。
 

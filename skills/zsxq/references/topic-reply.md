@@ -1,6 +1,6 @@
 # topic +reply（发表评论）
 
-对应命令：CLI 通道 `zsxq-cli topic +reply`；MCP 通道见下方命令块。
+对应操作：`topic +reply`；MCP 调用见下方命令块。
 
 对指定主题发表评论，支持楼中楼（回复某条评论）。
 

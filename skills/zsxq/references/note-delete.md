@@ -1,6 +1,6 @@
 # note +delete（删除笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +delete`；MCP 通道见下方命令块。
+对应操作：`note +delete`；MCP 调用见下方命令块。
 
 删除指定笔记。删除后**不可恢复**。
 

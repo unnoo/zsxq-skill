@@ -2,7 +2,7 @@
 
 读取一条主题当前所属的专栏列表，或覆盖式设置它所属的专栏集合。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口（action `group_topic/attachedcolumns` 读取、`group_topic/attachtopicstocolumn` 设置）。**「把主题加入某专栏」= 先读现有专栏 → 并入目标 → 整表回设**。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method GET|POST --path /v2/topics/<topic_id>/attached_columns`；MCP 通道见下方命令块。
+对应操作：`GET|POST /v2/topics/<topic_id>/attached_columns`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 设置操作是**替换性写入** —— 会改变主题的专栏归属。执行前必须向用户确认：

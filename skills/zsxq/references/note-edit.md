@@ -1,6 +1,6 @@
 # note +edit（编辑笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +edit`；MCP 通道见下方命令块。
+对应操作：`note +edit`；MCP 调用见下方命令块。
 
 编辑已有笔记的内容。未修改的字段自动保留。
 

@@ -2,7 +2,7 @@
 
 列出指定星球的全部专栏，用于按专栏名称找到 `column_id`（收录主题、浏览专栏主题都要用到）。CLI 未封装该能力，通过 `api raw` 调用原始 HTTP 接口获取。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns`；MCP 通道见下方命令块。
+对应操作：`GET /v2/groups/<group_id>/columns`；MCP 调用见下方命令块。
 
 ## 命令
 

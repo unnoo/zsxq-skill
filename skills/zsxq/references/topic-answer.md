@@ -1,6 +1,6 @@
 # topic +answer（回答提问）
 
-对应命令：CLI 通道 `zsxq-cli topic +answer`；MCP 通道见下方命令块。
+对应操作：`topic +answer`；MCP 调用见下方命令块。
 
 对 `q&a` 类型的主题发布**官方回答**。仅适用于问答类主题，且每个问题只能回答一次。
 

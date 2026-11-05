@@ -1,6 +1,6 @@
 # user +footprints（查看主题足迹）
 
-对应命令：CLI 通道 `zsxq-cli user +footprints`；MCP 通道见下方命令块。
+对应操作：`user +footprints`；MCP 调用见下方命令块。
 
 查看当前用户在**所有星球**中最近发过的主题，按时间倒序排列。
 

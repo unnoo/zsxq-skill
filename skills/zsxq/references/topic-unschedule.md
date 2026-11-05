@@ -1,6 +1,6 @@
 # topic +unschedule（取消定时任务）
 
-对应命令：CLI 通道 `zsxq-cli topic +unschedule`；MCP 通道见下方命令块。
+对应操作：`topic +unschedule`；MCP 调用见下方命令块。
 
 删除一条待执行的定时任务（定时发布主题或定时回答），删除后到点**不会**发布。
 

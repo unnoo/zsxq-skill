@@ -2,7 +2,7 @@
 
 列出指定星球的成员，支持按到期时间、加入时间等排序与筛选。CLI 未封装此工具，通过 `api raw` 调用原始 HTTP 接口，查询条件用 `--query`（JSON 对象）传入。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method GET --path /v2/groups/<group_id>/members`；MCP 通道见下方命令块。
+对应操作：`GET /v2/groups/<group_id>/members`；MCP 调用见下方命令块。
 
 ## 命令
 

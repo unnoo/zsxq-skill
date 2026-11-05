@@ -1,6 +1,6 @@
 # group +hashtags（查看星球标签）
 
-对应命令：CLI 通道 `zsxq-cli group +hashtags`；MCP 通道见下方命令块。
+对应操作：`group +hashtags`；MCP 调用见下方命令块。
 
 列出指定星球内所有的话题标签（Hashtag）及其主题数量。常用于获取 `hashtag_id` 以便按分类浏览内容。
 

@@ -1,6 +1,6 @@
 # topic +search（搜索主题）
 
-对应命令：CLI 通道 `zsxq-cli topic +search`；MCP 通道见下方命令块。
+对应操作：`topic +search`；MCP 调用见下方命令块。
 
 在指定星球内进行全文搜索，返回匹配的主题列表。搜索使用 RAG 服务，结果按相关性排序。
 

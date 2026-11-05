@@ -1,6 +1,6 @@
 # note +list（查看笔记列表）
 
-对应命令：CLI 通道 `zsxq-cli note +list`；MCP 通道见下方命令块。
+对应操作：`note +list`；MCP 调用见下方命令块。
 
 查看当前登录用户的个人笔记列表，按创建时间倒序排列。
 
