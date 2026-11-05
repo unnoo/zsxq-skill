@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parent.parent
 CLI_START = "<!-- cli-only:start -->"
 CLI_END = "<!-- cli-only:end -->"
 
+TABLE_RE = r"\|[^\n]*\n\|[\s:|-]+\n(?:\|[^\n]*\n?)+"
+CLI_ONLY_FLAGS = {"--json", "--files", "--markdown-file", "--help",
+                  "--version", "--dry-run"}
+COMPOSITE_FLAGS = {"--query", "--body"}
+INFO_MARKER = "<!-- params:mcp-only -->"
+
 
 class BuildError(Exception):
     pass
@@ -157,6 +163,100 @@ def sanitize_frontmatter(text: str, description: str) -> str:
     return "\n".join([lines[0], *out, *lines[end:]])
 
 
+def _split_row(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _parse_table(block: str) -> list[list[str]]:
+    lines = [line for line in block.strip().split("\n")
+             if line.strip().startswith("|")]
+    if len(lines) < 2:
+        raise BuildError("表格格式不正确")
+    return [_split_row(line) for line in lines[2:]]
+
+
+def _render_table(header: list[str], rows: list[list[str]]) -> str:
+    out = ["| " + " | ".join(header) + " |",
+           "|" + "|".join("---" for _ in header) + "|"]
+    out.extend("| " + " | ".join(row) + " |" for row in rows)
+    return "\n".join(out)
+
+
+def _flags(cell: str) -> list[str]:
+    return re.findall(r"--[a-z][a-z0-9-]*", cell)
+
+
+def merge_official_params(text: str, rel: str) -> str:
+    param = re.search(r"(## 参数[ \t]*\n\n)(" + TABLE_RE + ")", text)
+    if not param:
+        return text
+    mapping = re.search(r"\n### 通道映射[ \t]*\n\n(" + TABLE_RE + ")", text)
+    if not mapping:
+        if INFO_MARKER in text:
+            return text
+        raise BuildError(
+            f"{rel}: 「## 参数」缺少「### 通道映射」；"
+            f"MCP 专用文档请加 {INFO_MARKER}"
+        )
+
+    param_rows = _parse_table(param.group(2))
+    mapping_rows = _parse_table(mapping.group(1))
+    flag_to_field: dict[str, str] = {}
+    for row in mapping_rows:
+        if len(row) < 2:
+            raise BuildError(f"{rel}: 通道映射行列数不足")
+        for flag in _flags(row[0]):
+            flag_to_field[flag] = row[1]
+
+    merged: list[list[str]] = []
+    used: set[str] = set()
+    for row in param_rows:
+        if len(row) < 3:
+            raise BuildError(f"{rel}: 参数行列数不足: {' | '.join(row)}")
+        flags = _flags(row[0])
+        if not flags:
+            merged.append([row[0], row[1], row[2]])
+            continue
+        used.update(flags)
+        if all(flag in CLI_ONLY_FLAGS for flag in flags):
+            continue
+        fields: list[str] = []
+        skip = False
+        for flag in flags:
+            if flag not in flag_to_field:
+                raise BuildError(f"{rel}: 参数 {flag} 缺少通道映射")
+            field = flag_to_field[flag]
+            if "仅 CLI 通道" in field:
+                skip = True
+                break
+            fields.append(field)
+        if skip:
+            continue
+        merged.append([" / ".join(dict.fromkeys(fields)), row[1], row[2]])
+
+    for row in mapping_rows:
+        flags = _flags(row[0])
+        if not flags or any(flag in used for flag in flags):
+            continue
+        if all(flag in COMPOSITE_FLAGS for flag in flags):
+            continue
+        if "hidden" in row[0] or "不上送" in row[1] or "无对应字段" in row[1]:
+            continue
+        merged.append([row[1], "—", "通道映射补充字段"])
+
+    if not merged:
+        merged = [["—", "—", "该操作无额外 MCP 参数，字段见调用示例"]]
+
+    without_mapping = text[: mapping.start()] + text[mapping.end():]
+    without_mapping = re.sub(r"\n{3,}", "\n\n", without_mapping)
+    param = re.search(r"(## 参数[ \t]*\n\n)(" + TABLE_RE + ")", without_mapping)
+    if not param:
+        raise BuildError(f"{rel}: 移除通道映射后找不到参数表")
+    table = _render_table(["字段 / 位置", "必填", "说明"], merged)
+    return (without_mapping[: param.start(2)] + table
+            + without_mapping[param.end(2):])
+
+
 def validate_sizes(texts: dict[str, str], limits: Limits) -> None:
     if "SKILL.md" not in texts:
         raise BuildError("缺少 SKILL.md")
@@ -197,6 +297,13 @@ def build(config: dict, check_only: bool = False) -> Report:
     if "SKILL.md" not in texts:
         raise BuildError("源目录缺少 SKILL.md")
 
+    merged_params = 0
+    for rel in list(texts):
+        before = texts[rel]
+        texts[rel] = merge_official_params(before, rel)
+        if texts[rel] != before:
+            merged_params += 1
+
     texts = {rel: strip_cli_regions(text) for rel, text in texts.items()}
     texts["SKILL.md"] = sanitize_frontmatter(
         texts["SKILL.md"], config["official"]["description"])
@@ -221,11 +328,12 @@ def build(config: dict, check_only: bool = False) -> Report:
                 "total_bytes": total,
                 "limits": asdict(limits),
                 "dropped_rows": [],
-                "merged_params": 0,
+                "merged_params": merged_params,
             }, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
-    return Report(output=output, files=files, total_bytes=total, limits=limits)
+    return Report(output=output, files=files, total_bytes=total,
+                  limits=limits, merged_params=merged_params)
 
 
 def main() -> int:

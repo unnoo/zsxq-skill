@@ -127,5 +127,79 @@ class FrontmatterTest(unittest.TestCase):
             og.sanitize_frontmatter(broken, "官方描述")
 
 
+DUAL_PARAMS = """## 参数
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `--group-id <id>` | **是** | 星球 ID |
+| `--json` | 否 | 输出 JSON |
+| `--files <paths>` | 否 | 附件 |
+| `--ai` / `--ai-mode` | 否 | AI 声明 |
+
+### 通道映射
+
+| CLI flag | HTTP 字段 |
+|----------|-----------|
+| `--group-id` | path `/v2/groups/{group_id}/topics` |
+| `--files` | 仅 CLI 通道（附件上传缺口） |
+| `--ai` / `--ai-mode` | `req_data.creation_statement` |
+"""
+
+RAW_PARAMS = """## 参数
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `<group_id>` | **是** | 星球 ID |
+| `scope` | 否 | 范围 |
+| `count` | **是** | 数量 |
+
+### 通道映射
+
+| CLI 形式 | HTTP 字段 |
+|----------|-----------|
+| `<group_id>`（路径） | path `/v2/groups/{group_id}/checkins` |
+| `--query` JSON | 同名 query 参数 |
+"""
+
+
+class ParamMergeTest(unittest.TestCase):
+    def test_cli_flags_merge_to_fields_and_cli_only_rows_drop(self):
+        merged = og.merge_official_params(DUAL_PARAMS, "topic.md")
+        self.assertIn("path `/v2/groups/{group_id}/topics`", merged)
+        self.assertIn("`req_data.creation_statement`", merged)
+        self.assertNotIn("--json", merged)
+        self.assertNotIn("--files", merged)
+        self.assertNotIn("### 通道映射", merged)
+        self.assertIn("| 字段 / 位置 | 必填 | 说明 |", merged)
+
+    def test_raw_http_params_are_preserved(self):
+        merged = og.merge_official_params(RAW_PARAMS, "checkins.md")
+        self.assertIn("| `<group_id>` | **是** |", merged)
+        self.assertIn("| `scope` | 否 |", merged)
+        self.assertNotIn("--query", merged)
+        self.assertNotIn("### 通道映射", merged)
+
+    def test_unmapped_flag_fails(self):
+        text = DUAL_PARAMS.replace(
+            "| `--group-id` | path `/v2/groups/{group_id}/topics` |\n", "")
+        with self.assertRaises(og.BuildError):
+            og.merge_official_params(text, "topic.md")
+
+    def test_missing_mapping_requires_mcp_only_marker(self):
+        text = DUAL_PARAMS.split("### 通道映射")[0]
+        with self.assertRaises(og.BuildError):
+            og.merge_official_params(text, "topic.md")
+        marked = "<!-- params:mcp-only -->\n\n" + text
+        self.assertEqual(og.merge_official_params(marked, "topic.md"), marked)
+
+    def test_mapping_only_field_is_appended(self):
+        text = RAW_PARAMS.replace(
+            "| `--query` JSON | 同名 query 参数 |",
+            "| `--query` JSON | 同名 query 参数 |\n| `--scope` | `query.scope` |",
+        )
+        merged = og.merge_official_params(text, "checkins.md")
+        self.assertIn("`query.scope`", merged)
+
+
 if __name__ == "__main__":
     unittest.main()
