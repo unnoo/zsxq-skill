@@ -38,11 +38,11 @@
 
 ### 第二步：取最新 N 条主题的 topic_id
 
-用 `group +topics --group-id <id> --limit N`（见 [group-topics](../group-topics.md)），按时间倒序收集每条的 `topic_id` 与标题。`group +topics` 单次最多返回 30 条，N > 30 时用返回的 `next_end_time` 翻页累积到 N 条。
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`；见 [group-topics](../group-topics.md)），按时间倒序收集每条的 `topic_id` 与标题。单次最多返回 30 条，N > 30 时用返回的 `next_end_time` 翻页累积到 N 条。
 
 ### 第三步：确定目标专栏（含创建）
 
-**3a. 拉取专栏列表**：`api raw --method GET --path /v2/groups/<group_id>/columns`（见 [group-columns](../group-columns.md)）。
+**3a. 拉取专栏列表**：MCP `GET /v2/groups/<group_id>/columns`（见 [group-columns](../group-columns.md)）。
 
 **3b. 专栏列表为空**（`columns[]` 为空数组）：
 
@@ -50,7 +50,7 @@
 
 > 是否需要创建一个新专栏？提供专栏名称即可，创建后继续收录流程。
 
-- 用户提供名称 → 按 [group-column-create](../group-column-create.md) 创建（`POST /v2/groups/<group_id>/columns --body '{"name":"…"}'`），拿到返回的 `column_id`（`topics_count` 为 0），跳至第四步
+- 用户提供名称 → 按 [group-column-create](../group-column-create.md) 创建（MCP：`POST /v2/groups/<group_id>/columns`，body `{"req_data":{"name":"…"}}`），拿到返回的 `column_id`（`topics_count` 为 0），跳至第四步
 - 用户拒绝 → 停止（见「分支与停止条件」）
 
 **3c. 专栏列表非空但找不到目标**：

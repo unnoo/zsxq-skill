@@ -11,7 +11,7 @@
 
 ## 不适用情况
 
-- 只想看某一条主题的评论、不需要归类/起草 → 直接用 `api call get_topic_comments`（无独立 reference，见 [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic)）
+- 只想看某一条主题的评论、不需要归类/起草 → 直接用 `get_topic_comments`（MCP：`GET /v2/topics/<id>/comments`；无独立 reference，见 [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic)）
 - 处理别人向你发起的**提问**（q&a 提问箱）而非评论 → 见提问管理场景 / [topic-answer](../topic-answer.md)
 - 只是要发一条评论、已想好内容 → 直接用 [topic-reply](../topic-reply.md)
 - 想按关键词找内容而非按主题拉评论 → [topic-search](../topic-search.md)
@@ -29,8 +29,8 @@
 | `group +list` | [group-list](../group-list.md) | 星球名 → `group_id`（只给名称时的前置解析） |
 | `user +info` | [user-info](../user-info.md) | 取当前登录账户 `user_id`，作为"星主"身份基准，用于判断评论作者与星主的关系 |
 | `group +topics` | [group-topics](../group-topics.md) | 拉该星球最近 N 条主题（默认 5） |
-| `api call get_topic_comments` | 无独立 reference（在 [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic)登记，参数 `topic_id` / `limit` / `index`） | 逐条主题拉评论（默认前 20 条），得到评论作者、内容、时间 |
-| `topic +reply` | [topic-reply](../topic-reply.md) | **写入**：星主逐条确认后发评论 / 楼中楼回复（`--reply-to <comment_id>`） |
+| `get_topic_comments` | 无独立 reference（MCP：`GET /v2/topics/<topic_id>/comments`，query `count` / `index`；在 [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic)登记） | 逐条主题拉评论（默认前 20 条），得到评论作者、内容、时间 |
+| `topic +reply` | [topic-reply](../topic-reply.md) | **写入**：星主逐条确认后发评论 / 楼中楼回复（`replied_comment_id` 指向被回复评论） |
 
 ## 执行流程
 
@@ -41,11 +41,11 @@
 
 ### 第二步：拉最近主题
 
-用 `group +topics --group-id <id> --limit <N>`（默认 N=5，最大 30）取最新主题，记录每条的 `topic_id`、标题/摘要、类型。数量不足 N 条时按实际数量继续。
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`）取最新主题（默认 N=5，单页最大 30），记录每条的 `topic_id`、标题/摘要、类型。数量不足 N 条时按实际数量继续。
 
 ### 第三步：逐条主题拉评论
 
-对每个 `topic_id` 调 `api call get_topic_comments --params '{"topic_id":"<id>","limit":20}'`：
+对每个 `topic_id` 调 `get_topic_comments`（MCP：`GET /v2/topics/<id>/comments`，query `count=20`、`index` 翻页）：
 
 - 返回 `comments` 数组（顶层含 `count` / `has_more` / `index`）；每条评论关键字段：`comment_id`、`owner.user_id`、`owner.name`、`text`、`create_time`、`group_owner_liked` / `topic_owner_liked`
 - 只需前 20 条时单页即可；`has_more: true` 且用户要求取更多时，用返回的 `index` 值作为下一页 `index` 参数继续翻页
@@ -64,11 +64,11 @@
 
 ### 第五步：为未回复评论起草
 
-对每条"未回复 / 待确认"评论生成一条回复草稿：语气温和亲切、100 字以内、扣住评论内容与其归类。每条草稿记录：所属主题（`topic_id` + 标题）、原评论（`comment_id` + 作者 + 原文摘要）、归类、草稿正文；楼中楼回复额外标注 `--reply-to <comment_id>`。汇总成清单交用户。
+对每条"未回复 / 待确认"评论生成一条回复草稿：语气温和亲切、100 字以内、扣住评论内容与其归类。每条草稿记录：所属主题（`topic_id` + 标题）、原评论（`comment_id` + 作者 + 原文摘要）、归类、草稿正文；楼中楼回复额外标注被回复的 `comment_id`。汇总成清单交用户。
 
 ### 第六步：逐条确认后发评论（写入）
 
-按 [topic-reply](../topic-reply.md) 发送：星主对某条说 "OK" 才发那一条，`--reply-to` 指向对应 `comment_id`（楼中楼回复原评论）。未确认的不发。
+按 [topic-reply](../topic-reply.md) 发送：星主对某条说 "OK" 才发那一条，楼中楼回复用 `replied_comment_id` 指向对应 `comment_id`（楼中楼回复原评论）。未确认的不发。
 
 ## 分支与停止条件
 

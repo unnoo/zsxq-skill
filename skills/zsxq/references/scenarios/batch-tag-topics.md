@@ -29,7 +29,7 @@
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|-----------------|
 | `group +list` | [../group-list.md](../group-list.md) | 星球名称 → `group_id` |
-| `group +topics` | [../group-topics.md](../group-topics.md) | 拉时间窗内的新主题；`--json` 一次带回 `content`（供内容分析与原有标签解析），`--end-time` 作翻页游标 |
+| `group +topics` | [../group-topics.md](../group-topics.md) | 拉时间窗内的新主题；一次带回 `content`（供内容分析与原有标签解析），`end_time` 作翻页游标 |
 | `topic +detail` | [../topic-detail.md](../topic-detail.md) | （按需）单条复核内容与现有标签 |
 | `set_topic_tags` | [../topic-tags.md](../topic-tags.md) | **写入**：批量回标；`titles` 为完整标签集合（覆盖式） |
 | 分享链接拼接 | [../share-links.md](../share-links.md) | 为确认清单生成主题链接 |
@@ -44,9 +44,9 @@
 
 ### 第二步：拉取时间窗内的新主题（只读）
 
-- `group +topics --group-id <id> --json`，结果按时间倒序（newest-first）
-- 时间窗为**客户端过滤**：只保留 `create_time >= 截止时间`（截止 = 当前时间 − 时间窗）。`--end-time` 是向更早翻页的游标，不是下界
-- 当 `has_more: true` 且当页最后一条仍落在窗口内时，用返回的 `next_end_time` 作 `--end-time` 继续翻页；一旦某条 `create_time` 越过截止时间即停止
+- 用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`、`end_time`）拉取，结果按时间倒序（newest-first），每条含 `content`
+- 时间窗为**客户端过滤**：只保留 `create_time >= 截止时间`（截止 = 当前时间 − 时间窗）。`end_time` 是向更早翻页的游标，不是下界
+- 当 `has_more: true` 且当页最后一条仍落在窗口内时，用返回的 `next_end_time` 作下一页的 `end_time` 继续翻页；一旦某条 `create_time` 越过截止时间即停止
 - 每条记录 `topic_id` / `title` / `content` / `create_time`
 
 ### 第三步：分析并推荐标签

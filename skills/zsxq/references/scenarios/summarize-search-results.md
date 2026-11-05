@@ -4,8 +4,10 @@
 
 检索命令、参数和错误语义只以 [topic-search](../topic-search.md) 为准。沿用当前已选定的通道，不因输入类型改走另一条通道，也不调用 reference 未记载的接口。
 
+<!-- cli-only:start -->
 - CLI 通道：`topic +search` 是增强检索，没有翻页参数。
-- MCP 通道：`GET /v2/search/groups/{group_id}/topics`，只传 `keyword` 与 `count=20`。它是官方搜索，排序与 CLI 不同。
+<!-- cli-only:end -->
+- MCP 通道：`GET /v2/search/groups/{group_id}/topics`，只传 `keyword` 与 `count=20`。它是官方搜索，排序与 `topic +search` 的增强检索不同。
 
 ## 适用意图
 
@@ -57,7 +59,9 @@
 
 调用 `topic +search`。`group_id`、`topic_id` 保持原样字符串，不要转成数字。
 
+<!-- cli-only:start -->
 - CLI：`zsxq-cli topic +search --group-id <id> --query "<搜索内容>" --json`
+<!-- cli-only:end -->
 - MCP：`{"method":"GET","path":"/v2/search/groups/<group_id>/topics","query":{"keyword":"<搜索内容>","count":20}}`
 
 多个关键词保持用户原来的分隔。不传 `filter_roles`、`filter_types`，也不传 reference 里没有的翻页字段。
@@ -66,7 +70,7 @@
 
 检索条目里已有正文就直接打分。只有标题或摘要时，对该条调用 `topic +detail`。MCP 长文只有 `inline_article_url`、没有正文时，按 [topic-detail](../topic-detail.md) 说明跳过，不编造正文。
 
-正文来源：CLI / 详情用 `content`；MCP 搜索命中用 `talk.text`，没有则用 `question.text` 与 `answer.text`。打分前清理：`<e>` 的 `href`、`title` 百分号解码后只取标题或标签；重复段落留一份；不描述图片和文件，不声称读过。
+正文来源：详情用 `content`；MCP 搜索命中用 `talk.text`，没有则用 `question.text` 与 `answer.text`。打分前清理：`<e>` 的 `href`、`title` 百分号解码后只取标题或标签；重复段落留一份；不描述图片和文件，不声称读过。
 
 总分 100 的整数。只看清理后的正文和搜索词，不看点赞、评论、阅读、精华或接口顺序。
 
@@ -138,7 +142,9 @@
 
 - 纯只读，中断不会改动星球数据，可换对的 group_id 或搜索词重跑
 - 个别 `topic +detail` 失败：跳过该条并记 `topic_id`，继续其余条目
+<!-- cli-only:start -->
 - 官方搜索与 CLI 增强检索结果不同是通道差异，不是失败；不要为了补齐而混用通道
+<!-- cli-only:end -->
 
 ## 附加资源
 

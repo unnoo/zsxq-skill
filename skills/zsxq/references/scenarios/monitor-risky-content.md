@@ -29,8 +29,8 @@
 
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|-----------------|
-| `group +topics` | [../group-topics.md](../group-topics.md) | 拉时间窗内的新主题，用 `--end-time` 控游标翻页 |
-| `api call get_topic_comments` | [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic) | 拉主题评论，按 comment 的 create_time 过滤新评论（参数 topic_id / limit / index） |
+| `group +topics` | [../group-topics.md](../group-topics.md) | 拉时间窗内的新主题，用 `end_time` 控游标翻页 |
+| `get_topic_comments` | [SKILL.md 主题 API 表](../../SKILL.md#主题管理topic) | 拉主题评论（MCP：`GET /v2/topics/<topic_id>/comments`，query `count` / `index`），按 comment 的 create_time 过滤新评论 |
 | `topic +detail` | [../topic-detail.md](../topic-detail.md) | 需要上下文判断冲突 / 攻击，或主题正文被截断时拉完整内容 |
 | 分享链接拼接 | [../share-links.md](../share-links.md) | 为每条风险项输出对应主题链接 |
 
@@ -45,17 +45,17 @@
 
 ### 第二步：拉时间窗内的新主题
 
-`group +topics --json` 按 create_time 倒序返回。从第一页开始，逐条比对 `create_time`：
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`、`end_time`）按 create_time 倒序返回。从第一页开始，逐条比对 `create_time`：
 
 - 落在时间窗内 → 收入待判定集合
 - 早于时间窗起点 → 停止翻页（后面只会更早）
-- 未翻完且 `has_more: true` 时，用返回的 `next_end_time` 作 `--end-time` 继续下一页
+- 未翻完且 `has_more: true` 时，用返回的 `next_end_time` 作下一页的 `end_time` 继续下一页
 
 ### 第三步：拉时间窗内的新评论
 
 风险常出现在评论里，且**旧主题也可能被评论新的风险内容**。候选主题集 =「本次新主题」+「星主指定关注的近期活跃主题」（可选，用户可给一批 topic_id 或让其覆盖最近 N 天主题）。对每个候选主题：
 
-- `api call get_topic_comments`（参数见上表 reference），按每条 comment 的 `create_time` 只保留落在时间窗内的新评论
+- `get_topic_comments`（MCP：`GET /v2/topics/<topic_id>/comments`；参数见上表 reference），按每条 comment 的 `create_time` 只保留落在时间窗内的新评论
 - 主题 `counts.comments` 为 0 的可跳过，减少无谓调用
 
 > 说明：现有只读能力没有「全站按评论时间排序」的入口，评论只能逐主题拉取。因此评论监控的覆盖面取决于候选主题集；默认覆盖新主题的评论，更旧主题需星主把它们列入关注集。

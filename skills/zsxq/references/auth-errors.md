@@ -1,6 +1,6 @@
 # 认证与常见错误
 
-本文档覆盖两条通道的认证与错误排查：**CLI 通道**（OAuth 设备码登录）与 **MCP 通道**（api-key 接入，见 [SKILL.md](../SKILL.md#执行通道)）。
+本文档覆盖认证与常见错误的排查。MCP 通道使用 api-key 接入（见 [SKILL.md](../SKILL.md#执行通道)）。
 
 <!-- cli-only:start -->
 
@@ -28,34 +28,37 @@ zsxq-cli 使用 **OAuth 2.0 设备授权码流程（RFC 8628）** 认证，token
 
 <!-- cli-only:end -->
 
-## MCP 通道认证
+## MCP 通道恢复
 
-MCP 通道使用 api-key 鉴权（密钥管理页创建密钥后复制含 key 的链接接入宿主）。没有 `auth login` 等命令：
+MCP 通道使用 api-key 鉴权（密钥管理页创建密钥后复制含 key 的链接接入宿主）。
 
-- 401 / 鉴权失败 → 提示用户到知识星球密钥管理页删除旧密钥、创建新密钥，并在宿主的 MCP 配置中更新链接后重连
-- 宿主工具列表中没有 `call_zsxq_api` → 说明 MCP 未接入；按 [SKILL.md](../SKILL.md#执行通道)「执行通道」引导用户接入 MCP 或改装 CLI
+- 工具列表里没有 `call_zsxq_api` → MCP 未接入：引导用户在云端接入知识星球 MCP，不要安装 CLI
+- 返回 401 / 鉴权失败 → 提示用户到知识星球密钥管理页删除旧密钥、创建新密钥，并在宿主的 MCP 配置中更新链接后重连
+- 返回 `succeeded: false` → 按 `code` / `resp_data` 判断业务错误，不用 HTTP 状态码代替
 - 不得要求用户把 api-key 贴到对话中；api-key 等同于登录凭证，按 token 同级保护
 
 ## 常见错误处理
 
-下表覆盖两条通道通用的错误。各命令 reference 只列出与该命令直接相关的特有错误。
+下表覆盖通用错误。各操作 reference 只列出与该操作直接相关的特有错误。
 
-| 错误 | 通道 | 原因 | 解决方案 |
-|------|------|------|---------|
-| 401 / 鉴权失败 | MCP 通道 | api-key 无效或已失效 | 到知识星球密钥管理页删除旧密钥、创建新密钥，在宿主的 MCP 配置中更新链接后重连 |
-| 403 / 无权限 / 不可访问 | 两通道 | 当前账户无访问权限 | 切换账户，或加入对应星球 |
-| 404 / 资源不存在 | 两通道 | group_id / topic_id / note_id 无效或已删除 | 用 `group +list`、`topic +search`、`note +list` 等核对 ID |
-| `MCP tool error: {"code":429,...}` / 操作过于频繁 | 仅 CLI 通道（MCP 通道看响应 `body.succeeded` / `status_code`） | 短时间内写入/调用过密触发限流 | 等待几秒到几十秒后重试；批量操作时在命令间留间隔 |
-| `body.code 1004` / `参数错误` | 两通道（`api raw` / `call_zsxq_api` 的响应 body） | query / body 缺必填字段或取值非法 | 对照对应 reference 的「参数」表补齐后重试 |
+| 错误 | 原因 | 处理 |
+|------|------|------|
+| 401 / 鉴权失败 | api-key 无效或已失效 | 到知识星球密钥管理页删除旧密钥、创建新密钥，在宿主的 MCP 配置中更新链接后重连 |
+| 403 / 无权限 / 不可访问 | 当前账户无访问权限 | 切换账户，或加入对应星球 |
+| 404 / 资源不存在 | group_id / topic_id / note_id 无效或已删除 | 用 `group +list`、`topic +search`、`note +list` 等操作核对 ID |
+| 429 / `MCP tool error: {"code":429,...}` / 操作过于频繁 | 短时间内写入/调用过密触发限流 | 等待几秒到几十秒后重试；批量操作之间留间隔 |
+| `body.code 1004` / `参数错误` | `call_zsxq_api` 请求的 query / body 缺必填字段或取值非法 | 对照对应 reference 的「参数」表补齐后重试 |
 
 <!-- cli-only:start -->
 
-| 错误 | 通道 | 原因 | 解决方案 |
-|------|------|------|---------|
-| `command not found: zsxq-cli` / `zsxq-cli: command not found` | 仅 CLI 通道 | CLI 工具未安装 | 见下方 [CLI 通道：未安装恢复流程](#cli-通道未安装恢复流程) |
-| `authentication failed (HTTP 401)` / `not logged in` | CLI 通道 | Token 无效、过期或未登录 | 运行 `zsxq-cli auth login` |
-| `--<flag> is required` | 仅 CLI 通道 | 缺少必填参数 | 用对应查询命令获取后再填 |
-| `--end-time` 解析失败 | 仅 CLI 通道 | 分页时间格式错误 | 使用上一页 JSON 中返回的 `next_end_time` / `create_time` 原值 |
+仅 CLI 通道的错误：
+
+| 错误 | 原因 | 处理 |
+|------|------|------|
+| `command not found: zsxq-cli` / `zsxq-cli: command not found` | CLI 工具未安装 | 见下方 [CLI 通道：未安装恢复流程](#cli-通道未安装恢复流程) |
+| `authentication failed (HTTP 401)` / `not logged in` | Token 无效、过期或未登录 | 运行 `zsxq-cli auth login` |
+| `--<flag> is required` | 缺少必填参数 | 用对应查询命令获取后再填 |
+| `--end-time` 解析失败 | 分页时间格式错误 | 使用上一页 JSON 中返回的 `next_end_time` / `create_time` 原值 |
 
 ## CLI 通道：未安装恢复流程
 
@@ -92,5 +95,4 @@ zsxq-cli auth login
 
 ## 参考
 
-- [cli-exploration](cli-exploration.md) — 探索模式与直接调用 API
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

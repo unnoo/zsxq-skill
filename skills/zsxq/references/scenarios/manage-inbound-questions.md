@@ -11,10 +11,10 @@
 
 ## 不适用情况
 
-- 用户想看的是**自己向别人发起**的提问（我问的、等别人答）→ 用 `api call get_self_question_topics`，不是本场景的 `get_self_answer_topics`（详见「使用的原子操作」的关键区分）
+- 用户想看的是**自己向别人发起**的提问（我问的、等别人答）→ 用 `get_self_question_topics`（MCP：`GET /v2/users/self/topics/questions`），不是本场景的 `get_self_answer_topics`（详见「使用的原子操作」的关键区分）
 - 只想对某一条已知 `topic_id` 的提问直接回答 → 直接用 [topic +answer](../topic-answer.md)，无需整场景编排
 - 想发普通评论而非"官方回答" → 用 [topic +reply](../topic-reply.md)（`+answer` 每题仅一次，`+reply` 可多条）
-- 想统计/回顾**已回答**记录 → 同一工具传 `topic_filter:"answered"`，只读，不涉及本场景的提交环节
+- 想统计/回顾**已回答**记录 → 同一接口传 `filter=answered`，只读，不涉及本场景的提交环节
 
 ## 所需输入
 
@@ -28,7 +28,7 @@
 
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|------------------|
-| `api call get_self_answer_topics` | 无独立 reference（在 [SKILL.md](../../SKILL.md) 主题管理 API 表登记，参数 `topic_filter` / `count` / `end_time`） | 列出别人向当前用户发起的提问，用 `topic_filter:"unanswered"` 筛未答 |
+| `get_self_answer_topics` | 无独立 reference（MCP：`GET /v2/users/self/topics/answers`，query `filter` / `count` / `end_time`；在 [SKILL.md](../../SKILL.md) 主题管理 API 表登记） | 列出别人向当前用户发起的提问，用 `filter=unanswered` 筛未答 |
 | `topic +answer` ⚠️写入 | [topic-answer.md](../topic-answer.md) | 对指定 `topic_id` 提交官方回答；每题只能回答一次、不可修改 |
 | `topic +detail`（可选） | [topic-detail.md](../topic-detail.md) | 提问引用了某主题、需补充上下文时按需拉取 |
 
@@ -38,13 +38,14 @@
 
 ### 第一步：拉取未回答提问
 
-```bash
-zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered","count":20}'
+```json
+{"method": "GET", "path": "/v2/users/self/topics/answers",
+ "query": {"filter": "unanswered", "count": 20}}
 ```
 
 从返回 `topics_brief[]` 的每条提取：
 
-- `topic_id` —— 后续提交回答的目标1
+- `topic_id` —— 后续提交回答的目标
 - `content` —— 提问正文，用于生成"提问内容摘要"
 - `group.name` / `group.group_id` —— 来自哪个星球
 - `create_time` —— 提问时间
@@ -73,6 +74,7 @@ zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered",
 
 | 优先级 | 提问内容摘要 | 来自哪个星球 | 提问时间 | 建议回答草稿（≤200 字） |
 |--------|--------------|--------------|----------|--------------------------|
+| P1 | 示例：课程退款进度怎么查 | 示例星球 | 2026-11-03 | 示例草稿（实际草稿逐条生成） |
 
 **到这里为止不做任何写入。** 请用户标注要提交的条目（以及需要改写的草稿）。
 

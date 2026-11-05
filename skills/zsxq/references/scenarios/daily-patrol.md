@@ -39,7 +39,7 @@
 
 ### 第 0 步：确认 group_id（用户只给星球名时）
 
-1. 运行 `group +list`，在结果里按名称匹配 group_id
+1. 调用 `group +list`（MCP：`GET /v2/groups`），在结果里按名称匹配 group_id
 2. 名称精确命中一个 → 直接用其 group_id
 3. 命中多个相似星球 → 列出候选（group_id + 名称）让用户选，**不默认取第一个**
 4. 一个都没命中 → 告知用户可能未加入该星球，让其核对名称或直接给 group_id
@@ -48,11 +48,11 @@
 
 ### 第 1 步：拉取候选主题
 
-`group +topics --group-id <id> --limit <N>`（默认 20，最大 30）。用 `--json` 便于后续逐条取 topic_id、type、create_time、digested、counts。N > 30 时按分支条件翻页。
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`）拉取，默认 20、单页最大 30；返回体逐条含 `topic_id`、`type`、`create_time`、`digested`、`counts`。N > 30 时按分支条件翻页。
 
 ### 第 2 步：逐条拉取完整内容
 
-对第 1 步每个 topic_id 调 `topic +detail --topic-id <id>`，取 `content`(正文)、`type`、`digested`、`counts`(comments/likes/readers)、`create_time`、`owner`。
+对第 1 步每个 topic_id 调 `topic +detail`（MCP：`GET /v2/topics/<id>/info`），取 `content`(正文)、`type`、`digested`、`counts`(comments/likes/readers)、`create_time`、`owner`。
 
 - 正文能判定就用正文；判定 ①④ 需要评论证据时，对该条补调 `get_topic_comments` 读评论文本
 - 每条之间轻微间隔，遇限流按分支条件退避
@@ -89,7 +89,7 @@
 
 - **无主题 / 今日无新内容**：`group +topics` 返回空或最新主题都早于用户关心的时间窗 → 报告"今日无新内容"，结束
 - **星球名命中多个**：列候选让用户确认，不自选（见第 0 步）
-- **N 超过单页上限（30）**：用上一页返回的 `next_end_time` 作为 `--end-time` 翻页续拉，直到凑够 N 或 `has_more=false`（翻页见 [group-topics](../group-topics.md#说明)）
+- **N 超过单页上限（30）**：用上一页返回的 `next_end_time` 作为下一页的 `end_time` 翻页续拉，直到凑够 N 或 `has_more=false`（翻页见 [group-topics](../group-topics.md#说明)）
 - **限流（429 / frequently）**：退避几秒再重试该条，不要循环猛刷；持续受限则先输出已完成部分并说明剩余待续
 - **个别 topic +detail 失败**：跳过该条、记录 topic_id，继续处理其余，最后在报告里列出未取到的条目
 - **用户只要列表、不要分类**：退回到直接用 [group-topics](../group-topics.md)，不进入四类分析
