@@ -2,7 +2,7 @@
 
 对应操作：`topic +schedule`；MCP 调用见下方命令块。
 
-创建或修改一条**定时发布任务**，让主题在未来指定时间自动发布到星球。带 `--job-id` 时为修改已有任务（未提供的字段保持原值），不带则创建新任务。
+创建或修改一条**定时发布任务**，让主题在未来指定时间自动发布到星球。指定任务 ID 时为修改已有任务（未提供的字段保持原值），不指定则创建新任务。
 
 > [!CAUTION]
 > 这是**写入操作** —— 任务到点会自动发布，内容对星球成员公开，且**发布时无需再次确认**。执行前必须向用户确认：
@@ -13,7 +13,7 @@
 > [!IMPORTANT]
 > - 定时任务**每星球上限 10 个**（用 `topic +scheduled` 查看待执行数量）
 > - 定时时间必须**晚于当前时间**且在**未来 14 天以内**（服务端窗口），时区为中国标准时间（+0800）
-> - 定时发布仅支持 `talk` 普通主题；定时**回答**用 `topic +answer --scheduled-time`（见 [topic-answer](topic-answer.md)）
+> - 定时发布仅支持 `talk` 普通主题；定时**回答**见 [topic-answer](topic-answer.md)
 
 ## 命令
 
@@ -81,11 +81,19 @@ zsxq-cli topic +schedule \
 
 ## 输出
 
-成功后输出 `✓ Scheduled job saved` 及服务端返回的 JSON（`resp_data` 为空，**不含 job_id** —— 用 `topic +scheduled` 查看新任务的 job_id）；`--json` 模式仅输出 JSON。MCP 通道恒为 `{success, status_code, body}` 信封，同样**不返回 job_id**，job_id 需用 `topic +scheduled` / `GET /v2/groups/{group_id}/scheduled_jobs` 查询。
+<!-- cli-only:start -->
+
+成功后输出 `✓ Scheduled job saved` 及服务端返回的 JSON（`resp_data` 为空，**不含 job_id** —— 用 `topic +scheduled` 查看新任务的 job_id）；`--json` 模式仅输出 JSON。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，同样**不返回 job_id**，job_id 需用 `GET /v2/groups/{group_id}/scheduled_jobs` 查询。
 
 ## 推荐工作流
 
 **两通道步骤相同，仅调用形式不同**：查看任务用 CLI `topic +scheduled` / MCP `GET /v2/groups/{group_id}/scheduled_jobs`；创建或修改用上方对应通道的命令。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：查看现有定时任务与配额
@@ -101,11 +109,15 @@ zsxq-cli topic +schedule \
 zsxq-cli topic +scheduled --group-id 123456789
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 参数校验（内容 / 时间格式 / 14 天窗口）与附件上传失败不会创建任务；创建或修改失败不改变已有任务列表。
 
 ## 错误说明
+
+<!-- cli-only:start -->
 
 | 错误 | 原因 |
 |------|------|
@@ -119,12 +131,14 @@ zsxq-cli topic +scheduled --group-id 123456789
 | `定时回答任务暂不支持通过 +schedule 修改，请删除后重新创建（topic +answer --scheduled-time）` | 用 +schedule 修改了定时回答任务 |
 | `API 错误(<code>): <msg>` | 服务端拒绝（如配额已满） |
 
-通用错误（401、`--group-id is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
 - [topic-scheduled](topic-scheduled.md) — 查看待执行定时任务与配额
 - [topic-unschedule](topic-unschedule.md) — 取消定时任务
-- [topic-answer](topic-answer.md) — 定时回答（`topic +answer --scheduled-time`）
+- [topic-answer](topic-answer.md) — 定时回答
 - [topic-create](topic-create.md) — 立即发布主题
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

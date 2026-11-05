@@ -41,7 +41,13 @@ zsxq-cli group +hashtags --group-id 123456789 --json
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 | HASHTAG ID | TITLE | TOPIC COUNT |
 |------------|-------|-------------|
@@ -54,6 +60,8 @@ MCP 通道返回 `body.resp_data.hashtags[]`（含 hashtag_id、owner 等完整�
 
 获得 `hashtag_id` 后，可通过 API 列出该标签下的所有主题。CLI 通道用底层接口工具 `get_hashtag_topics`；MCP 通道为 `GET /v2/hashtags/{hashtag_id}/topics`（query 参数见 [endpoint-catalog](endpoint-catalog.md)）。
 
+<!-- cli-only:start -->
+
 ```bash
 zsxq-cli api call get_hashtag_topics \
   --params '{"hashtag_id":"333444555666","limit":20}'
@@ -63,13 +71,15 @@ zsxq-cli api call get_hashtag_topics \
   --params '{"hashtag_id":"333444555666","limit":20,"end_time":"2025-11-01T00:00:00.000+0800"}'
 ```
 
+<!-- cli-only:end -->
+
 ## 错误说明
 
 | 症状 | 可能原因 | 处理 |
 |------|---------|------|
 | 返回空列表 | 该星球尚未创建任何标签 | 正常情况，无需处理 |
 
-通用错误（401、`--group-id is required`、星球不存在/无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、参数缺失、星球不存在/无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

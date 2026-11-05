@@ -1,6 +1,10 @@
 # user +nps（提交 NPS 反馈）
 
+<!-- cli-only:start -->
+
 > **版本要求：** 需要 `zsxq-cli` ≥ **0.4.6**。低于该版本时 `+nps` 不存在，命令会被识别为未知 shortcut。
+
+<!-- cli-only:end -->
 
 对应操作：`user +nps`；MCP 调用见下方命令块。
 
@@ -8,8 +12,8 @@
 
 > [!CAUTION]
 > 这是**写入操作** —— 反馈会发送给知识星球官方。执行前必须向用户确认：
-> 1. 推荐分数（`--score`，1–10 的整数）
-> 2. 文字建议内容（`--suggestion`，必填，500 字以内）
+> 1. 推荐分数（1–10 的整数）
+> 2. 文字建议内容（必填，500 字以内）
 
 ## 命令
 
@@ -73,7 +77,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.s
 |---|------|------|------|
 | 1 | 用户表达对产品本身的不满 | 抱怨产品规则/体验 | `#产品建议#` |
 | 2 | 需求在知识星球产品侧不存在 | 排查后确认接口/能力根本没有 | `#产品建议#` |
-| 3 | zsxq-cli / skill 工具侧未封装 | `api list` 中找不到，`api raw` 也无现成 path | `#工具反馈#` |
+| 3 | CLI / skill 工具侧未封装 | 能力列表中找不到，原始 HTTP 也无现成 path | `#工具反馈#` |
 | 4 | 同一命令多次重试仍失败 | 同一目标连续失败 ≥ 3 次，且非排除清单内错误 | `#工具反馈#` |
 
 **排除场景（不触发）：**
@@ -81,8 +85,8 @@ MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.s
 - `401` / `not logged in` → 引导 `auth login`
 - `403` / 无权限 → 提示切换账户或加入星球
 - `404` / 资源不存在 → 重新核对 ID
-- `--<flag> is required` 等参数缺失 → 用查询命令补齐参数
-- `--end-time` 解析失败等格式错误 → 按 [auth-errors](auth-errors.md#常见错误处理) 的格式说明修正
+- 参数缺失 → 用查询命令补齐参数
+- 时间格式错误 → 按 [auth-errors](auth-errors.md#常见错误处理) 的格式说明修正
 
 **提示流程：**
 
@@ -90,13 +94,15 @@ MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.s
 2. 用户拒绝 → 回到主任务，会话内不再主动提，**除非用户后续主动询问**
 3. 用户接受 → AI 协助起草：询问 score（1–10，不自动赋值），起草 suggestion（≤ 500 字，以 `#产品建议#` 或 `#工具反馈#` 开头）
 4. AI 把 score 与 suggestion 全文复述给用户确认 → **用户改稿则回到第 3 步修订**
-5. 用户确认 → 执行本文件 `## 命令` 中对应通道的提交（CLI 通道 `zsxq-cli user +nps`；MCP 通道 `POST /v2/nps`）
+5. 用户确认 → 执行本文件 `## 命令` 中对应通道的提交（CLI 通道 `user +nps`；MCP 通道 `POST /v2/nps`）
 
 **关键约束**：每会话最多主动提 1 次（用户主动再问不受限）；先解决用户的事再顺口提；score 必须问用户、不自动赋值；suggestion 必须全文复述确认，改稿后回上一步修订；`#产品建议#` / `#工具反馈#` 标签写在 suggestion 正文开头，不占用 score 字段。
 
 ## 推荐工作流
 
 **两通道步骤相同，仅调用形式不同** —— 确认环节与提交内容完全一致，提交时按所在通道调用：
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：与用户确认分数和建议
@@ -105,6 +111,8 @@ MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.s
 # 第二步：执行提交
 zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
 ```
+
+<!-- cli-only:end -->
 
 ```json
 {"method": "POST", "path": "/v2/nps", "body": {"req_data": {"source": "ai_tool", "score": 9, "suggestion": "希望增加更多互动功能"}}}
@@ -116,15 +124,21 @@ zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
 
 ## 错误说明
 
+<!-- cli-only:start -->
+
 | 错误 | 原因 | 解决方案 |
 |------|------|---------|
 | 提示仅列出 `+footprints` / `+info` 等 shortcut，未识别 `+nps` | 当前 zsxq-cli 版本低于 0.4.6 | 运行 `npm i -g zsxq-cli@latest` 升级，再用 `zsxq-cli config show` 确认版本 ≥ 0.4.6 |
 | `--score must be 1–10` | 分数超出范围或非整数 | 改为 1–10 的整数 |
 | `--suggestion exceeds 500 chars` | 建议超过 500 字 | 精简至 500 字以内 |
 
-上表为 CLI 通道的本地参数校验提示；MCP 通道由服务端校验，失败结果看 `body.succeeded` 与 `body.code` / `body.info`。
+上表为 CLI 通道的本地参数校验提示。
 
-通用错误（401、`--score is required` / `--suggestion is required` 等参数缺失）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+MCP 通道由服务端校验，失败结果看 `body.succeeded` 与 `body.code` / `body.info`。
+
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

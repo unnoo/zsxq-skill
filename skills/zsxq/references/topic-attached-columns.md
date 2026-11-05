@@ -48,7 +48,7 @@ zsxq-cli api raw --method POST \
 {"method": "POST", "path": "/v2/topics/111222333444/attached_columns", "body": {"req_data": {"column_ids": ["555666777"]}}}
 ```
 
-> CLI 通道的 `api raw --body` 会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`（移出所有专栏时 `req_data.column_ids` 传 `[]`）。
+> CLI 通道的 `api raw` 请求体会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`（移出所有专栏时 `req_data.column_ids` 传 `[]`）。
 
 ## 参数
 
@@ -106,6 +106,8 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 把主题加入目标专栏（保留原有归属）：
 
+<!-- cli-only:start -->
+
 ```bash
 # 第一步：拿到 group_id，查专栏列表找到目标 column_id、并看现有 topics_count 是否接近 100
 zsxq-cli group +list
@@ -122,6 +124,8 @@ zsxq-cli api raw --method POST \
   --body '{"column_ids": [<现有...>, <目标>]}'
 ```
 
+<!-- cli-only:end -->
+
 移出某专栏：同样先读现有集合，从中**剔除**该专栏后整表回设。
 
 ## 失败语义
@@ -135,9 +139,9 @@ zsxq-cli api raw --method POST \
 | 上限错误 code | `column_ids` 中某专栏已达 100 主题上限，该专栏设置失败 |
 | 无权限 / `code` 类权限错误 | 当前账户非星主 / 合伙人 / 管理员，无权设置 |
 | `429`「操作过于频繁，请稍后重试」 | 短时间内密集写入触发限流。放慢节奏、每次写入间隔约 2 秒后重试；批量场景见 [archive-topics-to-column](scenarios/archive-topics-to-column.md) |
-| `接口 ... 不存在，请检查路径是否正确` | 当前 zsxq-cli 版本的底层接口工具尚未登记该路径，需升级 zsxq-cli（该接口为主题维度 `attached_columns`，替代已废弃的 column 维度收录接口） |
+| `接口 ... 不存在，请检查路径是否正确` | CLI 通道的底层接口工具尚未登记该路径，需升级 CLI（该接口为主题维度 `attached_columns`，替代已废弃的 column 维度收录接口） |
 
-通用错误（401、404 主题不存在、`--body` / 参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、404 主题不存在、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

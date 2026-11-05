@@ -46,25 +46,33 @@ zsxq-cli group +list --json
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 | GROUP ID | NAME |
 |----------|------|
 | 123456789 | 示例星球 |
 
-MCP 通道返回 `body.resp_data.groups[]`（含 owner、statistics 等完整字段），无 `--limit` 对应参数，截断由 agent 自行处理。
+MCP 通道返回 `body.resp_data.groups[]`（含 owner、statistics 等完整字段），无条数参数，截断由 agent 自行处理。
 
 ## 说明
 
 - 返回结果同时包含用户**加入**和**创建**的星球
 - `group_id` 是纯数字字符串，后续 `+topics`、`+hashtags` 等命令均需要此值
+<!-- cli-only:start -->
 - 如需在结果中区分"加入 / 创建"，使用 `--json` 查看完整字段
+<!-- cli-only:end -->
 
 ## 错误说明
 
 | 症状 | 可能原因 | 处理 |
 |------|---------|------|
-| 返回空列表 | 当前账户尚未加入或创建任何星球 | 确认登录账户：`zsxq-cli user +info` |
+| 返回空列表 | 当前账户尚未加入或创建任何星球 | 确认登录账户：`user +info` |
 
 通用错误（401 等）见 [auth-errors](auth-errors.md#常见错误处理)。
 

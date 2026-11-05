@@ -1,6 +1,6 @@
 # group 成员列表（通过 api raw）
 
-列出指定星球的成员，支持按到期时间、加入时间等排序与筛选。CLI 未封装此工具，通过 `api raw` 调用原始 HTTP 接口，查询条件用 `--query`（JSON 对象）传入。
+列出指定星球的成员，支持按到期时间、加入时间等排序与筛选。查询条件以 JSON 对象传入。
 
 对应操作：`GET /v2/groups/<group_id>/members`；MCP 调用见下方命令块。
 
@@ -31,11 +31,9 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
 {"method": "GET", "path": "/v2/groups/123456789/members", "query": {"count": 20}}
 ```
 
-`--query` 内的 JSON 对象原样作为 `query` 传入，字段范围与约束同下方参数表（上方三个 CLI 示例的查询条件可 1:1 照搬）。
+JSON 对象原样作为 `query` 传入，字段范围与约束见下方参数表（上方示例的查询条件可 1:1 照搬）。
 
 ## 参数
-
-`--query` 内的 JSON 字段：
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
@@ -55,11 +53,11 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
 | CLI 形式 | HTTP 字段 |
 |----------|-----------|
 | `<group_id>`（路径） | path `/v2/groups/{group_id}/members` |
-| `api raw --query '{...}'` | `query`（JSON 原样透传，字段以上方参数表为准） |
+| `query` JSON | `query`（JSON 原样透传，字段以上方参数表为准） |
 
 ## 输出
 
-`api raw` 返回 JSON 信封，成员在 `body.resp_data.members[]`（按 `sort` 字段和 `order` 顺序排列）：
+返回 JSON 信封，成员在 `body.resp_data.members[]`（按 `sort` 字段和 `order` 顺序排列）：
 
 ```json
 {
@@ -105,7 +103,7 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
 | `description` | 成员描述（可选） |
 | `user_specific.remark` | 当前请求者为该成员设置的备注（可选） |
 
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`（结构与上方 CLI `api raw` 返回一致）。
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`（结构与上方返回一致）。
 
 ## 说明
 
@@ -116,7 +114,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
   - 时间排序（`join_time` / `expired_time` / `update_time`）：当返回条数等于 `count` 时可能还有更多，用最后一条的对应时间推进游标继续拉——`order=asc` 时把 `begin_time` 设为该时间，`order=desc` 时把 `end_time` 设为该时间，直到返回不足 `count` 或为空。
   - `sort=number`（仅 `scope=expired`）：用上一页返回中最后一条的 `number` 作为下一次的 `page_tag`。
 - `number` 仅当星球启用「成员编号」并已分配时才有；未启用的星球该字段缺失（实测多数星球不返回）。
-- 定位**单个**成员用关键词搜索更直接：`zsxq-cli api call search_group_members --params '{"group_id":<id>,"keyword":"昵称","limit":10}'`；本接口用于**成批**拉取成员列表。
+- 定位**单个**成员用关键词搜索更直接：底层接口工具 `search_group_members`（`group_id` + `keyword` + `limit`）；本接口用于**成批**拉取成员列表。
 
 ## 错误说明
 

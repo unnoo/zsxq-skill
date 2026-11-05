@@ -36,7 +36,7 @@ zsxq-cli api raw --method POST \
 {"method": "POST", "path": "/v2/groups/123456789/columns", "body": {"req_data": {"name": "专栏名称"}}}
 ```
 
-> CLI 通道的 `api raw --body` 会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`。
+> CLI 通道的 `api raw` 请求体会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`。
 
 ## 参数
 
@@ -50,7 +50,7 @@ zsxq-cli api raw --method POST \
 | CLI 形式 | HTTP 字段 |
 |----------|-----------|
 | `<group_id>`（路径） | path `/v2/groups/{group_id}/columns` |
-| `--body '{"name":…}'` | `body.req_data.name`（MCP 通道需显式包 `req_data`） |
+| 请求体 `{"name":…}` | `body.req_data.name`（MCP 通道需显式包 `req_data`） |
 
 ## 输出
 
@@ -93,6 +93,8 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 **两通道步骤相同，仅调用形式不同**：各步骤的两种调用形式见上方「命令」块。
 
+<!-- cli-only:start -->
+
 ```bash
 # 1. 确定目标星球
 zsxq-cli group +list
@@ -105,6 +107,8 @@ zsxq-cli api raw --method POST \
 # 3. 验证创建结果（查专栏列表确认新专栏在列）
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns
 ```
+
+<!-- cli-only:end -->
 
 ## 失败语义
 

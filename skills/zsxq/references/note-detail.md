@@ -52,13 +52,13 @@ zsxq-cli note +detail --note-id 444555666777 --json
 }
 ```
 
-完整字段以 `--json` 实际输出为准。
+完整字段以接口实际输出为准。
 
 CLI 通道输出的是上述提取好的 `note` 子对象；MCP 通道恒为 `{success, status_code, body}` 信封，取 `body.resp_data.note`。
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失、笔记不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

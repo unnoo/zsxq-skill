@@ -48,7 +48,7 @@ zsxq-cli topic +reply \
 {"method": "POST", "path": "/v2/topics/111222333444/comments", "body": {"req_data": {"text": "评论内容", "image_ids": [], "mentioned_user_ids": []}}}
 ```
 
-楼中楼加 `"replied_comment_id": "888999"`（对应 CLI 通道的 `--reply-to`）。
+楼中楼加 `"replied_comment_id": "888999"`（楼中楼即对某条评论的回复）。
 
 ## 参数
 
@@ -88,6 +88,8 @@ MCP 通道恒为 `{success, status_code, body}` 信封，新评论信息（`comm
 
 顶层评论：
 
+<!-- cli-only:start -->
+
 ```bash
 # 第一步：确认目标主题
 zsxq-cli topic +detail --topic-id 111222333444
@@ -106,18 +108,24 @@ zsxq-cli api call get_topic_comments --params '{"topic_id":"111222333444","limit
 zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 222333444555
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 写入失败即原子回滚 —— 不会留下空评论或半成品 comment_id。重试前请先确认参数是否合法。
 
 ## 错误说明
 
+<!-- cli-only:start -->
+
 | 错误 | 原因 |
 |------|------|
 | `评论内容不能为空，请提供 --text 或 --files` | 内容与附件都为空 |
 | `评论仅支持上传 1 个文件` | `--files` 传了多个路径（逗号分隔） |
 
-通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失、主题不存在、被回复的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

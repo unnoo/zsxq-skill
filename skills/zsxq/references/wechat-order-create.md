@@ -2,7 +2,7 @@
 
 > **通道：仅 MCP 通道**。CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
 
-通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。不要用 `zsxq-cli api raw` 代替本操作，CLI 无法保证把支付所需的 `_meta` 交给支付宿主。
+通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。不要用 CLI 的原始 HTTP 调用（`api raw`）代替本操作，CLI 无法保证把支付所需的 `_meta` 交给支付宿主。
 
 > [!CAUTION]
 > 创建订单会产生真实待支付订单，完成支付会发生真实资金交易。首先确认当前宿主是 WorkBuddy 且提供官方 `weixinpay_pay`；非 WorkBuddy（如 Claude Code / CC）必须说明不支持并停止，不得创建订单。通过宿主检查后，首次调用前还必须向用户确认：
@@ -116,8 +116,6 @@
 
 ## 参数
 
-工具顶层参数：
-
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `method` | **是** | 固定为 `POST` |
@@ -126,7 +124,7 @@
 | `payment_retry_token` | 仅预下单失败重试 | `SKILLHUB_PREORDER_FAILED` 返回的短期签名凭据；重试时无需再传 `body` |
 | `out_trade_no` | 否 | 与 `payment_retry_token` 一起校验订单；单独传入会被拒绝。**只能作为字符串原样保存和传递**，不得转换为数值；恢复时可省略，由签名凭据确定订单 |
 
-`body.req_data` 字段：
+`body.req_data` 字段（上表为工具顶层参数）：
 
 | 字段 | 必填 | 适用范围与说明 |
 |------|------|----------------|

@@ -1,6 +1,8 @@
 # 认证与常见错误
 
-本文档覆盖两条通道的认证与错误排查：**CLI 通道**（zsxq-cli，OAuth 设备码登录）与 **MCP 通道**（api-key 接入，见 [SKILL.md](../SKILL.md#执行通道)）。
+本文档覆盖两条通道的认证与错误排查：**CLI 通道**（OAuth 设备码登录）与 **MCP 通道**（api-key 接入，见 [SKILL.md](../SKILL.md#执行通道)）。
+
+<!-- cli-only:start -->
 
 ## CLI 通道认证
 
@@ -24,6 +26,8 @@ zsxq-cli 使用 **OAuth 2.0 设备授权码流程（RFC 8628）** 认证，token
 
 > 当你作为 AI Agent 帮用户登录时，在后台运行 `zsxq-cli auth login`，读取输出后将授权链接提供给用户，等待用户完成授权。
 
+<!-- cli-only:end -->
+
 ## MCP 通道认证
 
 MCP 通道使用 api-key 鉴权（密钥管理页创建密钥后复制含 key 的链接接入宿主）。没有 `auth login` 等命令：
@@ -38,14 +42,19 @@ MCP 通道使用 api-key 鉴权（密钥管理页创建密钥后复制含 key �
 
 | 错误 | 通道 | 原因 | 解决方案 |
 |------|------|------|---------|
-| `command not found: zsxq-cli` / `zsxq-cli: command not found` | 仅 CLI 通道 | CLI 工具未安装 | 见下方 [CLI 通道：未安装恢复流程](#cli-通道未安装恢复流程) |
-| `authentication failed (HTTP 401)` / `not logged in` | CLI 通道 | Token 无效、过期或未登录 | 运行 `zsxq-cli auth login` |
 | 401 / 鉴权失败 | MCP 通道 | api-key 无效或已失效 | 到知识星球密钥管理页删除旧密钥、创建新密钥，在宿主的 MCP 配置中更新链接后重连 |
 | 403 / 无权限 / 不可访问 | 两通道 | 当前账户无访问权限 | 切换账户，或加入对应星球 |
 | 404 / 资源不存在 | 两通道 | group_id / topic_id / note_id 无效或已删除 | 用 `group +list`、`topic +search`、`note +list` 等核对 ID |
 | `MCP tool error: {"code":429,...}` / 操作过于频繁 | 仅 CLI 通道（MCP 通道看响应 `body.succeeded` / `status_code`） | 短时间内写入/调用过密触发限流 | 等待几秒到几十秒后重试；批量操作时在命令间留间隔 |
-| `--<flag> is required` | 仅 CLI 通道 | 缺少必填参数 | 用对应查询命令获取后再填 |
 | `body.code 1004` / `参数错误` | 两通道（`api raw` / `call_zsxq_api` 的响应 body） | query / body 缺必填字段或取值非法 | 对照对应 reference 的「参数」表补齐后重试 |
+
+<!-- cli-only:start -->
+
+| 错误 | 通道 | 原因 | 解决方案 |
+|------|------|------|---------|
+| `command not found: zsxq-cli` / `zsxq-cli: command not found` | 仅 CLI 通道 | CLI 工具未安装 | 见下方 [CLI 通道：未安装恢复流程](#cli-通道未安装恢复流程) |
+| `authentication failed (HTTP 401)` / `not logged in` | CLI 通道 | Token 无效、过期或未登录 | 运行 `zsxq-cli auth login` |
+| `--<flag> is required` | 仅 CLI 通道 | 缺少必填参数 | 用对应查询命令获取后再填 |
 | `--end-time` 解析失败 | 仅 CLI 通道 | 分页时间格式错误 | 使用上一页 JSON 中返回的 `next_end_time` / `create_time` 原值 |
 
 ## CLI 通道：未安装恢复流程
@@ -78,6 +87,8 @@ zsxq-cli auth login
 **3. 安装并登录成功后，自动重试用户原本要执行的操作。** 不需要用户再重复一遍指令。
 
 > 这个流程只在命令真正报 `command not found` 时才触发。日常使用中绝大多数用户已安装，不应浪费 token 做预检查。
+
+<!-- cli-only:end -->
 
 ## 参考
 

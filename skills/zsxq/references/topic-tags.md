@@ -1,6 +1,6 @@
 # 设置主题标签（api call set_topic_tags）
 
-通过 `zsxq-cli api call set_topic_tags` 为某主题设置标签（hashtag），返回更新后的主题简要信息。
+为某主题设置标签（hashtag），返回更新后的主题简要信息。
 
 对应操作：底层接口工具 `set_topic_tags`；MCP 调用见下方命令块。
 
@@ -63,6 +63,8 @@ MCP 通道没有 `titles` 数组，需自行把标签构造为 `annotation`：
 
 **两通道步骤相同，仅调用形式不同**：查看现有标签用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；设置标签用上方对应通道的命令（MCP 通道需先按规则构造 `annotation`）。
 
+<!-- cli-only:start -->
+
 ```bash
 # 第一步：查看主题现有标签，避免覆盖时误删
 zsxq-cli topic +detail --topic-id 123
@@ -70,6 +72,8 @@ zsxq-cli topic +detail --topic-id 123
 # 第二步：与用户确认「最终完整标签集合」后执行
 zsxq-cli api call set_topic_tags --params '{"topic_id":"123","titles":["产品","增长"]}'
 ```
+
+<!-- cli-only:end -->
 
 > 查看星球已有哪些标签可用 `group +hashtags`（见 [group-hashtags](group-hashtags.md)）。
 

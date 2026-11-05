@@ -83,7 +83,7 @@ CLI 通道恒输出 JSON；MCP 通道恒为 `{success, status_code, body}` 信�
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、无权限访问等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失、主题不存在、无权限访问等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

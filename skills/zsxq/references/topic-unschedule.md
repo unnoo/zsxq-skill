@@ -30,7 +30,7 @@ zsxq-cli topic +unschedule --group-id 123456789 --job-id 888
 {"method": "DELETE", "path": "/v2/groups/123456789/scheduled_jobs/777888999"}
 ```
 
-`--group-id` 与 `--job-id` 都拼进 path；DELETE 请求无 body。
+`group_id` 与 `job_id` 都拼进 path；DELETE 请求无 body。
 
 ## 参数
 
@@ -49,11 +49,19 @@ zsxq-cli topic +unschedule --group-id 123456789 --job-id 888
 
 ## 输出
 
-成功后输出 `✓ Scheduled job deleted`；`--json` 模式仅输出服务端返回的 JSON。MCP 通道恒为 `{success, status_code, body}` 信封（DELETE 无业务 body）。
+<!-- cli-only:start -->
+
+成功后输出 `✓ Scheduled job deleted`；`--json` 模式仅输出服务端返回的 JSON。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封（DELETE 无业务 body）。
 
 ## 推荐工作流
 
 **两通道步骤相同，仅调用形式不同**：核对任务用 CLI `topic +scheduled` / MCP `GET /v2/groups/{group_id}/scheduled_jobs`；删除用上方对应通道的命令。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：列出待执行任务，核对要删的 job_id 与内容
@@ -66,6 +74,8 @@ zsxq-cli topic +unschedule --group-id 123456789 --job-id 888
 zsxq-cli topic +scheduled --group-id 123456789
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 删除失败任务仍在列表中，到点仍会执行；确认参数后可重试。
@@ -77,7 +87,7 @@ zsxq-cli topic +scheduled --group-id 123456789
 | `API 错误(52201): 未找到待发布的定时任务` | job_id 不存在或已执行/已删除 |
 | `API 错误(<code>): <msg>` | 服务端拒绝（非本人创建的任务等） |
 
-通用错误（401、`--group-id is required`、`--job-id is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

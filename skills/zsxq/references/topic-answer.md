@@ -16,9 +16,9 @@
 > - `+reply`：发表普通评论，适用于所有类型主题，可发多条
 
 > [!IMPORTANT]
-> 定时回答（`--scheduled-time`）：
+> 定时回答：
 > - 时间必须**晚于当前时间**且在**未来 14 天以内**；任务同样占用星球定时任务配额（每星球上限 10，见 [topic-scheduled](topic-scheduled.md)）
-> - 定时回答任务到点自动发布，可用 `topic +unschedule` 取消；不支持经 `topic +schedule --job-id` 修改
+> - 定时回答任务到点自动发布，可用 `topic +unschedule` 取消；不支持经 `topic +schedule` 修改
 
 ## 命令
 
@@ -82,7 +82,7 @@ zsxq-cli topic +answer \
 | `--text <text>` | **是** | 回答正文 |
 | `--files <paths>` | 否 | 附件路径；**不支持文件，仅图片**，且仅支持 1 张 |
 | `--scheduled-time <time>` | 否 | 定时发布时间，如 `"2026-08-14 12:00"`；不传则立即回答 |
-| `--silenced` | 否 | 静默回答：仅提醒提问者（仅与 `--scheduled-time` 同用） |
+| `--silenced` | 否 | 静默回答：仅提醒提问者（仅与定时发布同用） |
 | `--json` | 否 | 输出原始 JSON |
 
 ### 通道映射
@@ -97,7 +97,9 @@ zsxq-cli topic +answer \
 
 ## 推荐工作流
 
-先确认主题类型，再发布。**两通道步骤相同，仅调用形式不同**：查主题类型用 CLI `topic +detail --json` / MCP `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方对应通道的命令（MCP 通道不能带附件）。
+先确认主题类型，再发布。**两通道步骤相同，仅调用形式不同**：查主题类型用 CLI 通道的 `topic +detail` / MCP 通道的 `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方对应通道的命令（MCP 通道不能带附件）。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认目标主题是 q&a 类型并核对问题内容
@@ -120,6 +122,8 @@ zsxq-cli api call get_self_question_topics --params '{"topic_filter":"unanswered
 zsxq-cli api call get_self_answer_topics --params '{"topic_filter":"unanswered","count":20}'
 ```
 
+<!-- cli-only:end -->
+
 MCP 通道对应调用：
 
 ```json
@@ -138,6 +142,8 @@ MCP 通道对应调用：
 
 ## 错误说明
 
+<!-- cli-only:start -->
+
 | 错误 | 原因 |
 |------|------|
 | `问题已回答` | 该主题已有官方回答，每题只能回答一次 |
@@ -149,7 +155,9 @@ MCP 通道对应调用：
 | `无法解析时间 "..."，请使用 "2026-08-14 10:00" 或 "2026-08-14T10:00:00" 格式` | 时间格式不对 |
 | `定时时间必须晚于当前时间（当前: ...）` / `定时时间必须在未来 14 天以内` | 时间超出允许窗口 |
 
-通用错误（401、`--topic-id is required`、主题不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失、主题不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

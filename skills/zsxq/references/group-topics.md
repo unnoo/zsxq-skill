@@ -52,7 +52,13 @@ zsxq-cli group +topics --group-id 123456789 --json
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 | TOPIC ID | TYPE | TITLE / DIGEST | CREATED AT |
 |----------|------|----------------|------------|
@@ -61,11 +67,13 @@ CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success
 - `TYPE`：`talk`（帖子）、`q&a`（提问）、`task`（作业题目）、`solution`（作业答案）
 - `TITLE / DIGEST`：优先显示标题，无标题时显示内容摘要（截断至 50 字符）
 
-MCP 通道返回 `body.resp_data.topics[]`（完整 topic 字段，等同 CLI 的 `--json`）。
+MCP 通道返回 `body.resp_data.topics[]`（完整 topic 字段）。
 
 ## 说明
 
 按时间倒序返回最新主题。
+
+<!-- cli-only:start -->
 
 **翻页（CLI 通道）**：当 `--json` 输出中 `has_more: true` 时，使用返回的 `next_end_time` 值作为 `--end-time` 参数继续翻页：
 
@@ -79,17 +87,19 @@ zsxq-cli group +topics --group-id 123456789 \
   --end-time "2025-11-01T10:00:00.000+0800" --json
 ```
 
+<!-- cli-only:end -->
+
 **翻页（MCP 通道）**：响应不含 `next_end_time` 字段，取本页**最后一条**主题的 `create_time` 原值作为下一页的 `query.end_time`：
 
 ```json
 {"method": "GET", "path": "/v2/groups/123456789/topics", "query": {"count": 20, "end_time": "2025-11-01T10:00:00.000+0800"}}
 ```
 
-> **翻页边界去重**：`next_end_time` 等于本页最后一条主题的 `create_time`，而 `--end-time` / `end_time` 是**含等于**的，因此下一页会把上一页最后一条主题**重复返回为首条**。翻页累积时须按 `topic_id` 去重（周期巡查同理按 `comment_id`），不要重复计数或重复处理边界主题。
+> **翻页边界去重**：游标时间等于本页最后一条主题的 `create_time`，而 `end_time` 是**含等于**的，因此下一页会把上一页最后一条主题**重复返回为首条**。翻页累积时须按 `topic_id` 去重（周期巡查同理按 `comment_id`），不要重复计数或重复处理边界主题。
 
 ## 错误说明
 
-通用错误（401、参数缺失、404、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失、404、游标时间格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

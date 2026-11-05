@@ -45,7 +45,13 @@ zsxq-cli topic +scheduled --group-id 123456789
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 ```
 JOB ID   SCHEDULED TIME                  TYPE    DIGEST
@@ -55,22 +61,28 @@ JOB ID   SCHEDULED TIME                  TYPE    DIGEST
 待执行定时任务：2 个（每星球上限 10）
 ```
 
-CLI 通道在非 `--json` 时自动合并配额行；MCP 通道需**两次调用**（任务列表 + 配额统计）后自行合并，配额数字在 statistics 响应的 `scheduled_jobs_count`。
+<!-- cli-only:start -->
+
+CLI 通道在非 `--json` 时自动合并配额行。
+
+<!-- cli-only:end -->
+
+MCP 通道需**两次调用**（任务列表 + 配额统计）后自行合并，配额数字在 statistics 响应的 `scheduled_jobs_count`。
 
 ## 说明
 
 - `TYPE` 列：`topic` = 定时发布主题，`answer` = 定时回答（问答主题附带的定时回答任务）
 - 已执行或已删除的任务不在列表内
 - 配额统计来自独立接口，统计失败时仅不显示配额行，不影响任务列表
-- 定时发布任务用 `topic +schedule --job-id` 修改；定时回答任务不支持经 `+schedule` 修改，需删除后重建（见 [topic-schedule](topic-schedule.md)）
+- 定时发布任务用 `topic +schedule` 修改；定时回答任务不支持经 `+schedule` 修改，需删除后重建（见 [topic-schedule](topic-schedule.md)）
 
 ## 错误说明
 
-通用错误（401、`--group-id is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 
 - [topic-schedule](topic-schedule.md) — 创建 / 修改定时发布任务
 - [topic-unschedule](topic-unschedule.md) — 取消定时任务
-- [topic-answer](topic-answer.md) — 定时回答（`topic +answer --scheduled-time`）
+- [topic-answer](topic-answer.md) — 定时回答
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

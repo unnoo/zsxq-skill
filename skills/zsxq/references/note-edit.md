@@ -68,6 +68,8 @@ MCP 通道的 `image_ids` 须先 `GET /v2/notes/{note_id}` 读出当前值后原
 
 **两通道步骤相同，仅调用形式不同**：先读当前内容确认，再写入。
 
+<!-- cli-only:start -->
+
 ```bash
 # 第一步：确认当前笔记内容
 zsxq-cli note +detail --note-id 444555666777
@@ -75,6 +77,8 @@ zsxq-cli note +detail --note-id 444555666777
 # 第二步：确认无误后执行编辑
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 ```
+
+<!-- cli-only:end -->
 
 MCP 通道：
 
@@ -92,7 +96,7 @@ MCP 通道：
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在、403 无权限编辑他人笔记等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、参数缺失、笔记不存在、403 无权限编辑他人笔记等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

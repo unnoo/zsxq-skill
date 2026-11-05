@@ -78,7 +78,7 @@ CLI 通道直接输出业务数据（`+info` 始终为 JSON）；MCP 通道恒�
 
 | 症状 | 可能原因 | 处理 |
 |------|---------|------|
-| 输出账户与预期不符 | 当前 keychain 中保存的是其他账户 | `zsxq-cli auth logout` 后重新登录 |
+| 输出账户与预期不符 | 当前保存的是其他账户 | `auth logout` 后重新登录 |
 
 通用错误（401 等）见 [auth-errors](auth-errors.md#常见错误处理)。
 

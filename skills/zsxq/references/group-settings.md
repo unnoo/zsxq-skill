@@ -11,8 +11,8 @@
 
 > [!IMPORTANT]
 > - 字段为 patch 语义：只传要改的字段，未传的保持不变；名称与简介**无法清空**（不传即保留原值）
-> - `--background`、`--promo-images` 只接受**本地图片文件路径**，上传后以星球资源形式引用
-> - 背景图与亮点图均为**替换**语义：新图覆盖旧图；亮点图用 `--clear-promo-images` 清空
+> - 背景图、亮点图只接受**本地图片文件路径**，上传后以星球资源形式引用
+> - 背景图与亮点图均为**替换**语义：新图覆盖旧图；亮点图可整体清空
 
 ## 命令
 
@@ -56,7 +56,7 @@ zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 | `--description <text>` | 否 | 新简介（最多 1000 字符） |
 | `--background <path>` | 否 | 背景图本地图片路径（替换现有背景图） |
 | `--promo-images <paths>` | 否 | 亮点图本地图片路径，逗号分隔，最多 3 张（全量替换现有亮点图） |
-| `--clear-promo-images` | 否 | 清空全部亮点图（不能与 `--promo-images` 同用） |
+| `--clear-promo-images` | 否 | 清空全部亮点图（不能与亮点图列表同用） |
 | `--json` | 否 | 输出原始 JSON |
 
 ### 通道映射
@@ -72,11 +72,19 @@ zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 
 ## 输出
 
-成功后输出 `✓ Group settings updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`；MCP 通道只能修改名称与简介（背景图 / 亮点图涉及本地上传，仅 CLI 通道支持）。
+<!-- cli-only:start -->
+
+成功后输出 `✓ Group settings updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`；MCP 通道只能修改名称与简介（背景图 / 亮点图涉及本地上传，仅 CLI 通道支持）。
 
 ## 推荐工作流
 
 **两通道步骤相同，仅调用形式不同**：查星球用 `group +list` / `GET /v2/groups`，写入用上方对应通道的命令。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认目标星球与当前资料
@@ -89,11 +97,15 @@ zsxq-cli group +settings --group-id 123456789 --name "新星球名"
 zsxq-cli group +list
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 参数校验或图片上传失败不会修改任何星球资料；上传成功后写入失败则资料保持不变（已上传图片成为未引用的资源，重试会重新上传）。
 
 ## 错误说明
+
+<!-- cli-only:start -->
 
 | 错误 | 原因 |
 |------|------|
@@ -107,7 +119,9 @@ zsxq-cli group +list
 | `上传背景图失败: 未获取到 image_id` | 背景图上传未返回 image_id |
 | `API 错误(<code>): <msg>` | 服务端拒绝 |
 
-通用错误（401、`--group-id is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

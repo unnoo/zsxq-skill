@@ -51,7 +51,13 @@ zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800"
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 | NOTE ID | CONTENT | CREATED AT |
 |---------|---------|------------|
@@ -63,7 +69,11 @@ CLI 通道从 `footprints[]` 中抽取 `note` 字段拼成上表；MCP 通道返
 
 按创建时间倒序返回。
 
-**翻页（两通道一致）**：取上一页最后一条的 `create_time` 原值作为下一页游标。CLI 通道传 `--end-time`：
+**翻页（两通道一致）**：取上一页最后一条的 `create_time` 原值作为下一页游标。
+
+<!-- cli-only:start -->
+
+CLI 通道传 `--end-time`：
 
 ```bash
 # 第一页
@@ -72,6 +82,8 @@ zsxq-cli note +list --json
 # 第二页
 zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800" --json
 ```
+
+<!-- cli-only:end -->
 
 MCP 通道取本页 `footprints[]` 末条的 `create_time` 原值作为下一页 `query.end_time`：
 
@@ -85,7 +97,7 @@ MCP 通道取本页 `footprints[]` 末条的 `create_time` 原值作为下一页
 |------|---------|------|
 | 返回空列表 | 当前账户尚未创建任何笔记 | 正常情况，无需处理 |
 
-通用错误（401、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、游标时间格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
