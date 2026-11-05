@@ -7,13 +7,14 @@
 > [!IMPORTANT]
 > - 支持 `talk`（普通帖子，默认）与 `q&a`（提问，需 `--ask`）两种类型；`task`、`solution` 类型暂不支持通过 CLI 创建。
 > - 投票（`--vote-title`）仅支持 `talk` 类型，不能与 `--ask` 提问同用。
+> - 关联打卡任务（`--checkin-id`）仅支持 `talk` 类型，不能与 `--ask` 提问同用；需 zsxq-cli ≥ 0.5.1。`checkin_id` 从 [group-checkins](group-checkins.md) 查询。
 > - 提问（`--ask`）不能问自己；在配置了**提问费用**的星球（星主设置了最低提问金额）会创建失败 —— CLI 无法传提问金额参数，实测返回 `code 80105/80106`。
 
 > [!CAUTION]
 > 这是**公开写入操作** —— 发布后对星球成员可见。执行前必须向用户确认：
 > 1. 目标星球（group_id 和星球名称）
-> 2. 发布的内容与类型（普通帖子 / 投票 / 提问）
-> 3. 投票主题：投票标题与全部选项；提问主题：向谁提问（对方 user_id）、是否匿名
+> 2. 发布的内容与类型（普通帖子，可选投票或关联打卡任务 / 提问）
+> 3. 投票主题：投票标题与全部选项；提问主题：向谁提问（对方 user_id）、是否匿名；关联打卡任务时：目标任务的名称与 checkin_id
 > 4. 是否声明 AI 生成（`--ai` / `--ai-mode`）
 > 5. 若对草稿做了排版或改写：把**完整确认稿**（标题、正文、标签、附件清单）交用户核对，待其明确表示”确认发布”后再执行
 
@@ -46,6 +47,12 @@ zsxq-cli topic +create \
   --vote-title "你支持哪个方案？" \
   --vote-options "方案A,方案B,方案C"
 
+# 关联打卡任务（仅 talk；checkin_id 从 group-checkins 查询）
+zsxq-cli topic +create \
+  --group-id 123456789 \
+  --text "今日打卡" \
+  --checkin-id 88888
+
 # 向指定成员提问（q&a 主题）
 zsxq-cli topic +create \
   --group-id 123456789 \
@@ -76,6 +83,12 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 {"method": "POST", "path": "/v2/groups/123456789/topics", "body": {"req_data": {"type": "q&a", "text": "请问这个问题怎么解决？", "questionee_id": "77777"}}}
 ```
 
+关联打卡任务（`talk`，对应 `--checkin-id`；`checkin_id` 为数字）：
+
+```json
+{"method": "POST", "path": "/v2/groups/123456789/topics", "body": {"req_data": {"type": "talk", "text": "今日打卡", "checkin_id": 88888}}}
+```
+
 带投票的帖子需两步 —— 先创建投票：
 
 ```json
@@ -97,6 +110,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 | `--anonymous` | 否 | 匿名提问（仅与 `--ask` 同用） |
 | `--vote-title <title>` | 否 | 投票标题；提供时内联创建投票并关联主题（仅 talk，与 `--ask` 互斥） |
 | `--vote-options <list>` | 否 | 投票选项，逗号分隔、至少 2 个（选项内不能含逗号）；须与 `--vote-title` 同时提供 |
+| `--checkin-id <id>` | 否 | 关联打卡任务（仅 talk，与 `--ask` 互斥；需 zsxq-cli ≥ 0.5.1）；任务 ID 从 [group-checkins](group-checkins.md) 查询 |
 | `--markdown` | 否 | 正文按 markdown 渲染 |
 | `--markdown-file <path>` | 否 | 读取本地 .md 文件作为正文发布（按 markdown，非附件上传）；与 `--text` 互斥 |
 | `--json` | 否 | 输出原始 JSON（含新建 topic_id） |
@@ -116,6 +130,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 | `--ask` | `type: "q&a"` + `req_data.questionee_id` |
 | `--anonymous` | `req_data.anonymous: true` |
 | `--vote-title` / `--vote-options` | 先 `POST /v3/votes` 再带 `vote_uid` |
+| `--checkin-id` | `req_data.checkin_id`（数字） |
 | `--files` | **仅 CLI 通道**（附件上传缺口，见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」） |
 
 ## 输出
@@ -135,7 +150,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 }
 ```
 
-主题状态（类型、`creation_statement`、关联投票等）以 `topic +detail` 的返回为准。
+主题状态（类型、`creation_statement`、关联投票等）以 `topic +detail` 的返回为准。关联打卡任务时，响应与 `topic +detail` 中均含 `checkin` 对象（`checkin_id` / `title` / `min_words_count`），可据此核对关联是否生效。
 
 MCP 通道恒为 `{success, status_code, body}` 信封，新建主题信息在 `body.resp_data`（对应 CLI 通道的 JSON 输出）；正文是否按 markdown 落地、标签是否解析成功，同样以 `topic +detail` / `GET /v2/topics/{topic_id}/info` 的返回为准。
 
@@ -222,6 +237,7 @@ zsxq-cli topic +detail --topic-id <新建的 topic_id>
 
 ## 参考
 
+- [group-checkins](group-checkins.md) — 查询打卡任务、获取 checkin_id
 - [topic-reply](topic-reply.md) — 对已发主题评论
 - [group-list](group-list.md) — 获取 group_id
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

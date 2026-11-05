@@ -1,8 +1,8 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做星球AI搜索总结 / 按相关度总结搜索结果 / 搜不到时列出最贴近的主题、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、知识星球 MCP 接入 / api-key、查成员列表 / 成员到期时间 / 专栏 column 列表，或询问知识星球产品规则与常见问题（退款条件 / 退款要多久 / 手续费多少 / 费率是多少 / 提现多久到账 / 怎么开发票 / 企业认证要什么材料 / 分享有赏比例 / 为什么审核不通过 / 为什么打不开 / 违规封禁规则 / 用户协议隐私政策等，读官方帮助中心 doc.zsxq.com 后回答），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发"
+description: "知识星球 CLI（zsxq-cli）与底层接口完整操作指南，涵盖星球和内容管理、Skill Pay 微信支付场景。当用户提到知识星球、zsxq、小密圈、星球、登录/认证、发帖、评论、回答、编辑、删除主题、定时发布/定时任务/定时回答、投票、问答主题、打卡/打卡任务/关联打卡、markdown 正文、AI 声明（aigc/personal_perspective）、置顶、精华、标签/hashtag、成员、足迹、提问记录、分享链接、NPS 反馈、Skill Pay、微信支付、查询星球价格/续费价格/轻读价格、付费加入、续费/续期、礼品卡、付费提问、赞赏用户/主题/评论、购买轻读、购买创建星球邀请码、创建订单、group_id、topic_id、comment_id，需要登录/查看认证状态、查看/搜索/发布/编辑/管理知识星球内容、做星球AI搜索总结 / 按相关度总结搜索结果 / 搜不到时列出最贴近的主题、修改星球名称/简介/背景图/亮点图（星球设置）、做每日巡场 / 评论区运营 / 提问管理 / 精华与标签整理 / 运营日报周报复盘 / 生成星球日报海报图片 / 生成竖版动画视频 / 负面内容监控 / 批量打标签 / 到期成员续费关怀 / 收录主题到专栏等运营场景、拼接分享链接、直接调用底层接口（api call / api raw / call_zsxq_api）、知识星球 MCP 接入 / api-key、查成员列表 / 成员到期时间 / 专栏 column 列表，或询问知识星球产品规则与常见问题（退款条件 / 退款要多久 / 手续费多少 / 费率是多少 / 提现多久到账 / 怎么开发票 / 企业认证要什么材料 / 分享有赏比例 / 为什么审核不通过 / 为什么打不开 / 违规封禁规则 / 用户协议隐私政策等，读官方帮助中心 doc.zsxq.com 后回答），或需要检查/迁移/清理旧版知识星球 skill（zsxq-shared、zsxq-group 等升级到单一 zsxq）时，必须使用本 Skill。即使只涉及单一操作（如获取 group_id、查看帖子详情、回复评论），也应触发"
 metadata:
-  version: "3.0.0"
+  version: "3.1.0"
   channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
@@ -70,7 +70,8 @@ metadata:
 | 在星球内搜索内容 | → [`references/topic-search.md`](references/topic-search.md) |
 | 把星球内搜索结果做成 AI 总结 | → [`scenarios/summarize-search-results.md`](references/scenarios/summarize-search-results.md) |
 | 查看帖子详情 | → [`references/topic-detail.md`](references/topic-detail.md) |
-| 发帖（普通 / 投票 / 提问 / markdown / AI 声明） | → [`references/topic-create.md`](references/topic-create.md) |
+| 发帖（普通 / 投票 / 提问 / 关联打卡任务 / markdown / AI 声明） | → [`references/topic-create.md`](references/topic-create.md) |
+| 查询星球打卡任务 / 获取 checkin_id | → [`references/group-checkins.md`](references/group-checkins.md) |
 | 编辑帖子 | → [`references/topic-edit.md`](references/topic-edit.md) |
 | 评论 / 楼中楼回复 | → [`references/topic-reply.md`](references/topic-reply.md) |
 | 回答提问（立即 / 定时 / 静默） | → [`references/topic-answer.md`](references/topic-answer.md) |
@@ -178,6 +179,7 @@ User (user_id) — 已登录账户
 |------|----------|-----------|
 | 成员列表 | `api raw --method GET --path /v2/groups/<group_id>/members --query '<json>'` | [`group-members.md`](references/group-members.md) |
 | 专栏列表 | `api raw --method GET --path /v2/groups/<group_id>/columns` | [`group-columns.md`](references/group-columns.md) |
+| 打卡任务列表 | `api raw --method GET --path /v2/groups/<group_id>/checkins --query '<json>'` | [`group-checkins.md`](references/group-checkins.md) |
 | 创建专栏 | `api raw --method POST --path /v2/groups/<group_id>/columns --body '{"name":"…"}'` ⚠️ | [`group-column-create.md`](references/group-column-create.md) |
 
 > 成员列表的 `expired_time` 仅付费星球星主/管理员可见。主题的专栏归属为主题维度操作，见[主题管理](#主题管理topic)的原始 HTTP 调用。
@@ -198,7 +200,7 @@ User (user_id) — 已登录账户
 |----------|------|-----------|
 | `zsxq-cli topic +search` | 在星球内全文搜索主题 | [`topic-search.md`](references/topic-search.md) |
 | `zsxq-cli topic +detail` | 获取主题完整详情 | [`topic-detail.md`](references/topic-detail.md) |
-| `zsxq-cli topic +create` | 发布新帖子（talk / q&a、投票、AI 声明、markdown）⚠️ | [`topic-create.md`](references/topic-create.md) |
+| `zsxq-cli topic +create` | 发布新帖子（talk / q&a、投票、关联打卡任务、AI 声明、markdown）⚠️ | [`topic-create.md`](references/topic-create.md) |
 | `zsxq-cli topic +edit` | 编辑自己的帖子（正文 / 附件 / AI 声明 / 投票）⚠️ | [`topic-edit.md`](references/topic-edit.md) |
 | `zsxq-cli topic +reply` | 评论 / 楼中楼回复 ⚠️ | [`topic-reply.md`](references/topic-reply.md) |
 | `zsxq-cli topic +answer` | 回答提问（支持定时 / 静默）⚠️ | [`topic-answer.md`](references/topic-answer.md) |
