@@ -99,5 +99,33 @@ class BuildTest(unittest.TestCase):
                 og.build(config_for(root))
 
 
+class CliRegionTest(unittest.TestCase):
+    def test_strip_removes_only_marked_region(self):
+        text = "A\n<!-- cli-only:start -->\nCLI\n<!-- cli-only:end -->\nB\n"
+        self.assertEqual(og.strip_cli_regions(text).strip(), "A\nB")
+
+    def test_strip_rejects_unclosed_region(self):
+        with self.assertRaises(og.BuildError):
+            og.strip_cli_regions("<!-- cli-only:start -->\nCLI\n")
+
+    def test_strip_rejects_unpaired_end(self):
+        with self.assertRaises(og.BuildError):
+            og.strip_cli_regions("X\n<!-- cli-only:end -->\n")
+
+
+class FrontmatterTest(unittest.TestCase):
+    def test_sanitize_replaces_description_and_removes_cli_help(self):
+        text = og.sanitize_frontmatter(SKILL, "官方描述")
+        self.assertIn('description: "官方描述"', text)
+        self.assertNotIn("cliHelp", text)
+        self.assertIn('channels: "mcp（call_zsxq_api）"', text)
+        self.assertIn('version: "3.1.0"', text)
+
+    def test_sanitize_requires_description(self):
+        broken = "---\nname: zsxq\n---\n\n# x\n"
+        with self.assertRaises(og.BuildError):
+            og.sanitize_frontmatter(broken, "官方描述")
+
+
 if __name__ == "__main__":
     unittest.main()

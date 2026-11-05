@@ -108,6 +108,55 @@ def normalize_content(text: str) -> str:
     return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
+def strip_cli_regions(text: str) -> str:
+    out: list[str] = []
+    in_cli = False
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if stripped == CLI_START:
+            if in_cli:
+                raise BuildError("cli-only:start 嵌套")
+            in_cli = True
+            continue
+        if stripped == CLI_END:
+            if not in_cli:
+                raise BuildError("出现未配对的 cli-only:end")
+            in_cli = False
+            continue
+        if not in_cli:
+            out.append(line)
+    if in_cli:
+        raise BuildError("cli-only:start 未闭合")
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(out))
+
+
+def sanitize_frontmatter(text: str, description: str) -> str:
+    lines = text.split("\n")
+    if not lines or lines[0] != "---":
+        raise BuildError("SKILL.md 首行必须是 ---")
+    try:
+        end = lines.index("---", 1)
+    except ValueError as exc:
+        raise BuildError("SKILL.md frontmatter 未闭合") from exc
+    out: list[str] = []
+    replaced = False
+    for line in lines[1:end]:
+        stripped = line.strip()
+        if line.startswith("description:"):
+            out.append(f'description: "{description}"')
+            replaced = True
+        elif stripped.startswith("cliHelp:"):
+            continue
+        elif stripped.startswith("channels:"):
+            indent = line[: len(line) - len(line.lstrip())]
+            out.append(f'{indent}channels: "mcp（call_zsxq_api）"')
+        else:
+            out.append(line)
+    if not replaced:
+        raise BuildError("SKILL.md frontmatter 缺少 description")
+    return "\n".join([lines[0], *out, *lines[end:]])
+
+
 def validate_sizes(texts: dict[str, str], limits: Limits) -> None:
     if "SKILL.md" not in texts:
         raise BuildError("缺少 SKILL.md")
@@ -147,6 +196,10 @@ def build(config: dict, check_only: bool = False) -> Report:
         texts[rel] = normalize_content(path.read_text(encoding="utf-8"))
     if "SKILL.md" not in texts:
         raise BuildError("源目录缺少 SKILL.md")
+
+    texts = {rel: strip_cli_regions(text) for rel, text in texts.items()}
+    texts["SKILL.md"] = sanitize_frontmatter(
+        texts["SKILL.md"], config["official"]["description"])
 
     validate_sizes(texts, limits)
     files = {rel: len(text.encode("utf-8")) for rel, text in texts.items()}
