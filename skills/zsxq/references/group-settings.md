@@ -45,7 +45,11 @@ zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 {"method": "PUT", "path": "/v2/groups/123456789", "body": {"req_data": {"name": "新名称", "description": "新简介"}}}
 ```
 
-> 背景图 / 亮点图涉及本地上传，仅 CLI 通道支持；MCP 通道只能修改名称与简介。
+> 背景图 / 亮点图涉及本地上传，MCP 通道只能修改名称与简介。
+
+<!-- cli-only:start -->
+> 背景图 / 亮点图涉及本地上传，仅 CLI 通道支持。
+<!-- cli-only:end -->
 
 ## 参数
 
@@ -78,11 +82,14 @@ zsxq-cli group +settings --group-id 123456789 --clear-promo-images
 
 <!-- cli-only:end -->
 
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`；MCP 通道只能修改名称与简介（背景图 / 亮点图涉及本地上传，仅 CLI 通道支持）。
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`；MCP 通道只能修改名称与简介（背景图 / 亮点图涉及本地上传，MCP 通道不支持）。
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：查星球用 `group +list` / `GET /v2/groups`，写入用上方对应通道的命令。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：查星球用 `group +list`。
+<!-- cli-only:end -->
+查星球用 `GET /v2/groups`；写入用上方 MCP 调用块。
 
 <!-- cli-only:start -->
 

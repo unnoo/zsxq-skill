@@ -1,4 +1,4 @@
-# 设置/取消精华（api call set_topic_digested）
+# 设置/取消精华（`set_topic_digested`）
 
 通过底层接口工具 `set_topic_digested` 将某主题设为精华，或取消其精华状态。这是**管理权限（星主/管理员/合伙人）**的操作。
 
@@ -39,7 +39,7 @@ zsxq-cli api call set_topic_digested --params '{"topic_id":"123","digested":fals
 {"method": "PUT", "path": "/v2/topics/111222333444", "body": {"req_data": {"digested": false}}}
 ```
 
-设为精华把 `digested` 改为 `true` 即可 —— 与封装命令 [topic-set](topic-set.md) 的 `PUT /v2/topics/{topic_id}` 是**同一端点**，两个通道的权限要求也一致。
+设为精华把 `digested` 改为 `true` 即可 —— 与封装命令 [topic-set](topic-set.md) 的 `PUT /v2/topics/{topic_id}` 是**同一端点**，权限要求也相同。
 
 ## 参数
 
@@ -67,7 +67,10 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；设为 / 取消精华用上方对应通道的命令。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
+<!-- cli-only:end -->
+确认主题用 `GET /v2/topics/{topic_id}/info`；设为 / 取消精华用上方 MCP 调用块。
 
 <!-- cli-only:start -->
 
@@ -97,5 +100,5 @@ zsxq-cli api call set_topic_digested --params '{"topic_id":"123","digested":true
 
 - [topic-set](topic-set.md) — 封装命令 `topic +set`（精华 + 置顶，日常优先用）
 - [topic-detail](topic-detail.md) — 操作前确认主题内容
-- [topic-tags](topic-tags.md) — 为主题设置标签（同为星主/作者写入类 api call）
+- [topic-tags](topic-tags.md) — 为主题设置标签（同为星主/作者写入类操作）
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

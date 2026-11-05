@@ -1,6 +1,6 @@
-# group 创建专栏（通过 api raw）
+# group 创建专栏（底层 HTTP 接口）
 
-在指定星球中创建新专栏。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口。
+在指定星球中创建新专栏。该能力未封装为 shortcut，需直接调用底层 HTTP 接口。
 
 对应操作：`POST /v2/groups/<group_id>/columns`；MCP 调用见下方命令块。
 
@@ -36,7 +36,11 @@ zsxq-cli api raw --method POST \
 {"method": "POST", "path": "/v2/groups/123456789/columns", "body": {"req_data": {"name": "专栏名称"}}}
 ```
 
-> CLI 通道的 `api raw` 请求体会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`。
+> **请求体**：MCP 通道不会自动包装，必须显式写成 `body.req_data`。
+
+<!-- cli-only:start -->
+> **请求体**：CLI 通道的 `api raw` 会自动包装 `req_data`，无需手写这一层。
+<!-- cli-only:end -->
 
 ## 参数
 
@@ -91,7 +95,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：各步骤的两种调用形式见上方「命令」块。
+各步骤的调用形式见上方「命令」中的 MCP 调用块。
 
 <!-- cli-only:start -->
 

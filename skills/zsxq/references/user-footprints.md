@@ -55,7 +55,7 @@ zsxq-cli user +footprints --end-time "2025-11-01T00:00:00.000+0800"
 | `--end-time` | `query.end_time` |
 | `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
 
-服务端限制：**仅可查本人**，两通道一致（`user_id` 传他人 ID 不会返回结果）。
+服务端限制：**仅可查本人**（`user_id` 传他人 ID 不会返回结果）。
 
 ## 输出
 
@@ -85,7 +85,7 @@ MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象）。
 | 内容 | 用户在各星球发过的主题 | 星球内最新主题 |
 | 必填参数 | 无 | 星球 ID（`group_id`） |
 
-**翻页（两通道一致）**：用上一页最后一条的 `create_time` 原值作为下一页游标 —— MCP 通道传 `query.end_time`（MCP 响应不含 `next_end_time` 字段，须自行从返回的 `footprints[]` 末条取 `create_time`）：
+**翻页**：用上一页最后一条的 `create_time` 原值作为下一页游标 —— MCP 通道传 `query.end_time`（MCP 响应不含 `next_end_time` 字段，须自行从返回的 `footprints[]` 末条取 `create_time`）：
 
 ```json
 {"method": "GET", "path": "/v2/users/123456/footprints", "query": {"count": 20, "filter": "all", "end_time": "2025-11-01T00:00:00.000+0800"}}

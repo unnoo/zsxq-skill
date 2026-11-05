@@ -21,6 +21,17 @@
       "total_bytes": 262144,
       "description_bytes": 1024
     },
-    "residualForbidden": ["zsxq-cli", "scripts/", "npm ", "npx ", "node "]
+    "residualForbidden": [
+      "zsxq-cli",
+      "scripts/",
+      "npm ",
+      "npx ",
+      "node ",
+      "CLI 通道",
+      "CLI 工具",
+      "仅 CLI",
+      "api raw",
+      "api call"
+    ]
   }
 }

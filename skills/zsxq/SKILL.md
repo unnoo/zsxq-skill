@@ -7,7 +7,7 @@ metadata:
   cliHelp: "zsxq-cli --help"
 ---
 
-# 知识星球操作指南（CLI / MCP 双通道）
+# 知识星球操作指南
 
 本 Skill 覆盖通过知识星球 API 操作星球的全部场景：认证、星球管理、主题管理、用户信息、笔记管理，以及 Skill Pay 微信支付。
 
@@ -20,7 +20,10 @@ metadata:
 
 ## 执行通道
 
-本 Skill 的所有能力有两条执行通道，先判定通道再路由：
+<!-- cli-only:start -->
+本 Skill 的所有能力有 CLI / MCP 两条执行通道，先判定通道再路由：
+<!-- cli-only:end -->
+本 Skill 通过 MCP 通道执行，先确认宿主已接入再路由：
 
 <!-- cli-only:start -->
 1. 宿主可执行 `zsxq-cli` → **CLI 通道**（优先；shortcut 有参数校验与本地编排，行为最可控）
@@ -30,9 +33,9 @@ metadata:
 1. 宿主工具列表中存在 `call_zsxq_api` → **MCP 通道**
 2. 否则停止并提醒用户：在宿主中接入知识星球 MCP（密钥管理页创建 api-key 后复制链接接入）
 
-- 通道判定是一次性环境探测；选定后一致使用，不混用。仅当某操作标注「仅 CLI 通道」/「仅 MCP 通道」时，对该操作单独切换或告知用户。
+- 通道判定是一次性环境探测；选定后一致使用，不混用。某操作只支持单一通道时，按其 reference 的「仅 X 通道」标注处理。
 - MCP 通道下所有调用都通过底层接口工具 `call_zsxq_api`（参数 `{method, path, query?, body?}`）；**不得臆造未文档化的 method/path**——能力底表见 [`references/endpoint-catalog.md`](references/endpoint-catalog.md)，未覆盖即视为不支持。
-- 「执行模式」路由（场景 → 原子 → 探索）在两条通道下相同；通道只决定各 reference「## 命令」节使用哪一组调用块。
+- 「执行模式」路由（场景 → 原子 → 探索）不因通道而变；各 reference 的「## 命令」节给出对应调用块。
 <!-- cli-only:start -->
 - **CLI 通道的调用形式**：Shortcut 写作 `zsxq-cli <domain> +<verb>`（如 `zsxq-cli group +list`）；API 工具写作 `zsxq-cli api call <tool> --params '<json>'`；原始 HTTP 写作 `zsxq-cli api raw --method <METHOD> --path <PATH> [--query '<json>'] [--body '<json>']`。下文各表只列操作名与方法/路径，命令细节见各 reference 的「## 命令」节。
 <!-- cli-only:end -->
@@ -96,7 +99,7 @@ metadata:
 | 定时发布主题 / 修改或取消定时任务 | → [`references/topic-schedule.md`](references/topic-schedule.md) |
 | 查看待执行的定时任务与配额 | → [`references/topic-scheduled.md`](references/topic-scheduled.md) |
 | 设为精华 / 置顶（星主） | → [`references/topic-set.md`](references/topic-set.md) |
-| 取消精华（底层接口 api call） | → [`references/topic-digest.md`](references/topic-digest.md) |
+| 取消精华（`set_topic_digested` 传 `false`） | → [`references/topic-digest.md`](references/topic-digest.md) |
 | 给主题设置标签 | → [`references/topic-tags.md`](references/topic-tags.md) |
 | 读取 / 设置主题所属专栏（收录到专栏） | → [`references/topic-attached-columns.md`](references/topic-attached-columns.md) |
 | 查看自己的用户信息 | → [`references/user-info.md`](references/user-info.md) |
@@ -140,7 +143,7 @@ User (user_id) — 已登录账户
 - **创建订单前必须按原子 reference 查询或计算价格，并确认类型、对象与实际应付金额；固定价格不得由用户改写，支付必须由用户本人授权**；`PAYMENT_REQUIRED` 即使返回 `success: false` 也只表示待支付，不代表失败或支付成功，禁止自动重试创建订单
 - 不确定 `group_id` / `topic_id` / `comment_id` / `note_id` 时，先用查询操作确认，再执行写入或删除
 - **笔记是公开内容**，任何持有链接的人均可访问 —— 涉及隐私或敏感信息不要写进笔记
-- 底层 HTTP 写入（`api raw` / `call_zsxq_api`）不得绕过原子操作的安全约束；探索模式发现的写入接口同样需要用户确认
+- 通过底层接口直接构造写入请求（含探索模式发现的未封装接口）不得绕过原子操作的安全约束，执行前同样需要用户确认
 - 各写入/删除 reference 的 `> [!CAUTION]` 块列出该操作特有的确认项
 - 通道选定后一致使用不混用；MCP 通道不得臆造未在 reference 或 endpoint-catalog 中文档化的 method/path
 

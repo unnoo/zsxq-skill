@@ -40,7 +40,7 @@ zsxq-cli group +list --json
 
 | CLI flag | HTTP 字段 |
 |----------|-----------|
-| `--limit` | 不上送（仅 CLI 工具层校验；MCP 通道由 agent 自行截断返回列表） |
+| `--limit` | 不上送（由工具在本地校验与截断；MCP 通道由 agent 自行截断返回列表） |
 | `--scope` | 不上送（同上） |
 | — | `user_id` 不需要（CLI 取本地 config，MCP 通道无需） |
 

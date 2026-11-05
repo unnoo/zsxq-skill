@@ -2,12 +2,12 @@
 
 用户已经在某个星球里搜索。按输入是一段话还是关键词，用 [topic-search](../topic-search.md) 取出主题，只根据正文打分，输出关联度最高的一批，并给出可点开的来源。**纯只读：不发帖、不评论、不写笔记、不改精华或标签。**
 
-检索命令、参数和错误语义只以 [topic-search](../topic-search.md) 为准。沿用当前已选定的通道，不因输入类型改走另一条通道，也不调用 reference 未记载的接口。
+检索命令、参数和错误语义只以 [topic-search](../topic-search.md) 为准。两种输入都走同一条检索路径，不因输入类型改用其他接口，也不调用 reference 未记载的接口。
 
 <!-- cli-only:start -->
 - CLI 通道：`topic +search` 是增强检索，没有翻页参数。
 <!-- cli-only:end -->
-- MCP 通道：`GET /v2/search/groups/{group_id}/topics`，只传 `keyword` 与 `count=20`。它是官方搜索，排序与 `topic +search` 的增强检索不同。
+- MCP 通道：`GET /v2/search/groups/{group_id}/topics`，只传 `keyword` 与 `count=20`。它是官方搜索，排序与增强检索编排的结果顺序不同。
 
 ## 适用意图
 
@@ -42,7 +42,7 @@
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|-----------------|
 | `group +list` | [../group-list.md](../group-list.md) | 只有星球名时解析 group_id |
-| `topic +search` | [../topic-search.md](../topic-search.md) | 按当前通道检索主题。query / keyword 用用户输入，不拼星球名 |
+| `topic +search` | [../topic-search.md](../topic-search.md) | 检索主题。query / keyword 用用户输入，不拼星球名 |
 | `topic +detail` | [../topic-detail.md](../topic-detail.md) | 检索结果只有标题或摘要、没有可打分正文时补拉正文 |
 | 分享链接 | [../share-links.md](../share-links.md) | 「查看」用电脑端主题链接。不编造用户主页或其他链接 |
 
@@ -80,7 +80,7 @@
 
 80 分不进入总结。一段话首页最低 81 分。关键词首页最低 90 分。
 
-把搜索词、输入类型、通道、每条 `topic_id`、分数、`owner.name`、`owner.user_id`、`group_id`、摘要，以及已展示的 `topic_id` 留在对话里。
+把搜索词、输入类型、每条 `topic_id`、分数、`owner.name`、`owner.user_id`、`group_id`、摘要，以及已展示的 `topic_id` 留在对话里。
 
 ### 第 3 步：可能的正确词
 

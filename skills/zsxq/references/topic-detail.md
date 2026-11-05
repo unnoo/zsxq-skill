@@ -74,7 +74,11 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 - `counts`：评论数 / 点赞数 / 阅读数
 - `owner` / `group`：主题作者与所属星球的精简信息
 
-CLI 通道恒输出 JSON；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。CLI 通道下长文正文由服务端回填；**MCP 通道透传、不做长文回填**，`talk.article.inline_article_url` 仅返回原始 URL —— 遇长文主题时提示「该主题为长文，正文需另行获取」，不得臆造正文。
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。**MCP 通道透传、不做长文回填**，`talk.article.inline_article_url` 仅返回原始 URL —— 遇长文主题时提示「该主题为长文，正文需另行获取」，不得臆造正文。
+
+<!-- cli-only:start -->
+CLI 通道恒输出 JSON；CLI 通道下长文正文由服务端回填。
+<!-- cli-only:end -->
 
 ## 说明
 

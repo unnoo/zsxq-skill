@@ -1,6 +1,10 @@
 # 创建微信订单（底层接口工具 `call_zsxq_api`）
 
-> **通道：仅 MCP 通道**。CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
+> **通道：仅 MCP 通道**。支付所需的 `_meta` 只有 `call_zsxq_api` 会交给支付宿主，缺 MCP 时无法支付（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
+
+<!-- cli-only:start -->
+> CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP。
+<!-- cli-only:end -->
 
 通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。
 
@@ -183,7 +187,7 @@ weixinpay_pay(paymentCode="<WeixinPay-Required 的原值>")
 
 1. 确认当前宿主是 WorkBuddy 且提供官方 `weixinpay_pay`。否则在创建订单前说明限制并停止。
 2. 查询并核对目标 ID：赞赏评论需同时取得 `topic_id` 和 `comment_id`，轻读需同时取得 `group_id` 和 `back_issue_id`。按[下单前查询价格](#下单前查询价格)取得或计算固定价格，按逐类型传参规则整理必要字段，向用户以“元”展示对象、基础价/折扣（如适用）、应付金额和等值星球币；用户定价订单按[金额换算规则](#金额换算规则)精确换算为整数分，并同时确认元值和 `amount`。
-3. 使用 `call_zsxq_api` 创建订单。不要用 CLI `api raw` 绕过支付元数据；除付费提问和赞赏外，不要把查询或计算出的价格作为 `amount` 传入订单。
+3. 使用 `call_zsxq_api` 创建订单。不得绕过支付元数据（不经 `call_zsxq_api` 的请求拿不到支付所需的 `_meta`）；除付费提问和赞赏外，不要把查询或计算出的价格作为 `amount` 传入订单。
 4. 收到 `PAYMENT_REQUIRED` 后，按[宿主微信支付授权](#宿主微信支付授权)处理支付码和 `out_trade_no`，由用户本人在微信支付卡片中确认。
 5. 支付后的状态与履约由知识星球原支付链路处理；没有查单能力时如实说明无法核验，不要重复创建订单。
 6. 只有收到 `SKILLHUB_PREORDER_FAILED` 时，才按下方恢复请求重试 SkillHub 预下单：

@@ -156,11 +156,19 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 
 主题状态（类型、`creation_statement`、关联投票等）以 `topic +detail` 的返回为准。关联打卡任务时，响应与 `topic +detail` 中均含 `checkin` 对象（`checkin_id` / `title` / `min_words_count`），可据此核对关联是否生效。
 
-MCP 通道恒为 `{success, status_code, body}` 信封，新建主题信息在 `body.resp_data`（对应 CLI 通道的 JSON 输出）；正文是否按 markdown 落地、标签是否解析成功，同样以 `topic +detail` / `GET /v2/topics/{topic_id}/info` 的返回为准。
+MCP 通道恒为 `{success, status_code, body}` 信封，新建主题信息在 `body.resp_data`；正文是否按 markdown 落地、标签是否解析成功，以 `GET /v2/topics/{topic_id}/info` 的返回为准。
+
+<!-- cli-only:start -->
+CLI 通道下以 `topic +detail` 的返回为准（JSON 结构与 `body.resp_data` 相同）。
+<!-- cli-only:end -->
 
 ## 推荐工作流
 
-把草稿整理成规范帖子再发布的内容运营流程。下面每一步都给出两个通道的命令形式：**CLI 通道**用 bash，**MCP 通道**用底层接口工具 `call_zsxq_api` 的调用体（`{method, path, body}`）：
+把草稿整理成规范帖子再发布的内容运营流程。下面每一步给出 MCP 通道的调用形式：底层接口工具 `call_zsxq_api` 的调用体（`{method, path, body}`）。
+
+<!-- cli-only:start -->
+下面每一步同时给出 CLI 通道的命令形式：bash 命令。
+<!-- cli-only:end -->
 
 **① 明确主题类型与目标**
 
@@ -184,7 +192,11 @@ zsxq-cli group +list
 
 - **排版**：标题、分段、换行都写进正文内容字段（支持 `\n`；MCP 通道为 `req_data.text`）。常见要求——标题简洁、正文分段、结尾加一句引导互动的话；若用户要求“只排版，不改写”，则保留原文观点与立场、仅调整格式。
 - **话题标签**：标签**内嵌在正文 content 里**，形如 `<e type="hashtag" .../>`（与 [topic-detail](topic-detail.md) 的说明一致）。给标签建议时先看星球现有标签体系、尽量对齐以免造重复标签（见 [group-hashtags](group-hashtags.md)；MCP 通道 `{"method": "GET", "path": "/v2/groups/123456789/hashtags"}`）。
-- **图片 / 文件**：附件上传**仅 CLI 通道**支持，MCP 通道无法上传附件（见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」）。@成员等富文本同样内嵌在正文中；能力边界一律以 `## 参数` 为准。
+- **图片 / 文件**：MCP 通道无法上传附件，附件需由宿主侧完成上传后把 `image_ids` / `file_ids` 带入（见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」）。@成员等富文本同样内嵌在正文中；能力边界一律以 `## 参数` 为准。
+
+<!-- cli-only:start -->
+- **图片 / 文件**：附件上传仅 CLI 通道支持，用 `--files` 直接传本地路径。
+<!-- cli-only:end -->
 
 **③ 发布前把完整确认稿交用户确认（写入意图确认）**
 
@@ -238,8 +250,12 @@ zsxq-cli topic +detail --topic-id <新建的 topic_id>
 |------|------|
 | `投票至少需要 2 个选项` / `投票选项不能为空` | 选项不足 2 个或含空项 |
 | `问答内容不能超过 1000 字符` | 提问内容超长 |
-| `code 80105`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 向自己提问（提问对象传了自己的 user_id） |
-| `code 80106`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 服务端拒绝创建提问（实测于配置提问费用的星球；本操作无法传提问金额） |
+| `code 80105`（MCP 通道看 `body.succeeded` / `body.code`） | 向自己提问（提问对象传了自己的 user_id） |
+| `code 80106`（MCP 通道看 `body.succeeded` / `body.code`） | 服务端拒绝创建提问（实测于配置提问费用的星球；本操作无法传提问金额） |
+
+<!-- cli-only:start -->
+CLI 通道下 `80105` / `80106` 显示为 `MCP tool error`。
+<!-- cli-only:end -->
 
 <!-- cli-only:start -->
 

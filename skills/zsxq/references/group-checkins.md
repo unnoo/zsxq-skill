@@ -1,6 +1,6 @@
-# group 打卡任务列表（通过 api raw）
+# group 打卡任务列表（底层 HTTP 接口）
 
-查询指定星球的打卡任务，用于查看当前可用的打卡任务、筛选进行中或已结束的任务，以及在发布关联打卡的主题前获取 `checkin_id`（见 [topic-create](topic-create.md)）。CLI 未封装该能力，通过 `api raw` 调用原始 HTTP 接口获取。
+查询指定星球的打卡任务，用于查看当前可用的打卡任务、筛选进行中或已结束的任务，以及在发布关联打卡的主题前获取 `checkin_id`（见 [topic-create](topic-create.md)）。该能力未封装为 shortcut，需直接调用底层 HTTP 接口获取。
 
 对应操作：`GET /v2/groups/<group_id>/checkins`；MCP 调用见下方命令块。
 

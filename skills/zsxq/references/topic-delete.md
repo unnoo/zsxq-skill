@@ -1,4 +1,4 @@
-# topic 删除（通过 api raw）
+# topic 删除（底层 HTTP 接口）
 
 通过原始 HTTP 调用删除指定主题。删除后**不可恢复**。
 
@@ -31,7 +31,11 @@ zsxq-cli api raw --method DELETE --path /v2/topics/88888888888888
 {"method": "DELETE", "path": "/v2/topics/111222333444"}
 ```
 
-CLI 通道的 `api raw` 与 MCP 通道**仅外壳不同** —— 都是同一次 `DELETE /v2/topics/{topic_id}` 请求，删除后同样**不可恢复**。
+MCP 通道就是同一次 `DELETE /v2/topics/{topic_id}` 请求，删除后**不可恢复**。
+
+<!-- cli-only:start -->
+CLI 通道的 `api raw` 与 MCP 通道**仅外壳不同**，请求语义完全相同。
+<!-- cli-only:end -->
 
 ## 参数
 
@@ -47,7 +51,10 @@ CLI 通道的 `api raw` 与 MCP 通道**仅外壳不同** —— 都是同一次
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；删除用上方对应通道的命令。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
+<!-- cli-only:end -->
+确认主题用 `GET /v2/topics/{topic_id}/info`；删除用上方 MCP 调用块。
 
 <!-- cli-only:start -->
 

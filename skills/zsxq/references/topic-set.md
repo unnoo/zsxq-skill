@@ -59,7 +59,7 @@ zsxq-cli topic +set --topic-id 111222333444 --digested true --sticky true
 | `--digested true\|false` | `req_data.digested` |
 | `--sticky true\|false` | `req_data.sticky` |
 
-只传要改的字段 —— 未提供的字段保持不变（与 CLI 通道语义一致）。
+只传要改的字段 —— 未提供的字段保持不变。
 
 ## 输出
 
@@ -71,11 +71,14 @@ zsxq-cli topic +set --topic-id 111222333444 --digested true --sticky true
 
 MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
-权限说明（星主 / 管理员 / 合伙人）对两个通道同等适用。
+权限说明（星主 / 管理员 / 合伙人）同等适用。
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；设置精华 / 置顶用上方对应通道的命令。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
+<!-- cli-only:end -->
+确认主题用 `GET /v2/topics/{topic_id}/info`；设置精华 / 置顶用上方 MCP 调用块。
 
 <!-- cli-only:start -->
 

@@ -58,7 +58,11 @@ MCP 通道返回 `body.resp_data.hashtags[]`（含 hashtag_id、owner 等完整�
 
 ## 说明
 
-获得 `hashtag_id` 后，可通过 API 列出该标签下的所有主题。CLI 通道用底层接口工具 `get_hashtag_topics`；MCP 通道为 `GET /v2/hashtags/{hashtag_id}/topics`（query 参数见 [endpoint-catalog](endpoint-catalog.md)）。
+获得 `hashtag_id` 后，可通过 API 列出该标签下的所有主题：`GET /v2/hashtags/{hashtag_id}/topics`（query 参数见 [endpoint-catalog](endpoint-catalog.md)）。
+
+<!-- cli-only:start -->
+CLI 通道用底层接口工具 `get_hashtag_topics`。
+<!-- cli-only:end -->
 
 <!-- cli-only:start -->
 

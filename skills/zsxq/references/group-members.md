@@ -1,4 +1,4 @@
-# group 成员列表（通过 api raw）
+# group 成员列表（底层 HTTP 接口）
 
 列出指定星球的成员，支持按到期时间、加入时间等排序与筛选。查询条件以 JSON 对象传入。
 
@@ -107,10 +107,10 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 说明
 
-- **`expired_time` 的可见性（两通道一致）**：仅当请求发起者是该付费星球的**星主或管理员**，或查询的是**付费星球中自己的信息**时才返回。免费星球、以及以普通成员身份查询他人时，`expired_time` 不返回（字段缺失或为 `null`）。查「即将到期」必须以星主/管理员身份操作。
+- **`expired_time` 的可见性**：仅当请求发起者是该付费星球的**星主或管理员**，或查询的是**付费星球中自己的信息**时才返回。免费星球、以及以普通成员身份查询他人时，`expired_time` 不返回（字段缺失或为 `null`）。查「即将到期」必须以星主/管理员身份操作。
 - **查即将到期成员**：用 `scope=regular` + `sort=expired_time` + `order=asc`（最先到期在前），配合 `begin_time`（设为当前时刻）和 `end_time`（设为窗口末端，如 14 天后）圈定时间窗；或直接用 `scope=expired` 拉取已过期成员。
 - **排序字段的适用范围**：`sort=expired_time` 只在 `scope=regular` 或 `scope=expired` 下有效，`sort=number` 只在 `scope=expired` 下有效，其他组合会返回空数组（已实测验证：`scope=all` + `sort=expired_time` 返回空）。
-- **翻页（两通道一致）**：响应体不含 `has_more` / 游标字段，需自行判断。
+- **翻页**：响应体不含 `has_more` / 游标字段，需自行判断。
   - 时间排序（`join_time` / `expired_time` / `update_time`）：当返回条数等于 `count` 时可能还有更多，用最后一条的对应时间推进游标继续拉——`order=asc` 时把 `begin_time` 设为该时间，`order=desc` 时把 `end_time` 设为该时间，直到返回不足 `count` 或为空。
   - `sort=number`（仅 `scope=expired`）：用上一页返回中最后一条的 `number` 作为下一次的 `page_tag`。
 - `number` 仅当星球启用「成员编号」并已分配时才有；未启用的星球该字段缺失（实测多数星球不返回）。

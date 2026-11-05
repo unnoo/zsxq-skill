@@ -69,7 +69,11 @@ MCP 通道是**三步**（读 → 合并 → 写）。第一步读当前值：
 {"method": "PUT", "path": "/v2/groups/123456789/topics/111222333444", "body": {"req_data": {"type": "talk", "text": "新内容", "image_ids": [], "file_ids": [], "mentioned_user_ids": [], "creation_statement": "none"}}}
 ```
 
-写入是**全量字段合并**：`req_data` 里省略的字段不等于「保持原值」，因此必须先读再合并（CLI 通道由命令内部完成同样的读取与合并，只写一次命令即可）。
+写入是**全量字段合并**：`req_data` 里省略的字段不等于「保持原值」，因此必须先读再合并。
+
+<!-- cli-only:start -->
+CLI 通道由命令内部完成同样的读取与合并，只写一次命令即可。
+<!-- cli-only:end -->
 
 ## 参数
 
@@ -97,9 +101,12 @@ MCP 通道是**三步**（读 → 合并 → 写）。第一步读当前值：
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：读详情用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；写入用上方对应通道的命令（MCP 通道需自行完成「读 → 合并 → 写」三步，CLI 通道内部自动合并）。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：读详情用 CLI `topic +detail`；写入用上方 CLI 命令块，命令内部自动合并。
+<!-- cli-only:end -->
+读详情用 `GET /v2/topics/{topic_id}/info`；写入用上方 MCP 调用块，需自行完成「读 → 合并 → 写」三步。
 
-**仅 `talk` 主题可编辑**：`q&a` 主题不支持编辑，两个通道一致（见上方 IMPORTANT）。
+**仅 `talk` 主题可编辑**：`q&a` 主题不支持编辑（见上方 IMPORTANT）。
 
 <!-- cli-only:start -->
 

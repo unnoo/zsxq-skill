@@ -54,7 +54,11 @@ zsxq-cli note +detail --note-id 444555666777 --json
 
 完整字段以接口实际输出为准。
 
-CLI 通道输出的是上述提取好的 `note` 子对象；MCP 通道恒为 `{success, status_code, body}` 信封，取 `body.resp_data.note`。
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据取 `body.resp_data.note`（即上述提取好的 `note` 子对象）。
+
+<!-- cli-only:start -->
+CLI 通道直接输出上述提取好的 `note` 子对象。
+<!-- cli-only:end -->
 
 ## 错误说明
 
