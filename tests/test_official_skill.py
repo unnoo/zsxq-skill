@@ -201,5 +201,40 @@ class ParamMergeTest(unittest.TestCase):
         self.assertIn("`query.scope`", merged)
 
 
+class LinkAndResidualTest(unittest.TestCase):
+    def test_prune_drops_row_when_all_links_excluded(self):
+        texts = {
+            "SKILL.md": "| 场景 | 入口 |\n|---|---|\n"
+                        "| 视频 | [x](video.md) |\n"
+                        "| 巡场 | [y](patrol.md) |\n"
+        }
+        out, dropped = og.prune_table_rows(texts, {"video.md"})
+        self.assertNotIn("video.md", out["SKILL.md"])
+        self.assertIn("patrol.md", out["SKILL.md"])
+        self.assertEqual(len(dropped), 1)
+
+    def test_prune_rejects_mixed_row(self):
+        texts = {"SKILL.md": "| [x](video.md) [y](patrol.md) |\n"}
+        with self.assertRaises(og.BuildError):
+            og.prune_table_rows(texts, {"video.md"})
+
+    def test_prune_rejects_non_table_excluded_link(self):
+        texts = {"SKILL.md": "见 [x](video.md)\n"}
+        with self.assertRaises(og.BuildError):
+            og.prune_table_rows(texts, {"video.md"})
+
+    def test_check_links_rejects_dead_link(self):
+        with self.assertRaises(og.BuildError):
+            og.check_links({"SKILL.md": "[x](missing.md)"})
+
+    def test_check_links_accepts_anchor_and_http(self):
+        og.check_links({"SKILL.md": "[x](#a) [y](https://example.com)"})
+
+    def test_check_residual_rejects_cli_tokens_and_flags(self):
+        texts = {"SKILL.md": "run zsxq-cli topic +create --group-id 1\n"}
+        with self.assertRaises(og.BuildError):
+            og.check_residual(texts, ["zsxq-cli"])
+
+
 if __name__ == "__main__":
     unittest.main()

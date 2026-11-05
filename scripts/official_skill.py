@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import posixpath
 import re
 import shutil
 from dataclasses import asdict, dataclass, field
@@ -13,6 +14,8 @@ CLI_START = "<!-- cli-only:start -->"
 CLI_END = "<!-- cli-only:end -->"
 
 TABLE_RE = r"\|[^\n]*\n\|[\s:|-]+\n(?:\|[^\n]*\n?)+"
+LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+FLAG_RE = re.compile(r"(?<!-)--[a-z][a-z0-9-]*")
 CLI_ONLY_FLAGS = {"--json", "--files", "--markdown-file", "--help",
                   "--version", "--dry-run"}
 COMPOSITE_FLAGS = {"--query", "--body"}
@@ -257,6 +260,71 @@ def merge_official_params(text: str, rel: str) -> str:
             + without_mapping[param.end(2):])
 
 
+def _resolve_link(rel: str, target: str) -> str | None:
+    if target.startswith(("http://", "https://", "mailto:", "#")):
+        return None
+    target = target.split("#", 1)[0]
+    if not target:
+        return None
+    return posixpath.normpath(posixpath.join(posixpath.dirname(rel), target))
+
+
+def prune_table_rows(
+    texts: dict[str, str], excluded: set[str]
+) -> tuple[dict[str, str], list[str]]:
+    out: dict[str, str] = {}
+    dropped: list[str] = []
+    for rel, text in texts.items():
+        kept: list[str] = []
+        for line in text.split("\n"):
+            resolved = [
+                target for target in (
+                    _resolve_link(rel, raw) for raw in LINK_RE.findall(line)
+                ) if target
+            ]
+            if not resolved:
+                kept.append(line)
+                continue
+            hit = [target for target in resolved if target in excluded]
+            if not hit:
+                kept.append(line)
+                continue
+            if line.lstrip().startswith("|") and len(hit) == len(resolved):
+                dropped.append(f"{rel}: {line.strip()}")
+                continue
+            raise BuildError(
+                f"{rel}: 链接指向被排除文件或混合行: {line.strip()}")
+        out[rel] = "\n".join(kept)
+    return out, dropped
+
+
+def check_links(texts: dict[str, str]) -> None:
+    problems: list[str] = []
+    for rel, text in sorted(texts.items()):
+        for lineno, line in enumerate(text.split("\n"), 1):
+            for raw in LINK_RE.findall(line):
+                target = _resolve_link(rel, raw)
+                if target is not None and target not in texts:
+                    problems.append(f"{rel}:{lineno}: 死链 -> {raw}")
+    if problems:
+        raise BuildError("死链:\n" + "\n".join(problems))
+
+
+def check_residual(texts: dict[str, str], forbidden: list[str]) -> None:
+    problems: list[str] = []
+    for rel, text in sorted(texts.items()):
+        for lineno, line in enumerate(text.split("\n"), 1):
+            for token in forbidden:
+                if token in line:
+                    problems.append(
+                        f"{rel}:{lineno}: 残留 {token!r}: {line.strip()}")
+            if FLAG_RE.search(line):
+                problems.append(
+                    f"{rel}:{lineno}: 残留 CLI flag: {line.strip()}")
+    if problems:
+        raise BuildError("CLI 残留:\n" + "\n".join(problems))
+
+
 def validate_sizes(texts: dict[str, str], limits: Limits) -> None:
     if "SKILL.md" not in texts:
         raise BuildError("缺少 SKILL.md")
@@ -308,6 +376,12 @@ def build(config: dict, check_only: bool = False) -> Report:
     texts["SKILL.md"] = sanitize_frontmatter(
         texts["SKILL.md"], config["official"]["description"])
 
+    texts, dropped = prune_table_rows(texts, set(excluded))
+    texts = {rel: re.sub(r"\n{3,}", "\n\n", text)
+             for rel, text in texts.items()}
+    check_links(texts)
+    check_residual(texts, config["official"]["residualForbidden"])
+
     validate_sizes(texts, limits)
     files = {rel: len(text.encode("utf-8")) for rel, text in texts.items()}
     total = sum(files.values())
@@ -333,7 +407,8 @@ def build(config: dict, check_only: bool = False) -> Report:
             encoding="utf-8",
         )
     return Report(output=output, files=files, total_bytes=total,
-                  limits=limits, merged_params=merged_params)
+                  limits=limits, dropped_rows=dropped,
+                  merged_params=merged_params)
 
 
 def main() -> int:
