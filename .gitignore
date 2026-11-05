@@ -3,3 +3,4 @@ docs/superpowers/
 node_modules/
 docs/verification/
 .worktrees/
+dist/

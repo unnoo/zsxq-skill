@@ -1,0 +1,193 @@
+from __future__ import annotations
+
+import fnmatch
+import json
+import re
+import shutil
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+CLI_START = "<!-- cli-only:start -->"
+CLI_END = "<!-- cli-only:end -->"
+
+
+class BuildError(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class Limits:
+    body_bytes: int
+    resource_bytes: int
+    resource_count: int
+    total_bytes: int
+    description_bytes: int
+
+
+@dataclass
+class Report:
+    output: str
+    files: dict[str, int]
+    total_bytes: int
+    limits: Limits
+    dropped_rows: list[str] = field(default_factory=list)
+    merged_params: int = 0
+
+    def render(self) -> str:
+        resources = len(self.files) - 1
+        lines = [
+            "官方 Skill 构建报告",
+            f"输出目录: {self.output}",
+            f"文件: {len(self.files)}（SKILL.md + {resources} 个资源）",
+            f"总字节: {self.total_bytes} / {self.limits.total_bytes}"
+            f"（剩余 {self.limits.total_bytes - self.total_bytes}）",
+            f"合并参数表: {self.merged_params} 个文件",
+        ]
+        for rel in sorted(self.files):
+            lines.append(f"  {self.files[rel]:7d}  {rel}")
+        if self.dropped_rows:
+            lines.append("被删除的表格行:")
+            lines.extend(f"  - {row}" for row in self.dropped_rows)
+        return "\n".join(lines)
+
+
+def load_config(path: Path) -> dict:
+    config = json.loads(path.read_text(encoding="utf-8"))
+    config["_root"] = str(path.parent)
+    for key in ("source", "official"):
+        if key not in config:
+            raise BuildError(f"配置缺少 {key}")
+    official = config["official"]
+    for key in ("output", "name", "description", "exclude", "limits",
+                "residualForbidden"):
+        if key not in official:
+            raise BuildError(f"配置缺少 official.{key}")
+    official["limits"] = Limits(**official["limits"])
+    if not re.fullmatch(r"[a-z0-9-]{1,64}", official["name"]):
+        raise BuildError("official.name 必须是小写字母、数字、连字符")
+    if "\n" in official["description"] or '"' in official["description"]:
+        raise BuildError("official.description 必须是单行且不含双引号")
+    desc_bytes = len(official["description"].encode("utf-8"))
+    if desc_bytes > official["limits"].description_bytes:
+        raise BuildError(
+            f"official.description {desc_bytes} 字节超过上限 "
+            f"{official['limits'].description_bytes}"
+        )
+    return config
+
+
+def is_excluded(rel: str, patterns: list[str]) -> bool:
+    for pattern in patterns:
+        if pattern.endswith("/**"):
+            base = pattern[:-3]
+            if rel == base or rel.startswith(base + "/"):
+                return True
+        elif fnmatch.fnmatchcase(rel, pattern):
+            return True
+    return False
+
+
+def collect_files(root: Path, source: Path, exclude: list[str]) -> tuple[list[str], list[str]]:
+    included: list[str] = []
+    excluded: list[str] = []
+    for path in sorted(source.rglob("*")):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(source).as_posix()
+        if is_excluded(rel, exclude):
+            excluded.append(rel)
+        else:
+            included.append(rel)
+    return included, excluded
+
+
+def normalize_content(text: str) -> str:
+    text = text.removeprefix("\ufeff")
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def validate_sizes(texts: dict[str, str], limits: Limits) -> None:
+    if "SKILL.md" not in texts:
+        raise BuildError("缺少 SKILL.md")
+    if len(texts["SKILL.md"].encode("utf-8")) > limits.body_bytes:
+        raise BuildError("SKILL.md 超过正文上限")
+    resources = {rel: text for rel, text in texts.items() if rel != "SKILL.md"}
+    if len(resources) > limits.resource_count:
+        raise BuildError(
+            f"资源 {len(resources)} 个超过上限 {limits.resource_count}")
+    total = 0
+    for rel, text in texts.items():
+        size = len(text.encode("utf-8"))
+        if rel != "SKILL.md" and size > limits.resource_bytes:
+            raise BuildError(
+                f"{rel} 大小 {size} 超过单资源上限 {limits.resource_bytes}")
+        total += size
+    if total > limits.total_bytes:
+        raise BuildError(
+            f"总字节 {total} 超过上限 {limits.total_bytes}")
+
+
+def build(config: dict, check_only: bool = False) -> Report:
+    root = Path(config["_root"])
+    source = root / config["source"]
+    official = config["official"]
+    limits: Limits = official["limits"]
+    if isinstance(limits, dict):
+        limits = Limits(**limits)
+        official["limits"] = limits
+    included, excluded = collect_files(root, source, official["exclude"])
+
+    texts: dict[str, str] = {}
+    for rel in included:
+        path = source / rel
+        if path.suffix != ".md":
+            raise BuildError(f"{rel}: 只允许 .md 文件")
+        texts[rel] = normalize_content(path.read_text(encoding="utf-8"))
+    if "SKILL.md" not in texts:
+        raise BuildError("源目录缺少 SKILL.md")
+
+    validate_sizes(texts, limits)
+    files = {rel: len(text.encode("utf-8")) for rel, text in texts.items()}
+    total = sum(files.values())
+    output = "(check mode)" if check_only else official["output"]
+    if not check_only:
+        out_dir = root / official["output"]
+        if out_dir.exists():
+            shutil.rmtree(out_dir)
+        for rel, text in texts.items():
+            path = out_dir / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
+        report_path = out_dir.parent / "report.json"
+        report_path.write_text(
+            json.dumps({
+                "output": official["output"],
+                "files": files,
+                "total_bytes": total,
+                "limits": asdict(limits),
+                "dropped_rows": [],
+                "merged_params": 0,
+            }, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    return Report(output=output, files=files, total_bytes=total, limits=limits)
+
+
+def main() -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="构建 Console 官方版 zsxq skill")
+    parser.add_argument("--check", action="store_true",
+                        help="在临时目录构建并校验，不写 dist/")
+    parser.add_argument("--config", default=str(ROOT / "skill-package.json"))
+    args = parser.parse_args()
+    try:
+        config = load_config(Path(args.config))
+        report = build(config, check_only=args.check)
+    except BuildError as exc:
+        print(f"❌ 构建失败：\n{exc}")
+        return 1
+    print(report.render())
+    return 0

@@ -1,0 +1,26 @@
+{
+  "source": "skills/zsxq",
+  "official": {
+    "output": "dist/official/zsxq",
+    "name": "zsxq",
+    "description": "知识星球官方操作指南（MCP 通道）：通过 call_zsxq_api 查询与管理星球、主题、评论、标签、专栏、成员和笔记，支持巡场、评论运营、提问管理、精华标签整理、运营日报周报、风险监控、续费关怀、专栏收录与 Skill Pay。用户提到知识星球、zsxq、星球、发帖、评论、回答、精华、标签、成员、专栏、笔记、MCP、api-key 时使用。",
+    "exclude": [
+      "scripts/**",
+      "assets/**",
+      "references/cli-exploration.md",
+      "references/scenarios/generate-video.md",
+      "references/scenarios/generate-video/**",
+      "references/scenarios/generate-daily-poster.md",
+      "references/scenarios/generate-daily-poster/**",
+      "references/scenarios/migrate-legacy-skills.md"
+    ],
+    "limits": {
+      "body_bytes": 32768,
+      "resource_bytes": 16384,
+      "resource_count": 50,
+      "total_bytes": 262144,
+      "description_bytes": 1024
+    },
+    "residualForbidden": ["zsxq-cli", "scripts/", "npm ", "npx ", "node "]
+  }
+}
