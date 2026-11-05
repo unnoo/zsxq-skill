@@ -31,9 +31,9 @@
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|-----------------|
 | `group +list` | [../group-list.md](../group-list.md) | 过渡步骤：按星球名定位 group_id |
-| `group +topics` | [../group-topics.md](../group-topics.md) | 按时间窗拉主题，统计数量/类型分布；JSON 输出的 `counts` 直接提供点赞/评论数 |
+| `group +topics` | [../group-topics.md](../group-topics.md) | 按时间窗拉主题，统计数量/类型分布；返回体的 `counts` 直接提供点赞/评论数 |
 | `topic +detail` | [../topic-detail.md](../topic-detail.md) | 对选出的热门 / TOP 主题取完整正文并核对互动数据 |
-| `api call get_self_answer_topics` | [../../SKILL.md#主题管理topic](../../SKILL.md#主题管理topic) | 拉「别人向我发起的提问」，`topic_filter: "unanswered"` 取未答清单 |
+| `get_self_answer_topics` | [../../SKILL.md#主题管理topic](../../SKILL.md#主题管理topic) | 拉「别人向我发起的提问」（MCP：`GET /v2/users/self/topics/answers`，query `filter: "unanswered"`）取未答清单 |
 | `topic +create` | [../topic-create.md](../topic-create.md) | **写入**：确认后把日报/周报发布到星球 |
 | 分享链接拼接 | [../share-links.md](../share-links.md) | 周报热门内容附主题链接 |
 
