@@ -137,8 +137,10 @@
 ## 参考
 
 - [`../CLAUDE.md`](../CLAUDE.md) —— 项目结构、reference/场景模板、frontmatter、安全规则、Adding Operation/Scenario 步骤（模板唯一来源）
-- [`verification/_TEMPLATE.md`](verification/_TEMPLATE.md) —— 验证报告模板
-- [`verification/logs/_TEMPLATE.log`](verification/logs/_TEMPLATE.log) —— 原始日志模板
-- [`verification/topic-set.md`](verification/topic-set.md) —— 已填好的范例报告
+- `docs/verification/_TEMPLATE.md` —— 验证报告模板
+- `docs/verification/logs/_TEMPLATE.log` —— 原始日志模板
+- `docs/verification/topic-set.md` —— 已填好的范例报告
 - [`../scripts/check-docs.py`](../scripts/check-docs.py) —— 静态校验器
 - [`../scripts/build-official-skill.py`](../scripts/build-official-skill.py) —— 官方版（Console）构建与预算校验
+
+> `docs/verification/` 属于**本地工作区**：验证报告与日志留在本机供用户验收，被 `.gitignore` 排除，仓库里没有这三个文件——所以上面写的是路径而不是链接，clone 后要自己产出。首次写验证材料时从模板复制成 `docs/verification/<id>.md` 与 `docs/verification/logs/<id>.log`。
