@@ -53,17 +53,19 @@ zsxq-cli note +list --end-time "2025-11-01T00:00:00.000+0800"
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | NOTE ID | CONTENT | CREATED AT |
 |---------|---------|------------|
 | 444555666777 | 示例笔记内容… | 2026-04-10T09:00:00.000+0800 |
 
-CLI 通道从 `footprints[]` 中抽取 `note` 字段拼成上表；MCP 通道返回原始 footprints 结构，笔记数据在每条的 `note` 字段内（`body.resp_data.footprints[].note`）。
+CLI 通道从 `footprints[]` 中抽取 `note` 字段拼成上表。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+
+MCP 通道返回原始 footprints 结构，笔记数据在每条的 `note` 字段内（`body.resp_data.footprints[].note`）。
 
 ## 说明
 

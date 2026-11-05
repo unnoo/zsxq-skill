@@ -82,7 +82,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，成功与否看 `body.s
 
 **排除场景（不触发）：**
 
-- `401` / `not logged in` → 引导 `auth login`
+- `401` / `not logged in` → 引导完成认证（MCP 通道检查宿主 api-key；CLI 通道重新登录）
 - `403` / 无权限 → 提示切换账户或加入星球
 - `404` / 资源不存在 → 重新核对 ID
 - 参数缺失 → 用查询命令补齐参数

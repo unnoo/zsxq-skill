@@ -54,11 +54,7 @@ zsxq-cli group +topics --group-id 123456789 --json
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | TOPIC ID | TYPE | TITLE / DIGEST | CREATED AT |
 |----------|------|----------------|------------|
@@ -66,6 +62,10 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 - `TYPE`：`talk`（帖子）、`q&a`（提问）、`task`（作业题目）、`solution`（作业答案）
 - `TITLE / DIGEST`：优先显示标题，无标题时显示内容摘要（截断至 50 字符）
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 MCP 通道返回 `body.resp_data.topics[]`（完整 topic 字段）。
 

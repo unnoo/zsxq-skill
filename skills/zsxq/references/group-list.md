@@ -48,15 +48,15 @@ zsxq-cli group +list --json
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | GROUP ID | NAME |
 |----------|------|
 | 123456789 | 示例星球 |
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 MCP 通道返回 `body.resp_data.groups[]`（含 owner、statistics 等完整字段），无条数参数，截断由 agent 自行处理。
 

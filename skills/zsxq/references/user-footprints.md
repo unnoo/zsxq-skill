@@ -61,17 +61,19 @@ zsxq-cli user +footprints --end-time "2025-11-01T00:00:00.000+0800"
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | TOPIC ID | TYPE | TITLE / DIGEST | GROUP | CREATED AT |
 |----------|------|----------------|-------|------------|
 | 111222333444 | talk | 示例主题标题 | 示例星球 | 2026-04-10T09:00:00.000+0800 |
 
-MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象），CLI 表格中的各列由其中的 `topic` 与 `group` 字段抽取而来。
+CLI 表格中的各列由每条足迹的 `topic` 与 `group` 字段抽取而来。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+
+MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象）。
 
 ## 说明
 

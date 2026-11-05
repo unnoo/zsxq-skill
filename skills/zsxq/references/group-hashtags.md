@@ -43,16 +43,16 @@ zsxq-cli group +hashtags --group-id 123456789 --json
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | HASHTAG ID | TITLE | TOPIC COUNT |
 |------------|-------|-------------|
 | 333444555666 | #示例标签# | 12 |
 | 333444555677 | #示例标签二# | 5 |
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 MCP 通道返回 `body.resp_data.hashtags[]`（含 hashtag_id、owner 等完整字段）。
 

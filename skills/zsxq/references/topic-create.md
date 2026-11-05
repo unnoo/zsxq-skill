@@ -232,30 +232,33 @@ zsxq-cli topic +detail --topic-id <新建的 topic_id>
 
 ## 错误说明
 
+服务端返回的错误：
+
 | 错误 | 原因 |
 |------|------|
+| `投票至少需要 2 个选项` / `投票选项不能为空` | 选项不足 2 个或含空项 |
+| `问答内容不能超过 1000 字符` | 提问内容超长 |
+| `code 80105`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 向自己提问（提问对象传了自己的 user_id） |
+| `code 80106`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 服务端拒绝创建提问（实测于配置提问费用的星球；本操作无法传提问金额） |
+
 <!-- cli-only:start -->
+
+CLI 通道的本地参数校验提示：
+
+| 错误 | 原因 |
+|------|------|
 | `--ai 和 --ai-mode 不能同时使用` | 两个 AI 声明参数同传 |
 | `--ai-mode 取值必须是 aigc、personal_perspective 或 none` | `--ai-mode` 值非法 |
 | `投票仅支持普通主题（talk），不能与 --ask 问答主题同时使用` | 投票与提问同用 |
 | `--vote-title 和 --vote-options 必须同时提供` | 投票只给了标题或只给了选项 |
-<!-- cli-only:end -->
-| `投票至少需要 2 个选项` / `投票选项不能为空` | 选项不足 2 个或含空项 |
-<!-- cli-only:start -->
 | `--anonymous 仅支持与 --ask 一起使用` | 没指定提问对象却要求匿名 |
-<!-- cli-only:end -->
-<!-- cli-only:start -->
 | `问答主题不支持上传附件，请仅提供 --text` | 提问带了 `--files` |
 | `问答主题必须提供 --text` | 提问没写内容 |
-<!-- cli-only:end -->
-| `问答内容不能超过 1000 字符` | 提问内容超长 |
-<!-- cli-only:start -->
 | `主题内容不能为空，请提供 --text、--files 或 --vote-title` | 内容、附件、投票全部为空 |
 | `--text 和 --markdown-file 不能同时使用` | 两种正文来源同传 |
 | `读取 markdown 文件失败: ...` | .md 文件读取失败 |
+
 <!-- cli-only:end -->
-| `code 80105`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 向自己提问（提问对象传了自己的 user_id） |
-| `code 80106`（CLI 通道报 `MCP tool error`；MCP 通道看 `body.succeeded` / `body.code`） | 服务端拒绝创建提问（实测于配置提问费用的星球；本操作无法传提问金额） |
 
 通用错误（401、参数缺失、星球无权限发帖等）见 [auth-errors](auth-errors.md#常见错误处理)。
 

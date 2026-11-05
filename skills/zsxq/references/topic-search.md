@@ -48,15 +48,15 @@ zsxq-cli topic +search --group-id 123456789 --query "AI" --json
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | TOPIC ID | TYPE | TITLE / DIGEST | CREATED AT |
 |----------|------|----------------|------------|
 | 111222333444 | talk | 示例主题标题 | 2025-12-31T09:19:28.239+0800 |
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 ## 说明
 

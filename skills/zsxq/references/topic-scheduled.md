@@ -47,11 +47,7 @@ zsxq-cli topic +scheduled --group-id 123456789
 
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）。
-
-<!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 ```
 JOB ID   SCHEDULED TIME                  TYPE    DIGEST
@@ -61,11 +57,11 @@ JOB ID   SCHEDULED TIME                  TYPE    DIGEST
 待执行定时任务：2 个（每星球上限 10）
 ```
 
-<!-- cli-only:start -->
-
 CLI 通道在非 `--json` 时自动合并配额行。
 
 <!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 MCP 通道需**两次调用**（任务列表 + 配额统计）后自行合并，配额数字在 statistics 响应的 `scheduled_jobs_count`。
 
