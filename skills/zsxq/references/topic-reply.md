@@ -87,9 +87,9 @@ MCP 通道恒为 `{success, status_code, body}` 信封，新评论信息（`comm
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：读主题用 CLI `topic +detail`；读评论列表用 CLI `api call get_topic_comments`。
 <!-- cli-only:end -->
-MCP 通道读主题用 `GET /v2/topics/{topic_id}/info`；读评论列表用 `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方「## 命令」的调用块（不能带附件）。
+MCP 通道读主题用 `GET /v2/topics/{topic_id}/info`；读评论列表用 `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方「## 命令」的调用块（无法上传附件；需带附件时只能带入用户已上传的 `image_ids` / `file_ids`）。
 
-顶层评论：
+顶层评论省略 `replied_comment_id`；楼中楼则把目标评论的 `comment_id` 传给 `replied_comment_id`。
 
 <!-- cli-only:start -->
 
@@ -123,7 +123,7 @@ zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 2
 
 | 错误 | 原因 |
 |------|------|
-| 评论内容为空 | 内容为空会被服务端拒绝：`text` 与 `image_ids` / `file_ids` 至少提供其一 |
+| 评论内容为空 | 服务端拒绝：评论必须有内容或附件（`text` 与 `image_ids` / `file_ids` 至少一项非空）；MCP 通道无法上传附件，只能带入用户已上传的 id |
 
 <!-- cli-only:start -->
 

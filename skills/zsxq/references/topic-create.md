@@ -107,6 +107,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 |------|------|------|
 | `--group-id <id>` | **是** | 目标星球 ID（从 `group +list` 获取） |
 | `--text <text>` | 否* | 主题正文内容，支持 `\n` 换行（提问时必填；与本地文件发布互斥） |
+| `--title <text>`（隐藏参数） | 否 | 主题标题（可选）；`q&a` 主题不传 |
 | `--files <paths>` | 否 | 附件路径，多个用逗号分隔（图片/文件）；提问主题不支持 |
 | `--ai` / `--ai-mode <mode>` | 否 | AI 声明：取值 `aigc`（AI 生成）/ `personal_perspective`（个人观点）/ `none`（不声明）；简写开关等同 `aigc` |
 | `--ask <user_id>` | 否 | 向指定成员提问，创建 `q&a` 主题；值为对方 user_id |
@@ -126,7 +127,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 |----------|-----------|
 | `--group-id` | path `/v2/groups/{group_id}/topics` |
 | `--text` | `req_data.text` |
-| `--title`（hidden） | `req_data.title`（q&a 不传） |
+| `--title`（hidden） | `req_data.title` |
 | `--markdown` | `req_data.text_type: "markdown"` |
 | `--markdown-file` | 无对应字段 —— MCP 通道由 agent 自读文件内容作为 `req_data.text` 传入 |
 | `--ai` / `--ai-mode` | `req_data.creation_statement` |

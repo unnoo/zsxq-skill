@@ -110,14 +110,29 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 推荐工作流
 
-<!-- cli-only:start -->
-**两通道步骤相同，仅调用形式不同**：步骤 1 的 `group +list` → `GET /v2/groups`、专栏列表 → `GET /v2/groups/{group_id}/columns`。
-<!-- cli-only:end -->
-MCP 通道：步骤 1 取 `GET /v2/groups`、专栏列表用 `GET /v2/groups/{group_id}/columns`；步骤 2、4 见上方「## 命令」的调用块（`GET` 读、`POST` 整表回设）。
+加入 / 移出专栏都是「读现有集合 → 合并或剔除目标 → 整表回设」三步，两通道流程一致，仅调用形式不同。
 
-把主题加入目标专栏（保留原有归属）：
+**① 确认目标与专栏**
+
+1. 取 `group_id`（`GET /v2/groups`），列出星球专栏（`GET /v2/groups/{group_id}/columns`），核对目标 `column_id` 与名称，并看该专栏 `topics_count` 是否接近 100 上限
+
+**② 读取现有归属**
+
+2. 读主题当前所属专栏：`GET /v2/topics/{topic_id}/attached_columns`，从 `body.resp_data.columns[]` 收集 `column_id`
+
+**③ 计算最终集合并与用户确认**
+
+3. 加入某专栏：把目标 `column_id` 并入现有集合并去重；移出某专栏：从现有集合中剔除该 `column_id`；移出所有专栏：给空数组 `[]`
+4. 把最终**完整** `column_ids` 交用户确认 —— 这是替换语义，不在列表中的原有专栏会被取消
+
+**④ 整表回设并复核**
+
+5. `POST /v2/topics/{topic_id}/attached_columns`，body 显式写 `{"req_data": {"column_ids": [最终完整列表]}}`（调用块见上方「## 命令」）
+6. 成功后再 `GET` 一次复核实际归属；若存量集合含已达 100 上限的专栏，属部分成功（见下方「失败语义」）
 
 <!-- cli-only:start -->
+
+CLI 通道的对应调用形式（`api raw` 会自动包装 `req_data`）：
 
 ```bash
 # 第一步：拿到 group_id，查专栏列表找到目标 column_id、并看现有 topics_count 是否接近 100
@@ -136,8 +151,6 @@ zsxq-cli api raw --method POST \
 ```
 
 <!-- cli-only:end -->
-
-移出某专栏：同样先读现有集合，从中**剔除**该专栏后整表回设。
 
 ## 失败语义
 

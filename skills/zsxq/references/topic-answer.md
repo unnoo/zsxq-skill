@@ -81,9 +81,13 @@ zsxq-cli topic +answer \
 | `--topic-id <id>` | **是** | 主题 ID（必须是 `q&a` 类型） |
 | `--text <text>` | **是** | 回答正文 |
 | `--files <paths>` | 否 | 附件路径；**不支持文件，仅图片**，且仅支持 1 张 |
-| `--scheduled-time <time>` | 否 | 定时发布时间，如 `"2026-08-14 12:00"`；不传则立即回答 |
+| `--scheduled-time <time>` | 否 | 定时发布时间，UTC+8 毫秒格式，如 `2026-09-20T10:00:00.000+0800`；不传则立即回答 |
 | `--silenced` | 否 | 静默回答：仅提醒提问者（仅与定时发布同用） |
 | `--json` | 否 | 输出原始 JSON |
+
+<!-- cli-only:start -->
+CLI 通道还接受 `"2026-08-14 12:00"` / `"2026-08-14T12:00:00"` 这类人读格式，命令内部会转成 UTC+8 毫秒时间。
+<!-- cli-only:end -->
 
 ### 通道映射
 
@@ -102,7 +106,7 @@ zsxq-cli topic +answer \
 <!-- cli-only:start -->
 **两通道步骤相同，仅调用形式不同**：查主题类型用 CLI 通道的 `topic +detail`。
 <!-- cli-only:end -->
-MCP 通道查主题类型用 `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方「## 命令」的调用块（不能带附件）。
+MCP 通道查主题类型用 `GET /v2/topics/{topic_id}/info`（看 `type` 是否为 `q&a`）；发布回答用上方「## 命令」的调用块（无法上传附件；需带图时只能带入用户已上传的 `image_ids`，最多 1 个）。
 
 <!-- cli-only:start -->
 
@@ -159,7 +163,7 @@ MCP 通道对应调用：
 |------|------|
 | `问题已回答` | 该主题已有官方回答 —— 每题只能回答一次 |
 | `topic is not q&a` | 主题类型不是提问；普通主题请改用评论（[topic-reply](topic-reply.md)） |
-| 回答仅支持 1 张图片 | 服务端限制：回答的 `image_ids` 最多 1 个，且只接受图片、不接受文件（如 PDF） |
+| 回答仅支持 1 张图片 | 服务端限制：回答最多 1 张图片（`image_ids` 最多 1 个，不接受文件）；MCP 通道无法上传附件，只能带入用户已上传的 id |
 
 <!-- cli-only:start -->
 
