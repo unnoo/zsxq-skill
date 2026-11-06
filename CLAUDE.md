@@ -67,7 +67,7 @@ skills/zsxq/
 name: zsxq
 description: "触发描述（中文，含关键词以便 AI 匹配触发；上限 1024 字符）"
 metadata:
-  version: "3.0.0"
+  version: "3.2.0"
   channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---

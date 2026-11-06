@@ -36,7 +36,7 @@ SKILL = """---
 name: zsxq
 description: "长描述"
 metadata:
-  version: "3.1.0"
+  version: "3.2.0"
   channels: "cli / mcp"
   cliHelp: "zsxq-cli --help"
 ---
@@ -143,7 +143,7 @@ class FrontmatterTest(unittest.TestCase):
         self.assertIn('description: "官方描述"', text)
         self.assertNotIn("cliHelp", text)
         self.assertIn('channels: "mcp（call_zsxq_api）"', text)
-        self.assertIn('version: "3.1.0"', text)
+        self.assertIn('version: "3.2.0"', text)
 
     def test_sanitize_requires_description(self):
         broken = "---\nname: zsxq\n---\n\n# x\n"
