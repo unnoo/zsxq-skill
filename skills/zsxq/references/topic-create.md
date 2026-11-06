@@ -106,7 +106,7 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 | 参数 | 必填 | 说明 |
 |------|------|------|
 | `--group-id <id>` | **是** | 目标星球 ID（从 `group +list` 获取） |
-| `--text <text>` | 否* | 主题正文内容，支持 `\n` 换行（提问时必填；与本地文件发布互斥） |
+| `--text <text>` | 否* | 主题正文内容，支持 `\n` 换行（提问时必填） |
 | `--title <text>`（隐藏参数） | 否 | 主题标题（可选）；`q&a` 主题不传 |
 | `--files <paths>` | 否 | 附件路径，多个用逗号分隔（图片/文件）；提问主题不支持 |
 | `--ai` / `--ai-mode <mode>` | 否 | AI 声明：取值 `aigc`（AI 生成）/ `personal_perspective`（个人观点）/ `none`（不声明）；简写开关等同 `aigc` |
@@ -119,7 +119,11 @@ zsxq-cli topic +create --group-id 123456789 --markdown-file article.md
 | `--markdown-file <path>` | 否 | 读取本地 .md 文件作为正文发布（按 markdown，非附件上传）；与正文文本参数互斥 |
 | `--json` | 否 | 输出原始 JSON（含新建 topic_id） |
 
-\* 正文、附件、投票标题至少提供其一。
+\* 正文与投票标题至少提供其一；附件能力见 [endpoint-catalog](endpoint-catalog.md) 的「通道缺口」。
+
+<!-- cli-only:start -->
+CLI 通道下附件（`--files`）也可作为唯一内容来源。
+<!-- cli-only:end -->
 
 ### 通道映射
 
