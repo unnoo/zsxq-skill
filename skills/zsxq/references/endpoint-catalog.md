@@ -16,8 +16,8 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 能力 | method | path | query / 说明 |
 |------|--------|------|--------------|
 | 当前用户信息 | GET | `/v2/users/self` | 无；返回 `body.resp_data.user.user_id` 供其他接口使用 |
-| 我加入/创建的星球 | GET | `/v2/groups` | 无 query（CLI 的 `--limit`/`--scope` 只是工具层校验，不上送） |
-| 星球最新主题 | GET | `/v2/groups/{group_id}/topics` | `count`（对应 CLI `--limit`，默认 20）；`end_time` 可选；`scope` 仅非 `all` 时传 |
+| 我加入/创建的星球 | GET | `/v2/groups` | 无 query（条数与范围筛选不在接口层上送） |
+| 星球最新主题 | GET | `/v2/groups/{group_id}/topics` | `count`（默认 20）；`end_time` 可选；`scope` 仅非 `all` 时传 |
 | 星球标签 | GET | `/v2/groups/{group_id}/hashtags` | 无 |
 | 标签下主题 | GET | `/v2/hashtags/{hashtag_id}/topics` | `count`、`with_hashtag=true`、`end_time` 可选 |
 | 主题详情 | GET | `/v2/topics/{topic_id}/info` | 无。长文（`inline_article_url`）不做服务端回填，透传返回原始字段 |
@@ -25,8 +25,8 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 用户足迹 | GET | `/v2/users/{user_id}/footprints` | `count`、`filter=all`；限定星球时 `filter=group&group_id={id}&filter_group_id={id}`；`end_time` 可选；仅可查本人 |
 | 用户笔记列表 | GET | `/v2/users/{user_id}/footprints` | 同上但 `filter=note`；从 `footprints[]` 的 `note` 字段取笔记 |
 | 搜索星球 | GET | `/v2/search/groups` | `keyword`、`scope=joined`、`count=4` |
-| 搜索星球成员 | GET | `/v2/search/groups/{group_id}/members` | `keyword`、`count`（对应 `--limit`，≤50） |
-| 星球内搜索主题 | GET | `/v2/search/groups/{group_id}/topics` | `keyword`、`count=20`。注意：这是官方搜索，与 CLI `topic +search` 的语义排序不同（CLI 走增强检索编排） |
+| 搜索星球成员 | GET | `/v2/search/groups/{group_id}/members` | `keyword`、`count`（≤50） |
+| 星球内搜索主题 | GET | `/v2/search/groups/{group_id}/topics` | `keyword`、`count=20`。注意：这是官方搜索端点，排序为官方相关度，与增强检索编排的结果顺序可能不同 |
 | 我发起的提问 | GET | `/v2/users/self/topics/questions` | `filter`（`unanswered`/`answered`）、`count`、`end_time` 可选 |
 | 向我发起的提问 | GET | `/v2/users/self/topics/answers` | 同上 |
 | 定时任务列表 | GET | `/v2/groups/{group_id}/scheduled_jobs` | 无；任务数组在 `body.resp_data.jobs[]` |
@@ -67,14 +67,20 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 上传凭证（仅第一步） | POST | `/v2/uploads` | `type:"image"/"file"`、`size`（字节）；file 类型加 `name`；星球亮点图加 `usage:"promo"` |
 | 创建微信订单 | POST | `/v2/wechat_orders` | 见 [wechat-order-create](wechat-order-create.md)（Skill Pay，仅 MCP 通道） |
 
-## 通道缺口（仅 CLI 通道）
+## 通道缺口
 
 - **附件实际上传**：`POST /v2/uploads` 只拿到七牛 `upload_token`，第二步是 multipart 二进制直传七牛域名，不经过 MCP。含附件的操作（topic +create/+edit/+reply/+answer/+schedule、note +create/+edit、group +settings 的图片）在 MCP 通道只能发纯文本，或依赖宿主自行完成 multipart 上传后把 `image_ids`/`file_ids` 带入。
+- **删除评论**：当前没有文档化的接口（CLI 与 MCP 均未封装），不要臆造 path；遇到该需求时向用户说明能力不支持。
+
+<!-- cli-only:start -->
 - **认证命令族**（auth login/logout/status、doctor、config show）：纯 CLI；MCP 通道的认证问题见 [auth-errors](auth-errors.md)。
-- **能力发现**（`api list`、`--help`）：纯 CLI；MCP 通道以本目录为准。
+- **能力发现**：CLI 通道可借助 CLI 帮助与 API 列表动态发现；MCP 通道以本目录为准。
+<!-- cli-only:end -->
 
 ## 参考
 
 - [SKILL.md](../SKILL.md) — 执行通道判定与安全规则
+<!-- cli-only:start -->
 - [cli-exploration](cli-exploration.md) — CLI 通道探索模式
+<!-- cli-only:end -->
 - [auth-errors](auth-errors.md) — 认证与常见错误

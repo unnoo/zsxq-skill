@@ -39,7 +39,7 @@
 
 ### 第 0 步：确认 group_id（用户只给星球名时）
 
-1. 运行 `group +list`，在结果里按名称匹配 group_id
+1. 调用 `group +list`（MCP：`GET /v2/groups`），在结果里按名称匹配 group_id
 2. 名称精确命中一个 → 直接用其 group_id
 3. 命中多个相似星球 → 列出候选（group_id + 名称）让用户选，**不默认取第一个**
 4. 一个都没命中 → 告知用户可能未加入该星球，让其核对名称或直接给 group_id
@@ -48,11 +48,11 @@
 
 ### 第 1 步：拉取候选主题
 
-`group +topics --group-id <id> --limit <N>`（默认 20，最大 30）。用 `--json` 便于后续逐条取 topic_id、type、create_time、digested、counts。N > 30 时按分支条件翻页。
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`）拉取，默认 20、单页最大 30；返回体逐条含 `topic_id`、`type`、`create_time`、`digested`、`counts`。N > 30 时按分支条件翻页。
 
 ### 第 2 步：逐条拉取完整内容
 
-对第 1 步每个 topic_id 调 `topic +detail --topic-id <id>`，取 `content`(正文)、`type`、`digested`、`counts`(comments/likes/readers)、`create_time`、`owner`。
+对第 1 步每个 topic_id 调 `topic +detail`（MCP：`GET /v2/topics/<id>/info`），取 `content`(正文)、`type`、`digested`、`counts`(comments/likes/readers)、`create_time`、`owner`。
 
 - 正文能判定就用正文；判定 ①④ 需要评论证据时，对该条补调 `get_topic_comments` 读评论文本
 - 每条之间轻微间隔，遇限流按分支条件退避
@@ -65,10 +65,12 @@
 |------|--------------------|------------|
 | **① 需要我回复** | `type=q&a` 且尚无有效回答（comments=0，或评论里只有追问、无实质解答）；正文/评论有明确提问、求助、"求指导/怎么办/有没有人"；用户表达不满、抱怨、质疑 | 已由星主或他人充分回答的 q&a 不列入；判定"是否已答"需看评论，正文不含答案 |
 | **② 适合加精华** | `digested=false` 且内容有深度：真实案例 / 复盘 / 实操经验 / 深度分析 / 高质量讨论；或互动显著高于同批（`counts.likes`/`comments`/`readers` 明显偏高） | `digested=true` 的已是精华，跳过；纯广告 / 灌水 / 打卡不算优质 |
-| **③ 标签建议** | 内容明确属于某一类（如 工具推荐 / 复盘 / 读书笔记 / 提问 / 资源分享），适合归类打标签 | ⚠️ 主题现有标签**不以独立字段返回**，而是内联在正文的 `annotation`（URL 编码的 `<e type="hashtag">` 实体）里；本场景为轻量预览，只按内容给**建议标签**、不解析既有标签。可先跑 [group-hashtags](../group-hashtags.md) 看星球已有标签体系，让建议对齐现有标签、避免造重复标签 |
+| **③ 标签建议** | 内容明确属于某一类（如 工具推荐 / 复盘 / 读书笔记 / 提问 / 资源分享），适合归类打标签 | ⚠️ 主题现有标签**不以独立字段返回**（内联在正文的 `annotation` 里）；本场景只按内容给**建议标签**，不解析既有标签。可先跑 [group-hashtags](../group-hashtags.md) 对齐星球已有标签，避免造重复标签 |
 | **④ 需关注** | 负面情绪 / 情绪激动；引战、互相攻击、争议话题；敏感或可能违规内容（政治敏感、色情、诈骗、垃圾广告、外部导流、私留联系方式等） | 风险信号常在评论区，正文正常也要扫评论；本类只标记提醒，处置（删除等）由用户决定 |
 
 > 判定是内容理解，不是关键词硬匹配：结合正文语义、`type`、`digested`、`counts` 与（必要时）评论综合判断。拿不准归类的，宁可列入 ①/④ 提示人工确认，也不要漏判。
+
+四类落地时转对应专项场景：① → [triage-comments](triage-comments.md)（评论）或 [manage-inbound-questions](manage-inbound-questions.md)（q&a 提问）；②③ → [curate-digest-and-tags](curate-digest-and-tags.md) / [batch-tag-topics](batch-tag-topics.md)；④ → [monitor-risky-content](monitor-risky-content.md)。
 
 ### 第 4 步：按格式输出 + 运营提醒
 
@@ -89,7 +91,7 @@
 
 - **无主题 / 今日无新内容**：`group +topics` 返回空或最新主题都早于用户关心的时间窗 → 报告"今日无新内容"，结束
 - **星球名命中多个**：列候选让用户确认，不自选（见第 0 步）
-- **N 超过单页上限（30）**：用上一页返回的 `next_end_time` 作为 `--end-time` 翻页续拉，直到凑够 N 或 `has_more=false`（翻页见 [group-topics](../group-topics.md#说明)）
+- **N 超过单页上限（30）**：取上一页最后一条的 `create_time` 作为下一页的 `end_time` 翻页续拉，直到凑够 N 或某页返回条数不足一页（翻页见 [group-topics](../group-topics.md#说明)）
 - **限流（429 / frequently）**：退避几秒再重试该条，不要循环猛刷；持续受限则先输出已完成部分并说明剩余待续
 - **个别 topic +detail 失败**：跳过该条、记录 topic_id，继续处理其余，最后在报告里列出未取到的条目
 - **用户只要列表、不要分类**：退回到直接用 [group-topics](../group-topics.md)，不进入四类分析

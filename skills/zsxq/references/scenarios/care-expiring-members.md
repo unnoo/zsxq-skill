@@ -27,8 +27,8 @@
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|------------------|
 | `group +list` | [group-list](../group-list.md) | 由星球名称解析 group_id；确认当前账户是星主 |
-| 成员列表（`api raw` GET members） | [group-members](../group-members.md) | 第一步拉取即将到期成员，翻页拉完 |
-| `search_group_members`（`api call`） | 无独立 reference，见 [SKILL.md](../../SKILL.md) 星球管理 API 表 | 第二步在星球内按昵称定位成员、查看其发言 |
+| 成员列表（MCP：`GET /v2/groups/<id>/members`） | [group-members](../group-members.md) | 第一步拉取即将到期成员，翻页拉完 |
+| `search_group_members`（MCP：`GET /v2/search/groups/<id>/members`） | 无独立 reference，见 [SKILL.md](../../SKILL.md) 星球管理 API 表 | 第二步在星球内按昵称定位成员、查看其发言 |
 | `user +footprints` | [user-footprints](../user-footprints.md) | 第二步辅助判断成员活跃度（仅当目标是当前账户自身足迹时可用，见「分支与停止条件」） |
 | 分享链接拼接 | [share-links](../share-links.md) | 输出中附上成员相关主题的可点击链接（可选） |
 
@@ -36,13 +36,14 @@
 
 ### 第一步：拉取即将到期成员清单
 
-1. 若用户只给了星球名称，先 `zsxq-cli group +list` 解析 group_id；名称命中多个相似星球时，列出候选（group_id + 名称）让用户确认，不要默认取第一个。
+1. 若用户只给了星球名称，先用 `group +list`（MCP：`GET /v2/groups`）解析 group_id；名称命中多个相似星球时，列出候选（group_id + 名称）让用户确认，不要默认取第一个。
 2. 确认当前账户是该付费星球的**星主/管理员**（否则 `expired_time` 不返回，直接转「不适用情况」）。
 3. 按 [group-members](../group-members.md) 拉取普通成员，按到期时间正序、限定时间窗：
 
-   ```bash
-   zsxq-cli api raw --method GET --path /v2/groups/<group_id>/members \
-     --query '{"scope":"regular","sort":"expired_time","order":"asc","begin_time":"<现在>","end_time":"<现在+14天>","count":200}'
+   ```json
+   {"method": "GET", "path": "/v2/groups/<group_id>/members",
+    "query": {"scope": "regular", "sort": "expired_time", "order": "asc",
+              "begin_time": "<现在>", "end_time": "<现在+14天>", "count": 200}}
    ```
 
    也可用 `scope=expired` 拉取已过期成员做补充。**成员多时按 [group-members](../group-members.md) 的翻页规则拉完全部**（时间排序用最后一条的 `expired_time` 推进 `begin_time`），不要只取第一页。
@@ -50,12 +51,13 @@
 
    | 昵称 | 用户ID | 到期时间 | 距今天数 |
    |------|--------|----------|----------|
+   | 示例成员 | 123456789 | 2026-11-18 | 12 |
 
 ### 第二步：逐人分析活跃度与评论风格
 
 对清单中每个成员：
 
-1. 在该星球内按昵称搜索其发言：`zsxq-cli api call search_group_members --params '{"group_id":<id>,"keyword":"<昵称>","limit":10}'`，结合成员 `login_time`、发帖/评论记录判断。
+1. 在该星球内按昵称搜索其发言：`search_group_members`（MCP：`GET /v2/search/groups/<id>/members`，query `keyword`、`count`），结合成员 `login_time`、发帖/评论记录判断。
 2. 归纳三个维度：
    - **活跃等级**：高（每周有互动）/ 中（偶尔出现）/ 低（几乎无记录）
    - **评论风格**：主动分享型 / 提问求助型 / 点赞潜水型
@@ -64,6 +66,7 @@
 
    | 昵称 | 到期时间 | 活跃等级 | 评论风格 | 关注话题方向 | 续费跟进建议 |
    |------|----------|----------|----------|--------------|--------------|
+   | 示例成员 | 2026-11-18 | 中 | 提问求助型 | 工具使用 | 发送中活跃成员的续费提醒 |
 
 ### 第三步：按活跃度分层生成关怀文案
 

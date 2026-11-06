@@ -1,6 +1,6 @@
 # topic +reply（发表评论）
 
-对应命令：CLI 通道 `zsxq-cli topic +reply`；MCP 通道见下方命令块。
+对应操作：`topic +reply`；MCP 调用见下方命令块。
 
 对指定主题发表评论，支持楼中楼（回复某条评论）。
 
@@ -10,6 +10,8 @@
 > 2. 评论内容
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -38,13 +40,15 @@ zsxq-cli topic +reply \
   --files screenshot.png
 ```
 
+<!-- cli-only:end -->
+
 **MCP 通道（`call_zsxq_api`）：**
 
 ```json
 {"method": "POST", "path": "/v2/topics/111222333444/comments", "body": {"req_data": {"text": "评论内容", "image_ids": [], "mentioned_user_ids": []}}}
 ```
 
-楼中楼加 `"replied_comment_id": "888999"`（对应 CLI 通道的 `--reply-to`）。
+楼中楼加 `"replied_comment_id": "888999"`（楼中楼即对某条评论的回复）。
 
 ## 参数
 
@@ -80,9 +84,14 @@ MCP 通道恒为 `{success, status_code, body}` 信封，新评论信息（`comm
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：读主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；读评论列表用 CLI `api call get_topic_comments` / MCP `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方对应通道的命令（MCP 通道不能带附件）。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：读主题用 CLI `topic +detail`；读评论列表用 CLI `api call get_topic_comments`。
+<!-- cli-only:end -->
+MCP 通道读主题用 `GET /v2/topics/{topic_id}/info`；读评论列表用 `GET /v2/topics/{topic_id}/comments`（分页游标用返回的 `index`）；发评论用上方「## 命令」的调用块（无法上传附件；需带附件时只能带入用户已上传的 `image_ids` / `file_ids`）。
 
-顶层评论：
+顶层评论省略 `replied_comment_id`；楼中楼则把目标评论的 `comment_id` 传给 `replied_comment_id`。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认目标主题
@@ -102,18 +111,32 @@ zsxq-cli api call get_topic_comments --params '{"topic_id":"111222333444","limit
 zsxq-cli topic +reply --topic-id 111222333444 --text "回复内容" --reply-to 222333444555
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 写入失败即原子回滚 —— 不会留下空评论或半成品 comment_id。重试前请先确认参数是否合法。
 
 ## 错误说明
 
+服务端返回的错误：
+
+| 错误 | 原因 |
+|------|------|
+| 评论内容为空 | 服务端拒绝：评论必须有内容或附件（`text` 与 `image_ids` / `file_ids` 至少一项非空）；MCP 通道无法上传附件，只能带入用户已上传的 id |
+
+<!-- cli-only:start -->
+
+CLI 通道的本地参数校验提示：
+
 | 错误 | 原因 |
 |------|------|
 | `评论内容不能为空，请提供 --text 或 --files` | 内容与附件都为空 |
-| `评论仅支持上传 1 个文件` | `--files` 传了多个路径（逗号分隔） |
+| `评论仅支持上传 1 个文件` | 附件传了多个路径（逗号分隔） |
 
-通用错误（401、`--topic-id is required`、主题不存在、`--reply-to` 对应的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失、主题不存在、被回复的评论不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

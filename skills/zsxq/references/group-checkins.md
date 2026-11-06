@@ -1,10 +1,12 @@
-# group 打卡任务列表（通过 api raw）
+# group 打卡任务列表（底层 HTTP 接口）
 
-查询指定星球的打卡任务，用于查看当前可用的打卡任务、筛选进行中或已结束的任务，以及在发布关联打卡的主题前获取 `checkin_id`（见 [topic-create](topic-create.md)）。CLI 未封装该能力，通过 `api raw` 调用原始 HTTP 接口获取。
+查询指定星球的打卡任务，用于查看当前可用的打卡任务、筛选进行中或已结束的任务，以及在发布关联打卡的主题前获取 `checkin_id`（见 [topic-create](topic-create.md)）。该能力未封装为 shortcut，需直接调用底层 HTTP 接口获取。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins`；MCP 通道见下方命令块。
+对应操作：`GET /v2/groups/<group_id>/checkins`；MCP 调用见下方命令块。
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -21,6 +23,8 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
   --query '{"scope":"all","end_time":"2026-01-01T00:00:00.000+0800","count":100}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -42,11 +46,11 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
 | CLI 形式 | HTTP 字段 |
 |----------|-----------|
 | `<group_id>`（路径） | path `/v2/groups/{group_id}/checkins` |
-| `--query` JSON | 同名 query 参数（`scope` / `end_time` / `count`） |
+| `query` JSON | 同名 query 参数（`scope` / `end_time` / `count`） |
 
 ## 输出
 
-`api raw` 返回完整响应封套，打卡任务列表位于 `body.resp_data.checkins[]`：
+返回完整响应封套，打卡任务列表位于 `body.resp_data.checkins[]`：
 
 ```json
 {
@@ -74,7 +78,7 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
 
 | 字段 | 说明 |
 |------|------|
-| `checkin_id` | 打卡任务 ID；发布关联打卡主题时传给 `topic +create --checkin-id`（MCP 通道为发帖 `req_data.checkin_id`，数字） |
+| `checkin_id` | 打卡任务 ID；发布关联打卡主题时作为发帖的打卡任务 ID 传入（MCP 通道为发帖 `req_data.checkin_id`，数字） |
 | `title` | 打卡任务名称，用于与用户确认目标任务（**不是 `name`**，该字段恒为 null） |
 | `status` | 任务状态：`ongoing`（进行中）/ `over`（已结束）/ `closed`（已关闭），与 `scope` 筛选项对应 |
 | `create_time` | 任务创建时间，翻页时作为下一次请求的 `end_time` |

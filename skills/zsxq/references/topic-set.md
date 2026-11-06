@@ -1,6 +1,6 @@
 # topic +set（设置精华/置顶）
 
-对应命令：CLI 通道 `zsxq-cli topic +set`；MCP 通道见下方命令块。
+对应操作：`topic +set`；MCP 调用见下方命令块。
 
 设置或取消主题的**精华**（digested）和**置顶**（sticky）状态，直调官方「设置主题」接口。日常加精/取消精华优先用本命令，底层接口工具见 [topic-digest](topic-digest.md)。
 
@@ -11,9 +11,11 @@
 
 > [!IMPORTANT]
 > - 需要**管理权限**（星主 / 管理员 / 合伙人，同加精权限，见 [topic-digest](topic-digest.md)），无权限时服务端返回 `API 错误`
-> - `--digested`、`--sticky` 至少提供一个；只传其一不影响另一个字段
+> - 精华与置顶**至少设置一个**；只设置其一不影响另一个字段
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -27,6 +29,8 @@ zsxq-cli topic +set --topic-id 111222333444 --sticky false
 # 同时设置精华与置顶
 zsxq-cli topic +set --topic-id 111222333444 --digested true --sticky true
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -55,17 +59,28 @@ zsxq-cli topic +set --topic-id 111222333444 --digested true --sticky true
 | `--digested true\|false` | `req_data.digested` |
 | `--sticky true\|false` | `req_data.sticky` |
 
-只传要改的字段 —— 未提供的字段保持不变（与 CLI 通道语义一致）。
+只传要改的字段 —— 未提供的字段保持不变。
 
 ## 输出
 
-成功后输出 `✓ Topic updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
 
-权限说明（星主 / 管理员 / 合伙人）对两个通道同等适用。
+成功后输出 `✓ Topic updated` 及服务端返回的 JSON；`--json` 模式仅输出 JSON。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+
+权限说明（星主 / 管理员 / 合伙人）同等适用。
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；设置精华 / 置顶用上方对应通道的命令。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：确认主题用 CLI `topic +detail`。
+<!-- cli-only:end -->
+MCP 通道确认主题用 `GET /v2/topics/{topic_id}/info`；设置精华 / 置顶用上方「## 命令」的调用块。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认目标主题内容
@@ -78,19 +93,34 @@ zsxq-cli topic +set --topic-id 111222333444 --digested true
 zsxq-cli topic +detail --topic-id 111222333444
 ```
 
+<!-- cli-only:end -->
+
 ## 失败语义
 
 失败即不改变原精华 / 置顶状态，不会产生中间态；确认参数后可重试。
 
 ## 错误说明
 
+服务端返回的错误：
+
+| 错误 | 原因 |
+|------|------|
+| `code` / `msg`（服务端返回） | 服务端拒绝（无管理权限、主题不存在等），`code` 与 `msg` 为服务端返回值；MCP 通道看 `body.succeeded` / `body.code` / `body.error` |
+
+<!-- cli-only:start -->
+
+CLI 通道的本地参数校验提示：
+
 | 错误 | 原因 |
 |------|------|
 | `请至少提供 --digested 或 --sticky 之一` | 两个参数都没传 |
 | `--digested 取值必须是 true 或 false` / `--sticky 取值必须是 true 或 false` | 值不是 `true` / `false` |
-| `API 错误(<code>): <msg>` | 服务端拒绝（无管理权限、主题不存在等），`code` 与 `msg` 为服务端返回 |
 
-通用错误（401、`--topic-id is required` 等）见 [auth-errors](auth-errors.md#常见错误处理)。
+CLI 通道下服务端拒绝显示为 `API 错误(<code>): <msg>`。
+
+<!-- cli-only:end -->
+
+通用错误（401、参数缺失、主题不存在等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

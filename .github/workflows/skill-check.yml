@@ -1,0 +1,32 @@
+name: skill-check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 单元测试
+        run: python3 -m unittest discover -s tests -v
+      - name: 源文档校验
+        run: python3 scripts/check-docs.py
+      - name: 官方版构建与预算校验
+        run: python3 scripts/build-official-skill.py --check
+      - name: 生成官方版产物
+        if: github.event_name == 'push'
+        run: python3 scripts/build-official-skill.py
+      - name: 上传官方版产物
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zsxq-official-skill
+          path: dist/official/zsxq

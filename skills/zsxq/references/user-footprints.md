@@ -1,10 +1,12 @@
 # user +footprints（查看主题足迹）
 
-对应命令：CLI 通道 `zsxq-cli user +footprints`；MCP 通道见下方命令块。
+对应操作：`user +footprints`；MCP 调用见下方命令块。
 
 查看当前用户在**所有星球**中最近发过的主题，按时间倒序排列。
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -21,6 +23,8 @@ zsxq-cli user +footprints --json
 # 翻页（使用上一页返回的 create_time 作为游标）
 zsxq-cli user +footprints --end-time "2025-11-01T00:00:00.000+0800"
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -51,17 +55,25 @@ zsxq-cli user +footprints --end-time "2025-11-01T00:00:00.000+0800"
 | `--end-time` | `query.end_time` |
 | `--json` | 无对应字段 —— MCP 通道恒为 `{success, status_code, body}` 信封，无格式开关 |
 
-服务端限制：**仅可查本人**，两通道一致（`user_id` 传他人 ID 不会返回结果）。
+服务端限制：**仅可查本人**（`user_id` 传他人 ID 不会返回结果）。
 
 ## 输出
 
-CLI 通道默认表格输出（`--json` 为 JSON）；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+<!-- cli-only:start -->
+
+CLI 通道默认表格输出（`--json` 为 JSON）：
 
 | TOPIC ID | TYPE | TITLE / DIGEST | GROUP | CREATED AT |
 |----------|------|----------------|-------|------------|
 | 111222333444 | talk | 示例主题标题 | 示例星球 | 2026-04-10T09:00:00.000+0800 |
 
-MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象，等同 CLI 的 `--json`），CLI 表格中的各列由其中的 `topic` 与 `group` 字段抽取而来。
+CLI 表格中的各列由每条足迹的 `topic` 与 `group` 字段抽取而来。
+
+<!-- cli-only:end -->
+
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+
+MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象）。
 
 ## 说明
 
@@ -71,9 +83,9 @@ MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象，等同 CLI
 |---|---|---|
 | 范围 | **所有星球** | 单个星球 |
 | 内容 | 用户在各星球发过的主题 | 星球内最新主题 |
-| 必填参数 | 无 | `--group-id` |
+| 必填参数 | 无 | 星球 ID（`group_id`） |
 
-**翻页（两通道一致）**：用上一页最后一条的 `create_time` 原值作为下一页游标 —— CLI 通道传 `--end-time`，MCP 通道传 `query.end_time`（MCP 响应不含 `next_end_time` 字段，须自行从返回的 `footprints[]` 末条取 `create_time`）：
+**翻页**：用上一页最后一条的 `create_time` 原值作为下一页游标 —— MCP 通道传 `query.end_time`（MCP 响应不含 `next_end_time` 字段，须自行从返回的 `footprints[]` 末条取 `create_time`）：
 
 ```json
 {"method": "GET", "path": "/v2/users/123456/footprints", "query": {"count": 20, "filter": "all", "end_time": "2025-11-01T00:00:00.000+0800"}}
@@ -85,7 +97,7 @@ MCP 通道返回 `body.resp_data.footprints[]`（完整足迹对象，等同 CLI
 |------|---------|------|
 | 返回空列表 | 当前账户近期未在任何星球发主题 | 正常情况，无需处理 |
 
-通用错误（401、`--end-time` 格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、游标时间格式错误等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

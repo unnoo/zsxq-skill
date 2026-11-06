@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-zsxq-skill is the official skill package for `zsxq-cli` (知识星球 CLI). It contains **documentation-only skill definitions** — no application code, no build system, no tests. All files are Markdown (scenario scripts under `scripts/`, when added, are the only executable code).
+zsxq-skill is the official skill package for `zsxq-cli` (知识星球 CLI). 技能内容全部在 `skills/zsxq/`，以 Markdown 承载（场景脚本按需放在 `skills/zsxq/scripts/`）；仓库根的 `scripts/` 是文档校验与官方版构建工具，`tests/` 覆盖构建流程，两者都只服务文档，不含业务代码。
 
 The skill is consumed by AI agents (Claude Code, Codex, Cursor, OpenClaw) to learn how to operate the 知识星球 platform via `zsxq-cli`.
 
@@ -41,6 +41,23 @@ skills/zsxq/
 
 原子操作和场景执行时不得预先运行无关的 `doctor`、`--help` 或 `api list`；仅在能力不匹配或调用失败时回退到探索模式。
 
+## 双发行形态
+
+同一份源文档产出两种形态，**唯一源是 `skills/zsxq/`**，不要手改产物：
+
+| 形态 | 位置 | 内容 | 来源 |
+|------|------|------|------|
+| GitHub 版 | `skills/zsxq/` | CLI + MCP 双通道、场景、`scripts/`、`assets/` | 直接维护，`npx skills add` 安装 |
+| 官方发行版 | `dist/official/zsxq/` | 仅 MCP 内容，仅 `.md` 文件 | 构建生成，不入库；用于官方发行渠道导入 |
+
+- 构建：`python3 scripts/build-official-skill.py` 写入 `dist/official/zsxq/` 与 `dist/official/report.json`（各文件字节与预算）；`--check` 只在内存里构建校验，**不写 `dist/`**。
+- 配置：仓库根 [`skill-package.json`](skill-package.json) —— `source`、`official.output`、`official.exclude`、`official.limits`、`official.residualForbidden`、`official.description`。
+- CLI 专属内容必须包在 `<!-- cli-only:start -->` / `<!-- cli-only:end -->` 内，构建时整块删除；标记未闭合或嵌套会报错。
+- 有 `## 参数` 的 reference 必须有 `### 通道映射`（CLI flag ↔ HTTP 字段），构建据此把参数表合并成 MCP 字段表并删掉 CLI 专属行；映射值为「不上送」「无对应字段」的 CLI 参数视为无字段、整条删除；合并后同名字段自动去重并合并说明。没有 CLI flag 可映射的 MCP 专用文档，在 `## 参数` 前加 `<!-- params:mcp-only -->`，构建跳过合并。
+- 官方版排除项见 `official.exclude`：`scripts/**`、`assets/**`、`cli-exploration.md`、`generate-video*`、`generate-daily-poster*`、`migrate-legacy-skills.md`；被排除文件的表格行会整行删除，正文里出现指向它们的链接则构建失败。
+- 官方发行版导入限制（构建即校验）：SKILL.md ≤ 32768 字节、单资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节；`official.output` 的目录名必须等于 `official.name`。官方版正文不得残留 `zsxq-cli`、`scripts/`、`npm `、`npx `、`node `、`CLI 通道`、`CLI 工具`、`仅 CLI`、`api raw`、`api call`（`official.residualForbidden`）或任何 `--flag`。
+- 门禁：本地提交前跑 `python3 scripts/build-official-skill.py --check`；[`.github/workflows/skill-check.yml`](.github/workflows/skill-check.yml) 在任意分支推送与 PR 时跑单元测试、`check-docs.py`、官方版预算校验，并在推送时上传官方版产物。
+
 ## Key Conventions
 
 ### SKILL.md frontmatter format
@@ -50,13 +67,13 @@ skills/zsxq/
 name: zsxq
 description: "触发描述（中文，含关键词以便 AI 匹配触发；上限 1024 字符）"
 metadata:
-  version: "3.0.0"
+  version: "3.2.0"
   channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
 ```
 
-> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
+> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符（官方版另受 1024 **字节**限制，按 UTF-8 字节校验，描述由 `skill-package.json` 的 `official.description` 维护）；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
 
 `description` 字段直接决定 AI 何时触发该 skill，修改时确保包含所有相关操作的关键词（含场景触发语）。
 
@@ -138,7 +155,7 @@ CLI 通道有三类调用形式：
    - 快速索引表加一行
 3. 如果是新操作类型或新关键词，更新 SKILL.md frontmatter 的 `description` 以包含新关键词
 4. 错误：通用错误归 `auth-errors.md`，新增的命令特有错误才写在 reference 的「错误说明」节
-5. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」用真实运行校准文档，产出 `docs/verification/<id>.md` 报告 + `docs/verification/logs/<id>.log` 日志；写操作须先过测试授权门并选安全测试策略。收尾跑 `python3 scripts/check-docs.py`。
+5. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」用真实运行校准文档，产出 `docs/verification/<id>.md` 报告 + `docs/verification/logs/<id>.log` 日志；写操作须先过测试授权门并选安全测试策略。收尾跑 `python3 scripts/check-docs.py` 与 `python3 scripts/build-official-skill.py --check`。
 
 ## Adding a New Scenario
 
@@ -165,4 +182,4 @@ CLI 通道有三类调用形式：
 4. 在 SKILL.md 的「场景（Scenarios）」表注册入口 + 触发语；快速索引表加一行；description 补充触发关键词
 5. 场景只负责编排；命令参数和错误语义以原子操作 reference 为唯一来源
 6. 场景脚本要求：显式输入不猜 ID、结构化输入输出、不读写 token、非零退出码表示失败、写入类提供 dry-run 且保留用户确认。简单 CLI 编排不得封装为脚本
-7. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」端到端跑通主干 + 每条分支/停止条件各一个用例，产出 `docs/verification/<scenario-id>.md` 报告 + `logs/<scenario-id>.log` 日志；写操作须先过测试授权门。收尾跑 `python3 scripts/check-docs.py`
+7. **验证**：按 [`docs/skill-dev-workflow.md`](docs/skill-dev-workflow.md)「④ 验证」端到端跑通主干 + 每条分支/停止条件各一个用例，产出 `docs/verification/<scenario-id>.md` 报告 + `logs/<scenario-id>.log` 日志；写操作须先过测试授权门。收尾跑 `python3 scripts/check-docs.py` 与 `python3 scripts/build-official-skill.py --check`

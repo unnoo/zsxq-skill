@@ -1,10 +1,12 @@
 # topic +detail（查看主题详情）
 
-对应命令：CLI 通道 `zsxq-cli topic +detail`；MCP 通道见下方命令块。
+对应操作：`topic +detail`；MCP 调用见下方命令块。
 
 获取单条主题的完整详情，包括内容正文、发布者、点赞数、评论数等。
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -15,6 +17,8 @@ zsxq-cli topic +detail --topic-id 111222333444
 # 使用 --json 标志（效果相同，detail 命令始终输出 JSON）
 zsxq-cli topic +detail --topic-id 111222333444 --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -70,7 +74,11 @@ zsxq-cli topic +detail --topic-id 111222333444 --json
 - `counts`：评论数 / 点赞数 / 阅读数
 - `owner` / `group`：主题作者与所属星球的精简信息
 
-CLI 通道恒输出 JSON；MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。CLI 通道下长文正文由服务端回填；**MCP 通道透传、不做长文回填**，`talk.article.inline_article_url` 仅返回原始 URL —— 遇长文主题时提示「该主题为长文，正文需另行获取」，不得臆造正文。
+MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。**MCP 通道只透传接口原始字段、不做长文正文回填**，`talk.article.inline_article_url` 仅返回原始 URL —— 遇长文主题时提示「该主题为长文，正文需另行获取」，不得臆造正文。
+
+<!-- cli-only:start -->
+CLI 通道恒输出 JSON；CLI 通道下长文正文由服务端回填。
+<!-- cli-only:end -->
 
 ## 说明
 
@@ -79,7 +87,7 @@ CLI 通道恒输出 JSON；MCP 通道恒为 `{success, status_code, body}` 信�
 
 ## 错误说明
 
-通用错误（401、`--topic-id is required`、主题不存在、无权限访问等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失、主题不存在、无权限访问等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

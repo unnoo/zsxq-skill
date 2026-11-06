@@ -1,8 +1,8 @@
-# 设置主题标签（api call set_topic_tags）
+# 设置主题标签（`set_topic_tags`）
 
-通过 `zsxq-cli api call set_topic_tags` 为某主题设置标签（hashtag），返回更新后的主题简要信息。
+为某主题设置标签（hashtag），返回更新后的主题简要信息。
 
-对应命令：CLI 通道 `zsxq-cli api call set_topic_tags`；MCP 通道见下方命令块。
+对应操作：底层接口工具 `set_topic_tags`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 这是**写入操作** —— 会改变主题的标签。执行前必须向用户确认：
@@ -14,12 +14,16 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
 # 为主题设置标签（数组形式，可多个）
 zsxq-cli api call set_topic_tags --params '{"topic_id":"123","titles":["标签1","标签2"]}'
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -31,7 +35,7 @@ MCP 通道没有 `titles` 数组，需自行把标签构造为 `annotation`：
 
 1. 每个标签**去首尾空白**
 2. **补 `#` 前后缀**（`投资` → `#投资#`）
-3. 做 **URL 编码**（`#投资#` → `%23%E6%8A%95%E8%B5%84%23`）——以 Go `url.QueryEscape` 语义为准（空格编码为 `+`，不是 `%20`；含空格的标签两通道会因此产出不同 `annotation`）
+3. 做 **URL 编码**（`#投资#` → `%23%E6%8A%95%E8%B5%84%23`）——以 Go `url.QueryEscape` 语义为准（空格编码为 `+`，不是 `%20`；含空格的标签在不同编码实现下会因此产出不同 `annotation`）
 4. 套入 `<e type="hashtag" hid="0" title="编码值" />`
 5. 全部**串联**为一个字符串（上例即 `["投资","AI"]`）
 
@@ -53,11 +57,16 @@ MCP 通道没有 `titles` 数组，需自行把标签构造为 `annotation`：
 
 ## 输出
 
-成功后返回更新后的主题简要信息（含新的标签）；具体字段以 `api call` 实际输出为准。MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
+成功后返回更新后的主题简要信息（含新的标签）；具体字段以实际返回为准。MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：查看现有标签用 CLI `topic +detail` / MCP `GET /v2/topics/{topic_id}/info`；设置标签用上方对应通道的命令（MCP 通道需先按规则构造 `annotation`）。
+<!-- cli-only:start -->
+**两通道步骤相同，仅调用形式不同**：查看现有标签用 CLI `topic +detail`。
+<!-- cli-only:end -->
+MCP 通道查看现有标签用 `GET /v2/topics/{topic_id}/info`；设置标签用上方「## 命令」的调用块（需先按规则构造 `annotation`）。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：查看主题现有标签，避免覆盖时误删
@@ -66,6 +75,8 @@ zsxq-cli topic +detail --topic-id 123
 # 第二步：与用户确认「最终完整标签集合」后执行
 zsxq-cli api call set_topic_tags --params '{"topic_id":"123","titles":["产品","增长"]}'
 ```
+
+<!-- cli-only:end -->
 
 > 查看星球已有哪些标签可用 `group +hashtags`（见 [group-hashtags](group-hashtags.md)）。
 
@@ -85,5 +96,5 @@ zsxq-cli api call set_topic_tags --params '{"topic_id":"123","titles":["产品",
 
 - [topic-detail](topic-detail.md) — 操作前查看主题当前标签
 - [group-hashtags](group-hashtags.md) — 查看星球已有标签
-- [topic-digest](topic-digest.md) — 设置/取消精华（同为写入类 api call）
+- [topic-digest](topic-digest.md) — 设置/取消精华（同为写入类操作）
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

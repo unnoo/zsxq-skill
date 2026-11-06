@@ -1,8 +1,12 @@
-# 主题所属专栏（读取 / 设置，通过 api raw）
+# 主题所属专栏（读取 / 设置，底层 HTTP 接口）
 
-读取一条主题当前所属的专栏列表，或覆盖式设置它所属的专栏集合。CLI 未封装为 shortcut，通过 `api raw` 调用原始 HTTP 接口（action `group_topic/attachedcolumns` 读取、`group_topic/attachtopicstocolumn` 设置）。**「把主题加入某专栏」= 先读现有专栏 → 并入目标 → 整表回设**。
+读取一条主题当前所属的专栏列表，或覆盖式设置它所属的专栏集合。该能力未封装为 shortcut，需直接调用底层 HTTP 接口。**「把主题加入某专栏」= 先读现有专栏 → 并入目标 → 整表回设**。
 
-对应命令：CLI 通道 `zsxq-cli api raw --method GET|POST --path /v2/topics/<topic_id>/attached_columns`；MCP 通道见下方命令块。
+<!-- cli-only:start -->
+CLI 侧的 `api raw` 调用对应 action：`group_topic/attachedcolumns` 读取、`group_topic/attachtopicstocolumn` 设置。
+<!-- cli-only:end -->
+
+对应操作：`GET|POST /v2/topics/<topic_id>/attached_columns`；MCP 调用见下方命令块。
 
 > [!CAUTION]
 > 设置操作是**替换性写入** —— 会改变主题的专栏归属。执行前必须向用户确认：
@@ -12,10 +16,12 @@
 > 4. 操作身份具备权限（星主、合伙人或管理员）
 
 > [!IMPORTANT]
-> - **替换语义**：`POST` 的 `column_ids` 是**全量替换**，不在列表中的原有专栏会被取消；传空数组 `[]` = 把该主题移出**所有**专栏。要「新增」而非「替换」，必须先 `GET` 读出现有 `column_ids`、并入目标、去重后再整表 `POST`。**MCP 通道同样先读后并入回设**，替换语义与 CLI 通道完全一致。
+> - **替换语义**：`POST` 的 `column_ids` 是**全量替换**，不在列表中的原有专栏会被取消；传空数组 `[]` = 把该主题移出**所有**专栏。要「新增」而非「替换」，必须先 `GET` 读出现有 `column_ids`、并入目标、去重后再整表 `POST`。**MCP 通道同样先读后并入回设**，替换语义不变。
 > - **每专栏 100 主题上限**：`column_ids` 中未超限的专栏会设置成功，已超限的专栏设置失败；若结果里存在超限专栏，接口返回错误 code。
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -34,6 +40,8 @@ zsxq-cli api raw --method POST \
   --body '{"column_ids": []}'
 ```
 
+<!-- cli-only:end -->
+
 **MCP 通道（`call_zsxq_api`）：**
 
 ```json
@@ -44,7 +52,11 @@ zsxq-cli api raw --method POST \
 {"method": "POST", "path": "/v2/topics/111222333444/attached_columns", "body": {"req_data": {"column_ids": ["555666777"]}}}
 ```
 
-> CLI 通道的 `api raw --body` 会**自动包装** `req_data`；MCP 通道不会，必须显式写成 `body.req_data`（移出所有专栏时 `req_data.column_ids` 传 `[]`）。
+> **请求体**：MCP 通道不会自动包装，必须显式写成 `body.req_data`（移出所有专栏时 `req_data.column_ids` 传 `[]`）。
+
+<!-- cli-only:start -->
+> **请求体**：CLI 通道的 `api raw` 会自动包装 `req_data`，无需手写这一层。
+<!-- cli-only:end -->
 
 ## 参数
 
@@ -98,9 +110,29 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：步骤 1 的 `group +list` → `GET /v2/groups`、专栏列表 → `GET /v2/groups/{group_id}/columns`；步骤 2、4 见上方 MCP 块（`GET` 读、`POST` 整表回设）。
+加入 / 移出专栏都是「读现有集合 → 合并或剔除目标 → 整表回设」三步。
 
-把主题加入目标专栏（保留原有归属）：
+**① 确认目标与专栏**
+
+1. 取 `group_id`（`GET /v2/groups`），列出星球专栏（`GET /v2/groups/{group_id}/columns`），核对目标 `column_id` 与名称，并看该专栏 `topics_count` 是否接近 100 上限
+
+**② 读取现有归属**
+
+2. 读主题当前所属专栏：`GET /v2/topics/{topic_id}/attached_columns`，从 `body.resp_data.columns[]` 收集 `column_id`
+
+**③ 计算最终集合并与用户确认**
+
+3. 加入某专栏：把目标 `column_id` 并入现有集合并去重；移出某专栏：从现有集合中剔除该 `column_id`；移出所有专栏：给空数组 `[]`
+4. 把最终**完整** `column_ids` 交用户确认 —— 这是替换语义，不在列表中的原有专栏会被取消
+
+**④ 整表回设并复核**
+
+5. `POST /v2/topics/{topic_id}/attached_columns`，body 显式写 `{"req_data": {"column_ids": [最终完整列表]}}`（调用块见上方「## 命令」）
+6. 成功后再 `GET` 一次复核实际归属；若存量集合含已达 100 上限的专栏，属部分成功（见下方「失败语义」）
+
+<!-- cli-only:start -->
+
+CLI 通道的对应调用形式（`api raw` 会自动包装 `req_data`）：
 
 ```bash
 # 第一步：拿到 group_id，查专栏列表找到目标 column_id、并看现有 topics_count 是否接近 100
@@ -118,7 +150,7 @@ zsxq-cli api raw --method POST \
   --body '{"column_ids": [<现有...>, <目标>]}'
 ```
 
-移出某专栏：同样先读现有集合，从中**剔除**该专栏后整表回设。
+<!-- cli-only:end -->
 
 ## 失败语义
 
@@ -131,9 +163,13 @@ zsxq-cli api raw --method POST \
 | 上限错误 code | `column_ids` 中某专栏已达 100 主题上限，该专栏设置失败 |
 | 无权限 / `code` 类权限错误 | 当前账户非星主 / 合伙人 / 管理员，无权设置 |
 | `429`「操作过于频繁，请稍后重试」 | 短时间内密集写入触发限流。放慢节奏、每次写入间隔约 2 秒后重试；批量场景见 [archive-topics-to-column](scenarios/archive-topics-to-column.md) |
-| `接口 ... 不存在，请检查路径是否正确` | 当前 zsxq-cli 版本的底层接口工具尚未登记该路径，需升级 zsxq-cli（该接口为主题维度 `attached_columns`，替代已废弃的 column 维度收录接口） |
+| `接口 ... 不存在，请检查路径是否正确` | 该接口为主题维度 `attached_columns`（替代已废弃的 column 维度收录接口）；核对 path 拼写与登记情况 |
 
-通用错误（401、404 主题不存在、`--body` / 参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
+<!-- cli-only:start -->
+上表最后一行的 CLI 侧含义：底层接口工具尚未登记该路径，需升级 CLI。
+<!-- cli-only:end -->
+
+通用错误（401、404 主题不存在、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

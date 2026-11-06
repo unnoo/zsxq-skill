@@ -1,6 +1,6 @@
 # note +edit（编辑笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +edit`；MCP 通道见下方命令块。
+对应操作：`note +edit`；MCP 调用见下方命令块。
 
 编辑已有笔记的内容。未修改的字段自动保留。
 
@@ -14,6 +14,8 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
@@ -23,6 +25,8 @@ zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 # JSON 格式输出
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容" --json
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -62,7 +66,9 @@ MCP 通道的 `image_ids` 须先 `GET /v2/notes/{note_id}` 读出当前值后原
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：先读当前内容确认，再写入。
+先读当前内容确认，再写入。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认当前笔记内容
@@ -71,6 +77,8 @@ zsxq-cli note +detail --note-id 444555666777
 # 第二步：确认无误后执行编辑
 zsxq-cli note +edit --note-id 444555666777 --text "新的笔记内容"
 ```
+
+<!-- cli-only:end -->
 
 MCP 通道：
 
@@ -88,7 +96,7 @@ MCP 通道：
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在、403 无权限编辑他人笔记等）见 [auth-errors](auth-errors.md#常见错误处理)。
+通用错误（401、参数缺失、笔记不存在、403 无权限编辑他人笔记等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 

@@ -1,8 +1,12 @@
 # 创建微信订单（底层接口工具 `call_zsxq_api`）
 
-> **通道：仅 MCP 通道**。CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
+> **通道：仅 MCP 通道**。支付所需的 `_meta` 只有 `call_zsxq_api` 会交给支付宿主，缺 MCP 时无法支付（见 [SKILL.md 执行通道](../SKILL.md#执行通道)）。
 
-通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。不要用 `zsxq-cli api raw` 代替本操作，CLI 无法保证把支付所需的 `_meta` 交给支付宿主。
+<!-- cli-only:start -->
+> CLI 的 `api raw` 不会把支付所需的 `_meta` 交给支付宿主，CLI 通道无等价物；在 CLI 通道下收到购买意图时，引导用户接入 MCP。
+<!-- cli-only:end -->
+
+通过底层接口工具 `call_zsxq_api` 创建知识星球微信订单，并触发 Skill Pay。
 
 > [!CAUTION]
 > 创建订单会产生真实待支付订单，完成支付会发生真实资金交易。首先确认当前宿主是 WorkBuddy 且提供官方 `weixinpay_pay`；非 WorkBuddy（如 Claude Code / CC）必须说明不支持并停止，不得创建订单。通过宿主检查后，首次调用前还必须向用户确认：
@@ -21,37 +25,22 @@
 
 ## 下单前查询价格
 
-价格查询是只读操作。创建订单前使用 `call_zsxq_api` 按订单类型取得价格；接口金额单位均为“分”，向用户展示时除以 100 换算为“元”。`1 元 = 1 星球币`。
+价格查询是只读操作。创建订单前使用 `call_zsxq_api` 按订单类型取得价格；金额单位与换算见[金额换算规则](#金额换算规则)。
 
 | 订单类型 | 查询方式 | 金额字段或规则 |
 |----------|----------|----------------|
-| `membership_fee` | `GET /v2/groups/{group_id}/public_info` | 确认 `body.resp_data.public_info.type` 为 `pay`，读取 `body.resp_data.public_info.policies.payment.amount`，无折扣 |
-| `gift_card_fee` | `GET /v2/groups/{group_id}/public_info` | 确认 `body.resp_data.public_info.type` 为 `pay`；与加入星球相同，读取 `body.resp_data.public_info.policies.payment.amount`，无折扣 |
+| `membership_fee`、`gift_card_fee` | `GET /v2/groups/{group_id}/public_info` | 确认 `body.resp_data.public_info.type` 为 `pay`，读取 `body.resp_data.public_info.policies.payment.amount`，无折扣 |
 | `renewal_fee` | `GET /v2/groups/{group_id}` | 确认 `body.resp_data.group.type` 为 `pay`，读取基础价、当前用户有效期和续费折扣，按下方规则计算 |
 | `back_issue` | `GET /v2/groups/{group_id}/back_issues/{back_issue_id}` | `body.resp_data.back_issue.amount` |
 | `group_invite_code` | 无需查询 | 固定 `800 元`，即 `80000 分` |
 | `question_fee`、`reward_user`、`reward_topic`、`reward_comment` | 无价格查询接口 | 使用用户明确指定的元金额，按 `元 × 100` 换算并确认整数 `amount`（分） |
 
-调用示例均为底层接口工具参数：
+调用示例（`call_zsxq_api` 参数；其余类型的路径见上表）：
 
 ```json
 {
   "method": "GET",
   "path": "/v2/groups/123456789/public_info"
-}
-```
-
-```json
-{
-  "method": "GET",
-  "path": "/v2/groups/123456789"
-}
-```
-
-```json
-{
-  "method": "GET",
-  "path": "/v2/groups/123456789/back_issues/555666777888"
 }
 ```
 
@@ -61,23 +50,15 @@
 
 ### 续费价格计算
 
-`GET /v2/groups/{group_id}` 的星球数据位于 `body.resp_data.group`（宿主直接返回业务响应体时为 `resp_data.group`）。在 `group` 内读取：
-
-- 基础价：`policies.payment.amount`
-- 当前用户到期时间：`user_specific.validity.end_time`
-- 提前续费比例：`policies.renewal.advance_discounted_percentage`
-- 过期 30 天内续费比例：`policies.renewal.grace_discounted_percentage`
-- 过期超过 30 天续费比例：`policies.renewal.discounted_percentage`
-
-将 `end_time` 按响应中的时区偏移解析为时间点，并与当前时间比较：
+`GET /v2/groups/{group_id}` 的星球数据位于 `body.resp_data.group`（宿主直接返回业务响应体时为 `resp_data.group`）。基础价取 `policies.payment.amount`，当前用户到期时间取 `user_specific.validity.end_time`，折扣比例按有效期从下方表格选：
 
 | 用户有效期 | 使用的折扣比例 |
 |------------|----------------|
-| 尚未到期（`当前时间 <= end_time`） | `advance_discounted_percentage` |
-| 已过期且不超过 30 天 | `grace_discounted_percentage` |
-| 已过期超过 30 天 | `discounted_percentage` |
+| 尚未到期（`当前时间 <= end_time`） | `policies.renewal.advance_discounted_percentage` |
+| 已过期且不超过 30 天 | `policies.renewal.grace_discounted_percentage` |
+| 已过期超过 30 天 | `policies.renewal.discounted_percentage` |
 
-计算公式：
+`end_time` 须按响应中的时区偏移解析为时间点，再与当前时间比较。计算公式：
 
 ```text
 续费金额（分） = floor(policies.payment.amount * 对应 discounted_percentage / 100)
@@ -112,28 +93,22 @@
 }
 ```
 
-## 参数
+<!-- params:mcp-only -->
 
-工具顶层参数：
+## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
-| `method` | **是** | 固定为 `POST` |
-| `path` | **是** | 固定为 `/v2/wechat_orders` |
+| `method` / `path` | **是** | 固定为 `POST` 和 `/v2/wechat_orders` |
 | `body.req_data` | 首次调用 **是** | 订单请求体；字段见下表 |
 | `payment_retry_token` | 仅预下单失败重试 | `SKILLHUB_PREORDER_FAILED` 返回的短期签名凭据；重试时无需再传 `body` |
 | `out_trade_no` | 否 | 与 `payment_retry_token` 一起校验订单；单独传入会被拒绝。**只能作为字符串原样保存和传递**，不得转换为数值；恢复时可省略，由签名凭据确定订单 |
 
-`body.req_data` 字段：
+`body.req_data` 字段（上表为工具顶层参数）。各类型必填哪些 ID 字段见其后的逐类型传参规则：
 
-| 字段 | 必填 | 适用范围与说明 |
-|------|------|----------------|
-| `type` | **是** | 从上方支持的订单类型中选择 |
-| `group_id` | 按类型 | `membership_fee`、`gift_card_fee`、`renewal_fee`、`question_fee`、`reward_user` |
-| `topic_id` | 按类型 | `reward_topic` |
-| `comment_id` | 按类型 | `reward_comment` |
-| `user_id` | 按类型 | `question_fee`、`reward_user` 的被提问/被赞赏用户 |
-| `back_issue_id` | 按类型 | `back_issue` |
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `type` | **是** | 从下方支持的订单类型中选择 |
 | `amount` | 按类型 | 仅 `question_fee`、`reward_user`、`reward_topic`、`reward_comment` 必填；整数，单位为“分”。用户以“元”指定时乘以 100 换算 |
 | `pay_type` | 否 | 支付方式，缺省使用微信支付 |
 | `coupon_code` | 否 | `membership_fee`、`renewal_fee` 使用的优惠券码 |
@@ -155,79 +130,38 @@
 
 ### 金额换算规则
 
-- 接口 `amount` 的单位是“分”，必须传整数。
-- 用户通常以“元”指定金额：`接口 amount（分） = 用户金额（元） × 100`。只能接受最多两位小数且乘积为整数分的元金额；无法精确换算时停止并请用户重新给出金额，不得四舍五入或截断。
-- 向用户展示时使用“元”：`展示金额（元） = amount ÷ 100`。
-- `1 元 = 1 星球币`，因此换算后的元数值也等于星球币数量。
-- 示例：用户指定 `10 元`时传 `amount: 1000`；用户指定 `12.34 元`时传 `amount: 1234`，等值 `12.34 星球币`。
+- 接口 `amount` 的单位是“分”，必须传整数；向用户展示时 `展示金额（元） = amount ÷ 100`。
+- 用户以“元”指定金额时：`接口 amount（分） = 用户金额（元） × 100`。只接受最多两位小数且乘积为整数分的元金额；无法精确换算时停止并请用户重新给出金额，不得四舍五入或截断。
+- `1 元 = 1 星球币`，换算后的元数值即星球币数量。示例：用户指定 `10 元`时传 `amount: 1000`；指定 `12.34 元`时传 `amount: 1234`，等值 `12.34 星球币`。
 
 `pay_type` 省略时使用微信支付。除表中字段外，不要自行补充参数；尤其不要给付费加入、礼品卡、续期、创建星球邀请码或轻读订单传 `amount`。
 
 ## 输出
 
-知识星球订单和 SkillHub 预下单均成功时，底层接口工具调用本身不是协议错误，但结构化业务结果是 402 支付挑战。此时 `success: false` 是协议约定；必须以 `code == "PAYMENT_REQUIRED"` 且 `status_code == 402` 识别待支付状态，不得按普通失败处理，也不得重试创建订单：
+知识星球订单和 SkillHub 预下单均成功时，结构化业务结果是 402 支付挑战：`success: false` 是协议约定，必须以 `code == "PAYMENT_REQUIRED"` 且 `status_code == 402` 识别待支付状态，不得按普通失败处理，也不得重试创建订单。
 
 ```json
 {
   "success": false,
   "status_code": 402,
   "code": "PAYMENT_REQUIRED",
-  "message": "该订单需要完成微信支付",
   "payment": {
     "provider": "WEIXINPAY",
     "payment_code": "MOCK_PAYMENT_CODE",
-    "prompt": "请完成微信支付。",
     "out_trade_no": "90000000000000000001",
     "expires_at": 4102444800
   },
-  "out_trade_no": "90000000000000000001"
-}
-```
-
-同一结果还包含供支付宿主读取的 `_meta`：
-
-```json
-{
-  "WeixinPay": {
-    "WeixinPay-Required": "MOCK_PAYMENT_CODE",
-    "prompt": "请完成微信支付。"
-  },
-  "X-Out-Trade-No": "90000000000000000001"
-}
-```
-
-订单号可能同时出现在顶层 `out_trade_no`、`payment.out_trade_no` 和 `_meta.X-Out-Trade-No`。读取时，每个已出现的值都必须是非空字符串；多个位置同时存在时必须完全一致，否则停止并报告。订单号必须始终按原字符串保存和传递，不得转换为数值。
-
-收到 `PAYMENT_REQUIRED` 不是失败，也不是支付成功；应让支持 Skill Pay 的宿主展示微信支付授权卡片，由用户确认。
-
-`expires_at` 是 Unix 时间戳，单位为**秒**。与当前时间比较时使用当前 Unix 秒值（不能直接用毫秒级 `Date.now()`）；当前时间大于或等于 `expires_at` 时支付码已过期，必须停止。示例中的 `4102444800` 是模拟值，不对应真实订单。
-
-SkillHub 预下单失败时，知识星球订单已经创建，响应会包含安全恢复所需字段：
-
-```json
-{
-  "success": false,
-  "status_code": 502,
-  "code": "SKILLHUB_PREORDER_FAILED",
-  "error": "MOCK_SKILLHUB_ERROR",
-  "message": "SkillHub 预下单失败，可使用 payment_retry_token 重试，不会重复创建知识星球订单。",
   "out_trade_no": "90000000000000000001",
-  "order_type": "membership_fee",
-  "payment_retry_token": "MOCK_PAYMENT_RETRY_TOKEN",
-  "payment": {
-    "provider": "WEIXINPAY",
-    "pay_data": {
-      "type": "prepay_id",
-      "value": "MOCK_PREPAY_ID"
-    },
-    "out_trade_no": "90000000000000000001",
-    "payment_retry_token": "MOCK_PAYMENT_RETRY_TOKEN",
-    "expires_at": 4102444800
+  "_meta": {
+    "WeixinPay": {"WeixinPay-Required": "MOCK_PAYMENT_CODE", "prompt": "请完成微信支付。"},
+    "X-Out-Trade-No": "90000000000000000001"
   }
 }
 ```
 
-优先从顶层 `payment_retry_token` 读取恢复凭据；顶层缺失时可读取 `payment.payment_retry_token`。两处同时存在但值不一致，或两处均缺失/为空时停止并报告，不得重发订单 `body`。恢复凭据的 `expires_at` 同样是 Unix 秒级时间戳；过期后停止。
+订单号可能同时出现在顶层 `out_trade_no`、`payment.out_trade_no` 和 `_meta.X-Out-Trade-No`。每个已出现的值都必须是非空字符串，多处同时存在时必须完全一致，否则停止并报告；订单号必须始终按原字符串保存和传递，不得转换为数值。`expires_at` 是 Unix **秒**级时间戳（与当前时间比较时用 Unix 秒值，不能直接用毫秒级 `Date.now()`），当前时间大于或等于它时支付码已过期，必须停止。
+
+SkillHub 预下单失败（`SKILLHUB_PREORDER_FAILED`，502）时知识星球订单已经创建，响应仍包含 `out_trade_no`、`order_type`、恢复凭据 `payment_retry_token`（在顶层，或在 `payment.payment_retry_token`）以及 `payment.expires_at`。优先从顶层读取恢复凭据；两处同时存在但值不一致，或两处均缺失/为空时停止并报告，不得重发订单 `body`。恢复凭据的 `expires_at` 同样是 Unix 秒级时间戳，过期后停止。
 
 ## 宿主微信支付授权
 
@@ -241,7 +175,7 @@ weixinpay_pay(paymentCode="<WeixinPay-Required 的原值>")
 ```
 
 3. 宿主展示微信支付卡片后，将支付决定交给用户本人。agent 不得代替用户点击确认、自动授权或把创建订单时的确认视为支付授权。
-4. 将 `out_trade_no` 原样保存为字符串，但不要把它传给 `weixinpay_pay`，也不得转换为数值。支付能力调用完成只表示已发起或处理授权流程；支付是否成功及订单是否履约，以知识星球原支付回调或业务页面状态为准。
+4. 将 `out_trade_no` 原样保存为字符串，但不要传给 `weixinpay_pay`，也不得转换为数值。支付能力调用完成只表示已发起授权流程；是否支付成功及履约，以知识星球原支付回调或业务页面状态为准。
 
 以下情况必须停止，不得自动再次创建订单：
 
@@ -252,10 +186,10 @@ weixinpay_pay(paymentCode="<WeixinPay-Required 的原值>")
 ## 推荐工作流
 
 1. 确认当前宿主是 WorkBuddy 且提供官方 `weixinpay_pay`。否则在创建订单前说明限制并停止。
-2. 查询并核对目标 ID。赞赏评论需同时取得 `topic_id` 和 `comment_id`；轻读查价需同时取得 `group_id` 和 `back_issue_id`。按[下单前查询价格](#下单前查询价格)取得或计算固定价格，按逐类型传参规则整理必要字段，向用户以“元”展示对象、基础价/折扣（如适用）、应付金额和等值星球币；四类用户定价订单按[金额换算规则](#金额换算规则)将用户指定的元金额精确换算为整数分，再同时确认元值和 `amount`。
-3. 使用 `call_zsxq_api` 创建订单。不要用 CLI `api raw` 绕过支付元数据；除付费提问和赞赏外，不要把查询或计算出的价格作为 `amount` 传入订单。
+2. 查询并核对目标 ID：赞赏评论需同时取得 `topic_id` 和 `comment_id`，轻读需同时取得 `group_id` 和 `back_issue_id`。按[下单前查询价格](#下单前查询价格)取得或计算固定价格，按逐类型传参规则整理必要字段，向用户以“元”展示对象、基础价/折扣（如适用）、应付金额和等值星球币；用户定价订单按[金额换算规则](#金额换算规则)精确换算为整数分，并同时确认元值和 `amount`。
+3. 使用 `call_zsxq_api` 创建订单。不得绕过支付元数据（不经 `call_zsxq_api` 的请求拿不到支付所需的 `_meta`）；除付费提问和赞赏外，不要把查询或计算出的价格作为 `amount` 传入订单。
 4. 收到 `PAYMENT_REQUIRED` 后，按[宿主微信支付授权](#宿主微信支付授权)处理支付码和 `out_trade_no`，由用户本人在微信支付卡片中确认。
-5. 支付完成后的状态与履约由知识星球原支付链路处理。没有官方查单能力时，如实说明无法在本工具内核验，不要重复创建订单。
+5. 支付后的状态与履约由知识星球原支付链路处理；没有查单能力时如实说明无法核验，不要重复创建订单。
 6. 只有收到 `SKILLHUB_PREORDER_FAILED` 时，才按下方恢复请求重试 SkillHub 预下单：
 
 ```json
@@ -271,11 +205,7 @@ weixinpay_pay(paymentCode="<WeixinPay-Required 的原值>")
 
 ## 失败语义
 
-- 知识星球创建订单失败：不进入 SkillHub 预下单，按原接口错误处理。
-- `PAYMENT_REQUIRED`：订单已创建、待用户支付，不是工具失败；不要自动重试创建订单。
-- `SKILLHUB_PREORDER_FAILED`：知识星球订单**已经创建**，仅 SkillHub 预下单失败；使用返回的 `payment_retry_token` 恢复，服务端不会再次创建知识星球订单。
-- `ZSXQ_ORDER_PARSE_FAILED` / `PAYMENT_RETRY_TOKEN_FAILED`：订单可能已经创建，但无法安全进入支付流程；停止并报告，不得盲目重试创建。
-- 用户取消、拒绝或支付卡片过期：停止，不得自动重新下单。用户明确要求重试时，重新确认金额和对象后再决定是否创建新订单。
+不原子：知识星球订单与 SkillHub 预下单是两个步骤，`SKILLHUB_PREORDER_FAILED` 时订单**已经创建**，只能用 `payment_retry_token` 恢复预下单、不会再次创建；`ZSXQ_ORDER_PARSE_FAILED` / `PAYMENT_RETRY_TOKEN_FAILED` 时订单可能已创建但无法安全进入支付流程，必须停止并报告。任何无法判断“订单是否已创建”的错误都按“可能已创建”处理，禁止重放首次请求；用户取消、拒绝或支付卡片过期后不得自动重新下单，用户明确要求重试时须重新确认金额和对象。
 
 ## 错误说明
 

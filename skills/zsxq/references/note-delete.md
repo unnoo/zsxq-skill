@@ -1,6 +1,6 @@
 # note +delete（删除笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +delete`；MCP 通道见下方命令块。
+对应操作：`note +delete`；MCP 调用见下方命令块。
 
 删除指定笔记。删除后**不可恢复**。
 
@@ -11,12 +11,16 @@
 
 ## 命令
 
+<!-- cli-only:start -->
+
 **CLI 通道：**
 
 ```bash
 # 删除笔记
 zsxq-cli note +delete --note-id 444555666777
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -38,7 +42,9 @@ zsxq-cli note +delete --note-id 444555666777
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：先读内容确认，再向用户确认后删除。
+先读内容确认，再向用户确认后删除。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：确认笔记内容
@@ -47,6 +53,8 @@ zsxq-cli note +detail --note-id 444555666777
 # 第二步：向用户确认后执行删除
 zsxq-cli note +delete --note-id 444555666777
 ```
+
+<!-- cli-only:end -->
 
 MCP 通道：
 
@@ -64,7 +72,7 @@ MCP 通道：
 
 ## 错误说明
 
-通用错误（401、`--note-id is required`、笔记不存在、无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
+通用错误（401、参数缺失、笔记不存在、无权限等）见 [auth-errors](auth-errors.md#常见错误处理)。本命令无特有错误。
 
 ## 参考
 

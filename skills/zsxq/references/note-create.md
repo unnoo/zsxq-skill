@@ -1,6 +1,6 @@
 # note +create（创建笔记）
 
-对应命令：CLI 通道 `zsxq-cli note +create`；MCP 通道见下方命令块。
+对应操作：`note +create`；MCP 调用见下方命令块。
 
 在知识星球创建一条公开笔记，支持文本和图片附件。任何人通过笔记链接均可访问。
 
@@ -10,6 +10,8 @@
 > 2. 附件列表（如有）
 
 ## 命令
+
+<!-- cli-only:start -->
 
 **CLI 通道：**
 
@@ -26,6 +28,8 @@ zsxq-cli note +create --text "示例笔记内容" --json
 # 带图片的笔记
 zsxq-cli note +create --text "记录" --files idea.jpg
 ```
+
+<!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
@@ -64,7 +68,9 @@ MCP 通道恒为 `{success, status_code, body}` 信封，新建笔记信息（`n
 
 ## 推荐工作流
 
-**两通道步骤相同，仅调用形式不同**：确认内容、创建、回读校验三步一致，调用按所在通道进行。
+确认内容、创建、回读校验三步，各步调用见上方「## 命令」的调用块。
+
+<!-- cli-only:start -->
 
 ```bash
 # 第一步：与用户确认笔记内容（公开可访问，避免写入隐私）
@@ -74,6 +80,8 @@ zsxq-cli note +create --text "笔记内容"
 # 第三步：（可选）拿到 note_id 后立即查看，确认内容正确
 zsxq-cli note +detail --note-id <新建的 note_id>
 ```
+
+<!-- cli-only:end -->
 
 ```json
 {"method": "POST", "path": "/v2/notes", "body": {"req_data": {"text": "笔记内容", "image_ids": []}}}

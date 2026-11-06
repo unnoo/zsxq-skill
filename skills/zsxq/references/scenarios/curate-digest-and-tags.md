@@ -27,7 +27,7 @@
 
 | 操作 | reference | 在本场景中的作用 |
 |------|-----------|-----------------|
-| `group +topics` | [../group-topics.md](../group-topics.md) | 拉最近 N 条主题的标题/摘要做初筛（`--json` 每条含 `digested`，可先剔除已精华项） |
+| `group +topics` | [../group-topics.md](../group-topics.md) | 拉最近 N 条主题的标题/摘要做初筛（返回体每条含 `digested`，可先剔除已精华项） |
 | `topic +detail` | [../topic-detail.md](../topic-detail.md) | 对候选拉完整正文判断是否值得加精；打标签前读该主题**现有标签** |
 | `group +hashtags` | [../group-hashtags.md](../group-hashtags.md) | 查星球现有标签清单，作为建议标签的词表，优先复用已有标签 |
 | `set_topic_digested` | [../topic-digest.md](../topic-digest.md) | 写入：将主题设为精华（星主权限） |
@@ -41,16 +41,16 @@
 
 ### 第二步：拉最近主题做初筛（只读）
 
-`group +topics --group-id <id> --limit <N>`（默认 20），从标题/摘要初筛两类候选：
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`）拉最近 N 条主题（默认 20），从标题/摘要初筛两类候选：
 
-- **A 类（加精候选，默认 5–8 条）**：看起来有价值、值得沉淀的主题。用 `--json` 输出里的 `digested` 字段先剔除**已是精华**的，避免重复处理。
+- **A 类（加精候选，默认 5–8 条）**：看起来有价值、值得沉淀的主题。用返回体里的 `digested` 字段先剔除**已是精华**的，避免重复处理。
 - **B 类（打标签候选）**：内容主题明确、适合归类的主题。
 
 > 列表输出**不含标签信息**，因此 B 类此时只是「按标题/摘要的预判」；某条是否真的没打标签，要到第四步用 `topic +detail` 确认。
 
 ### 第三步：查现有标签（只读）
 
-`group +hashtags --group-id <id>` 拉星球现有标签清单，作为建议标签的词表：**优先复用已有标签**，避免制造重复或近义的新标签。
+用 `group +hashtags`（MCP：`GET /v2/groups/<id>/hashtags`）拉星球现有标签清单，作为建议标签的词表：**优先复用已有标签**，避免制造重复或近义的新标签。
 
 ### 第四步：拉详情、生成建议清单（只读）
 
