@@ -192,8 +192,12 @@ User (user_id) — 已登录账户
 | 工具 | 参数 | 说明 |
 |------|------|------|
 | `search_groups` | `keyword` | 按关键词搜索星球 |
-| `search_group_members` | `group_id`, `keyword`, `limit` | 搜索星球成员 |
-| `get_hashtag_topics` | `hashtag_id`, `limit`, `end_time` | 列出某标签下的主题（分页） |
+| `search_group_members` | `group_id`, `keyword`, `count` | 搜索星球成员 |
+| `get_hashtag_topics` | `hashtag_id`, `count`, `end_time` | 列出某标签下的主题（分页） |
+
+<!-- cli-only:start -->
+> CLI 通道经 `api call` 调用 `search_group_members` / `get_hashtag_topics` 时，条数参数名为 `limit`（MCP 通道为 `count`），勿混用。
+<!-- cli-only:end -->
 
 **原始 HTTP 调用：**
 
@@ -214,7 +218,7 @@ User (user_id) — 已登录账户
 | 查「自己最近发过什么」时逐个星球跑 `+topics` | 用 `user +footprints` 一次拿到跨星球足迹 |
 | 用户只给星球名称时，让用户自己提供 group_id | 先 `group +list` 或 `search_groups` 查到 ID 再继续 |
 | 名称命中多个相似星球时默认取第一个 | 列出候选（group_id + 名称）让用户确认 |
-| 把 `search_group_members` 当成员列表接口、调大 `limit` 遍历全员 | 它是关键词搜索，只用于按昵称定位具体成员 |
+| 把 `search_group_members` 当成员列表接口、调大 `count` 遍历全员 | 它是关键词搜索，只用于按昵称定位具体成员 |
 
 ## 主题管理（topic）
 
@@ -237,13 +241,17 @@ User (user_id) — 已登录账户
 
 | 工具 | 参数 | 说明 | Reference |
 |------|------|------|-----------|
-| `get_topic_comments` | `topic_id`, `limit`, `index` | 获取主题评论列表（分页） | — |
+| `get_topic_comments` | `topic_id`, `count`, `index` | 获取主题评论列表（分页） | — |
 | `set_topic_digested` | `topic_id`, `digested` | 设置/取消精华（星主权限）⚠️ | [`topic-digest.md`](references/topic-digest.md) |
 | `set_topic_tags` | `topic_id`, `titles` | 为主题设置标签（titles 为完整标签集合）⚠️ | [`topic-tags.md`](references/topic-tags.md) |
 | `get_self_question_topics` | `filter`, `count`, `end_time` | 查看自己发起的提问 | — |
 | `get_self_answer_topics` | `filter`（`unanswered`/`answered`）, `count`, `end_time` | 查看别人向我发起的提问（账号级，返回项带 `group` 字段，需按星球过滤） | — |
 
 > ⚠️ = 写入操作（`set_topic_digested` / `set_topic_tags` 会修改星球内容），执行前必须向用户确认，并遵守[安全规则](#安全规则)与对应 reference 的 `> [!CAUTION]` 块。
+
+<!-- cli-only:start -->
+> CLI 通道经 `api call` 调用 `get_topic_comments` 时，条数参数名为 `limit`（MCP 通道为 `count`），分页游标仍为 `index`。
+<!-- cli-only:end -->
 
 **原始 HTTP 调用：**
 

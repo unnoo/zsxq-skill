@@ -114,7 +114,7 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
   - 时间排序（`join_time` / `expired_time` / `update_time`）：当返回条数等于 `count` 时可能还有更多，用最后一条的对应时间推进游标继续拉——`order=asc` 时把 `begin_time` 设为该时间，`order=desc` 时把 `end_time` 设为该时间，直到返回不足 `count` 或为空。
   - `sort=number`（仅 `scope=expired`）：用上一页返回中最后一条的 `number` 作为下一次的 `page_tag`。
 - `number` 仅当星球启用「成员编号」并已分配时才有；未启用的星球该字段缺失（实测多数星球不返回）。
-- 定位**单个**成员用关键词搜索更直接：底层接口工具 `search_group_members`（`group_id` + `keyword` + `limit`）；本接口用于**成批**拉取成员列表。
+- 定位**单个**成员用关键词搜索更直接：底层接口工具 `search_group_members`（`group_id` + `keyword` + `count`）；本接口用于**成批**拉取成员列表。
 
 ## 错误说明
 

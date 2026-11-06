@@ -124,15 +124,21 @@ zsxq-cli user +nps --score 9 --suggestion "希望增加更多互动功能"
 
 ## 错误说明
 
+分数或建议不合法（服务端校验）：
+
+| 错误 | 原因 | 处理 |
+|------|------|------|
+| 校验不通过（MCP 通道看 `body.succeeded` 与 `body.code` / `body.info`） | `score` 不是 1–10 的整数，或 `suggestion` 为空 / 超过 500 字 | 改为 1–10 的整数，建议精简至 500 字以内后重试 |
+
 <!-- cli-only:start -->
+
+CLI 通道的本地参数校验提示：
 
 | 错误 | 原因 | 解决方案 |
 |------|------|---------|
 | 提示仅列出 `+footprints` / `+info` 等 shortcut，未识别 `+nps` | 当前 zsxq-cli 版本低于 0.4.6 | 运行 `npm i -g zsxq-cli@latest` 升级，再用 `zsxq-cli config show` 确认版本 ≥ 0.4.6 |
 | `--score must be 1–10` | 分数超出范围或非整数 | 改为 1–10 的整数 |
 | `--suggestion exceeds 500 chars` | 建议超过 500 字 | 精简至 500 字以内 |
-
-上表为 CLI 通道的本地参数校验提示。
 
 <!-- cli-only:end -->
 

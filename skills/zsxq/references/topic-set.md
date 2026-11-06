@@ -101,13 +101,22 @@ zsxq-cli topic +detail --topic-id 111222333444
 
 ## 错误说明
 
+服务端返回的错误：
+
+| 错误 | 原因 |
+|------|------|
+| `code` / `msg`（服务端返回） | 服务端拒绝（无管理权限、主题不存在等），`code` 与 `msg` 为服务端返回值；MCP 通道看 `body.succeeded` / `body.code` / `body.error` |
+
 <!-- cli-only:start -->
+
+CLI 通道的本地参数校验提示：
 
 | 错误 | 原因 |
 |------|------|
 | `请至少提供 --digested 或 --sticky 之一` | 两个参数都没传 |
 | `--digested 取值必须是 true 或 false` / `--sticky 取值必须是 true 或 false` | 值不是 `true` / `false` |
-| `API 错误(<code>): <msg>` | 服务端拒绝（无管理权限、主题不存在等），`code` 与 `msg` 为服务端返回 |
+
+CLI 通道下服务端拒绝显示为 `API 错误(<code>): <msg>`。
 
 <!-- cli-only:end -->
 

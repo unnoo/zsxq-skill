@@ -53,7 +53,7 @@
 用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`）按时间倒序取主题。**`end_time` 只是上界游标，没有下界参数**，窗口起点靠客户端按 `create_time` 自行截断：
 
 1. 取第一页；逐条比较 `create_time`，保留 ≥ 窗口起点的主题，丢弃更早的
-2. 若整页都还在窗口内且 `has_more: true`，用返回的 `next_end_time` 作为下一页的 `end_time` 翻页，直到某条 `create_time` < 窗口起点即停止翻页
+2. 若整页都还在窗口内（返回条数达到 `count`），取本页最后一条的 `create_time` 作为下一页的 `end_time` 翻页，直到某条 `create_time` < 窗口起点即停止翻页
 3. 对窗口内主题按 `type` 统计：`talk`（帖子）/ `q&a`（提问）/ `task`（作业）/ `solution`（作业答案）各几条，以及总量
 4. 每条主题自带 `counts`（`comments` / `likes` / `readers`），排热门时**直接用列表里的 `counts`**，无需逐条拉 detail
 
@@ -65,7 +65,7 @@
 
 - 该接口是**跨星球**的，返回项带 `group` 字段：按当前星球 group_id 客户端过滤，只留本星球
 - 再按 `create_time` 落在时间窗内筛选（日报=今天、周报/复盘=本周）
-- 需要更多时用返回的 `next_end_time` 作为 `end_time` 翻页
+- 需要更多时取本页最后一条的 `create_time` 作为 `end_time` 翻页
 
 ### 第 4 步：按变体分析
 
@@ -122,7 +122,7 @@
 
 ## 失败与回退
 
-- **只读阶段（第 1–5 步）**部分失败（某页拉取出错、detail 超时）：从最后成功的 `next_end_time` 续拉即可，数据可重新累积，无副作用
+- **只读阶段（第 1–5 步）**部分失败（某页拉取出错、detail 超时）：从最后成功一页末条的 `create_time` 续拉即可，数据可重新累积，无副作用
 - **发布阶段（第 6 步）**：`topic +create` 写入失败即原子回滚，不会留下半成品主题（见 [topic-create](../topic-create.md) 失败语义）；稿件仍在，修正后可重试发布
 - 通用错误（401、404、参数缺失、时间格式错误等）见 [auth-errors](../auth-errors.md#常见错误处理)
 

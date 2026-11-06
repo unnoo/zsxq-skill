@@ -38,7 +38,7 @@
 
 ### 第二步：取最新 N 条主题的 topic_id
 
-用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`；见 [group-topics](../group-topics.md)），按时间倒序收集每条的 `topic_id` 与标题。单次最多返回 30 条，N > 30 时用返回的 `next_end_time` 翻页累积到 N 条。
+用 `group +topics`（MCP：`GET /v2/groups/<id>/topics`，query `count`；见 [group-topics](../group-topics.md)），按时间倒序收集每条的 `topic_id` 与标题。单次最多返回 30 条，N > 30 时取本页最后一条的 `create_time` 作为下一页的 `end_time` 翻页累积到 N 条。
 
 ### 第三步：确定目标专栏（含创建）
 

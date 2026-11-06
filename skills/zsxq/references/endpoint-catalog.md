@@ -70,6 +70,7 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 ## 通道缺口
 
 - **附件实际上传**：`POST /v2/uploads` 只拿到七牛 `upload_token`，第二步是 multipart 二进制直传七牛域名，不经过 MCP。含附件的操作（topic +create/+edit/+reply/+answer/+schedule、note +create/+edit、group +settings 的图片）在 MCP 通道只能发纯文本，或依赖宿主自行完成 multipart 上传后把 `image_ids`/`file_ids` 带入。
+- **删除评论**：当前没有文档化的接口（CLI 与 MCP 均未封装），不要臆造 path；遇到该需求时向用户说明能力不支持。
 
 <!-- cli-only:start -->
 - **认证命令族**（auth login/logout/status、doctor、config show）：纯 CLI；MCP 通道的认证问题见 [auth-errors](auth-errors.md)。

@@ -91,7 +91,7 @@
 
 - **无主题 / 今日无新内容**：`group +topics` 返回空或最新主题都早于用户关心的时间窗 → 报告"今日无新内容"，结束
 - **星球名命中多个**：列候选让用户确认，不自选（见第 0 步）
-- **N 超过单页上限（30）**：用上一页返回的 `next_end_time` 作为下一页的 `end_time` 翻页续拉，直到凑够 N 或 `has_more=false`（翻页见 [group-topics](../group-topics.md#说明)）
+- **N 超过单页上限（30）**：取上一页最后一条的 `create_time` 作为下一页的 `end_time` 翻页续拉，直到凑够 N 或某页返回条数不足一页（翻页见 [group-topics](../group-topics.md#说明)）
 - **限流（429 / frequently）**：退避几秒再重试该条，不要循环猛刷；持续受限则先输出已完成部分并说明剩余待续
 - **个别 topic +detail 失败**：跳过该条、记录 topic_id，继续处理其余，最后在报告里列出未取到的条目
 - **用户只要列表、不要分类**：退回到直接用 [group-topics](../group-topics.md)，不进入四类分析
