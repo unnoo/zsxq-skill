@@ -175,15 +175,15 @@ zsxq-cli auth status
 
 Skill 内部按三层路由执行：**场景模式**（命中场景 → 按编排执行）→ **原子操作**（命中已知命令 → 直接调用）→ **探索模式**（未命中 → 通过 CLI 发现能力）。所有命令细节和参数均由 34 个 reference 文档独立承载，SKILL.md 只负责路由和索引。
 
-### Console 官方版（仓库构建）
+### 官方发行版（仓库构建）
 
-主站 Console 的官方 Skill 由本仓库构建生成，只含 MCP 内容与 `.md` 文件：
+官方发行版由本仓库构建生成，只含 MCP 内容与 `.md` 文件：
 
 ```bash
 python3 scripts/build-official-skill.py
 ```
 
-产物在 `dist/official/zsxq/`，用 Console 的目录选择上传（不是 zip；目录名必须等于 skill 的 `name`）。构建过程同时校验 Console 硬上限：SKILL.md ≤ 32768 字节、单个资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节。GitHub 安装仍使用 `skills/zsxq/`，包含 CLI、MCP 与场景脚本。
+产物在 `dist/official/zsxq/`，上传时目录名必须等于 skill 的 `name`。构建过程同时校验官方发行版的导入限制：SKILL.md ≤ 32768 字节、单个资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节。GitHub 安装仍使用 `skills/zsxq/`，包含 CLI、MCP 与场景脚本。
 
 > 从旧版（`zsxq-shared` / `zsxq-group` / `zsxq-topic` / `zsxq-user` / `zsxq-note` 五件套）升级的用户，安装新版后直接对 AI 说「检查并迁移旧版知识星球 skill」，AI 会先扫描报告、经你确认后再清理。
 

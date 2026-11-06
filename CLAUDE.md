@@ -48,14 +48,14 @@ skills/zsxq/
 | 形态 | 位置 | 内容 | 来源 |
 |------|------|------|------|
 | GitHub 版 | `skills/zsxq/` | CLI + MCP 双通道、场景、`scripts/`、`assets/` | 直接维护，`npx skills add` 安装 |
-| Console 官方版 | `dist/official/zsxq/` | 仅 MCP 内容，仅 `.md` 文件 | 构建生成，不入库；用于主站 Console 官方 Skill 导入 |
+| 官方发行版 | `dist/official/zsxq/` | 仅 MCP 内容，仅 `.md` 文件 | 构建生成，不入库；用于官方发行渠道导入 |
 
 - 构建：`python3 scripts/build-official-skill.py` 写入 `dist/official/zsxq/` 与 `dist/official/report.json`（各文件字节与预算）；`--check` 只在内存里构建校验，**不写 `dist/`**。
 - 配置：仓库根 [`skill-package.json`](skill-package.json) —— `source`、`official.output`、`official.exclude`、`official.limits`、`official.residualForbidden`、`official.description`。
 - CLI 专属内容必须包在 `<!-- cli-only:start -->` / `<!-- cli-only:end -->` 内，构建时整块删除；标记未闭合或嵌套会报错。
 - 有 `## 参数` 的 reference 必须有 `### 通道映射`（CLI flag ↔ HTTP 字段），构建据此把参数表合并成 MCP 字段表并删掉 CLI 专属行；映射值为「不上送」「无对应字段」的 CLI 参数视为无字段、整条删除；合并后同名字段自动去重并合并说明。没有 CLI flag 可映射的 MCP 专用文档，在 `## 参数` 前加 `<!-- params:mcp-only -->`，构建跳过合并。
 - 官方版排除项见 `official.exclude`：`scripts/**`、`assets/**`、`cli-exploration.md`、`generate-video*`、`generate-daily-poster*`、`migrate-legacy-skills.md`；被排除文件的表格行会整行删除，正文里出现指向它们的链接则构建失败。
-- Console 硬上限（构建即校验）：SKILL.md ≤ 32768 字节、单资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节；`official.output` 的目录名必须等于 `official.name`（Console 要求上传目录名与 skill 名一致）。官方版正文不得残留 `zsxq-cli`、`scripts/`、`npm `、`npx `、`node `、`CLI 通道`、`CLI 工具`、`仅 CLI`、`api raw`、`api call`（`official.residualForbidden`）或任何 `--flag`。
+- 官方发行版导入限制（构建即校验）：SKILL.md ≤ 32768 字节、单资源 ≤ 16384 字节、资源数 ≤ 50、总计 ≤ 262144 字节、description ≤ 1024 字节；`official.output` 的目录名必须等于 `official.name`。官方版正文不得残留 `zsxq-cli`、`scripts/`、`npm `、`npx `、`node `、`CLI 通道`、`CLI 工具`、`仅 CLI`、`api raw`、`api call`（`official.residualForbidden`）或任何 `--flag`。
 - 门禁：本地提交前跑 `python3 scripts/build-official-skill.py --check`；[`.github/workflows/skill-check.yml`](.github/workflows/skill-check.yml) 在任意分支推送与 PR 时跑单元测试、`check-docs.py`、官方版预算校验，并在推送时上传官方版产物。
 
 ## Key Conventions
@@ -73,7 +73,7 @@ metadata:
 ---
 ```
 
-> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符（官方版另受 1024 **字节**限制，Console 前端按 UTF-8 字节校验，描述由 `skill-package.json` 的 `official.description` 维护）；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
+> frontmatter 须符合 [Agent Skills 规范](https://agentskills.io/specification)：`name` 小写连字符且与目录同名；`description` ≤1024 字符（官方版另受 1024 **字节**限制，按 UTF-8 字节校验，描述由 `skill-package.json` 的 `official.description` 维护）；`metadata` 为 string→string 扁平映射（不要嵌套对象/数组）。仓库根另有 `plugin.json` 遵循 [Agent Plugins 规范](https://agent-plugins.org/)。
 
 `description` 字段直接决定 AI 何时触发该 skill，修改时确保包含所有相关操作的关键词（含场景触发语）。
 

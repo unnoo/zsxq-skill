@@ -79,7 +79,7 @@ def load_config(path: Path) -> dict:
     if posixpath.basename(official["output"].rstrip("/")) != official["name"]:
         raise BuildError(
             "official.output 的目录名必须等于 official.name"
-            f"（Console 要求上传目录名与 skill 名一致）: {official['output']}")
+            f"（官方发行版要求上传目录名与 skill 名一致）: {official['output']}")
     if "\n" in official["description"] or '"' in official["description"]:
         raise BuildError("official.description 必须是单行且不含双引号")
     desc_bytes = len(official["description"].encode("utf-8"))
@@ -490,7 +490,7 @@ def build(config: dict, check_only: bool = False) -> Report:
 def main() -> int:
     import argparse
 
-    parser = argparse.ArgumentParser(description="构建 Console 官方版 zsxq skill")
+    parser = argparse.ArgumentParser(description="构建官方发行版 zsxq skill")
     parser.add_argument("--check", action="store_true",
                         help="在内存中构建并校验，不写 dist/")
     parser.add_argument("--config", default=str(ROOT / "skill-package.json"))

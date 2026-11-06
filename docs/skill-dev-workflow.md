@@ -118,7 +118,7 @@
 ## ⑤ 验收收尾
 
 1. 跑静态校验：`python3 scripts/check-docs.py`（死链、场景 10 节、写入类 CAUTION、写操作报告缺失提示等），修到通过。
-2. 跑官方版构建校验：`python3 scripts/build-official-skill.py --check`（在内存里构建官方版并校验 Console 预算，不写 `dist/`）。新增/修改参数表时确认 `### 通道映射` 同步更新，否则构建失败；新增 MCP 专用 reference 时在 `## 参数` 前加 `<!-- params:mcp-only -->`。
+2. 跑官方版构建校验：`python3 scripts/build-official-skill.py --check`（在内存里构建官方版并校验官方发行版导入限制，不写 `dist/`）。新增/修改参数表时确认 `### 通道映射` 同步更新，否则构建失败；新增 MCP 专用 reference 时在 `## 参数` 前加 `<!-- params:mcp-only -->`。
 3. 提交：只提交文档改动；验证报告与日志留在本地 `docs/verification/`（该目录被 `.gitignore` 排除，不入库）。**开源仓库：功能确认完成前不开 PR（含 draft），只 commit + push 分支。**
 4. **向用户呈现验收清单**（见下），把「读什么就能验收」直接递到面前，不让用户翻工具日志。
 
@@ -141,6 +141,6 @@
 - `docs/verification/logs/_TEMPLATE.log` —— 原始日志模板（同上的本地约定）
 - `docs/verification/topic-set.md` —— 已填好的范例报告（本地产物）
 - [`../scripts/check-docs.py`](../scripts/check-docs.py) —— 静态校验器
-- [`../scripts/build-official-skill.py`](../scripts/build-official-skill.py) —— 官方版（Console）构建与预算校验
+- [`../scripts/build-official-skill.py`](../scripts/build-official-skill.py) —— 官方发行版构建与导入限制校验
 
 > `docs/verification/` 与 `docs/verification/logs/` 是**本地工作区**：按需创建、被 `.gitignore` 排除、从不入库，clone 下来并不存在，所以上面写的是路径而不是链接。里面按被验证的操作 reference 名或场景 id（`<id>`）放两份配套材料——报告 `docs/verification/<id>.md`（测试用例、预期 vs 实际、校准的假设、结论）与原始日志 `docs/verification/logs/<id>.log`（命令原样、完整输出、退出码）；模板只是一次性本地约定，仓库里没有。
