@@ -2,12 +2,12 @@
 
 用户已经在某个星球里搜索。按输入是一段话还是关键词，用 [topic-search](../topic-search.md) 取出主题，只根据正文打分，输出关联度最高的一批，并给出可点开的来源。**纯只读：不发帖、不评论、不写笔记、不改精华或标签。**
 
-检索命令、参数和错误语义只以 [topic-search](../topic-search.md) 为准。两种输入都走同一条检索路径，不因输入类型改用其他接口，也不调用 reference 未记载的接口。
+检索命令、参数和错误语义只以 [topic-search](../topic-search.md) 为准。话题、观点和完整问题优先语义检索；确切名称、术语或需要筛选、时间排序、翻页时使用关键词检索，不调用 reference 未记载的接口。
 
 <!-- cli-only:start -->
 - CLI 通道：`topic +search` 是增强检索，没有翻页参数。
 <!-- cli-only:end -->
-- MCP 通道：`GET /v2/search/groups/{group_id}/topics`，只传 `keyword` 与 `count=20`。它是官方搜索，排序与增强检索编排的结果顺序不同。
+- MCP 语义检索：`GET /v2/rag/topics/search`，不传 shape、无分页；关键词检索：`GET /v2/search/groups/{group_id}/topics`，支持筛选与 `index` 分页。两条路径不混排结果。
 
 ## 适用意图
 
@@ -62,9 +62,10 @@
 <!-- cli-only:start -->
 - CLI：`zsxq-cli topic +search --group-id <id> --query "<搜索内容>" --json`
 <!-- cli-only:end -->
-- MCP：`{"method":"GET","path":"/v2/search/groups/<group_id>/topics","query":{"keyword":"<搜索内容>","count":20}}`
+- MCP 语义：`{"method":"GET","path":"/v2/rag/topics/search","query":{"group_id":"<group_id>","query":"<搜索内容>","size":20}}`
+- MCP 关键词：`{"method":"GET","path":"/v2/search/groups/<group_id>/topics","query":{"keyword":"<搜索内容>","count":20,"index":0},"shape":"topic.excerpt"}`
 
-多个关键词保持用户原来的分隔。不传 `filter_roles`、`filter_types`，也不传 reference 里没有的翻页字段。
+多个名称分别查询，不拼成一个关键词。筛选、排序和分页参数只按 [topic-search](../topic-search.md) 使用，不补造未记载字段。
 
 ### 第 2 步：取正文并打分
 
@@ -122,7 +123,7 @@
 - **调用失败**：原样告诉用户错误信息后停止，见 [topic-search](../topic-search.md#错误说明) 与 [auth-errors](../auth-errors.md#常见错误处理)
 - **检索为空**：不输出列表，按第 4 步的空结果文案，并按第 3 步决定是否给候选
 - **结果已展示完**：写「相关主题已经展示完。可补充关键词，或去搜索结果里看看。」不重复已展示主题
-- **要更多召回**：本命令没有翻页参数。不要补造 `index` 或其他查询字段。按 [topic-search](../topic-search.md) 换近义或相关词再检索，那是一次新的搜索词
+- **要更多召回**：语义检索没有翻页，可换相关词或改用关键词检索；关键词检索按 [topic-search](../topic-search.md) 使用返回的 `index` 翻页，不补造游标
 
 ## 用户确认点
 

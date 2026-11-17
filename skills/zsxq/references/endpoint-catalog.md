@@ -7,8 +7,8 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 - 写接口的 body 必须显式包 `req_data`：`body: {"req_data": {...}}`（工具不会自动包装）。
 - 响应信封：`{success, status_code, body}`；业务数据在 `body.resp_data`，业务失败看 `body.succeeded == false` 与 `body.code` / `body.error`。权限拒绝（未开通 Skill 权限、查他人足迹等）不走信封，直接返回 `{success: false, error: "…"}`，无 `status_code`/`body`。
 - 响应裁剪（可选）：`shape` 按命名预设裁剪 `body.resp_data` 的主实体（`topic.brief`、`topic.excerpt`、`comment.brief`、`member.brief`、`hashtag.brief`、`checkin.brief`、`column.brief`、`file.brief`、`image.brief`、`article.brief`、`group.brief`、`note.brief`、`user.brief`；实体不存在时原样返回）；`fields` 为逗号分隔的点路径字段投影（相对于 `body.resp_data`，如 `topics.topic_id,topics.title`，数组自动逐元素投影，未匹配路径进 `_unknown_fields` 而不报错）。两者可叠加（先 shape 后 fields）。**它们是 `call_zsxq_api` 的顶层参数，不是上游 HTTP 参数——不得放进 `query` 或 `body`**（会被透传给上游并静默忽略）。
-- 分页：列表接口用 `count` 控制条数、`end_time` 翻页；取本页最后一条的 `create_time` 原值作为下一页 `end_time`（评论接口用返回的 `index` 作下一页 `index`）。实测翻页边界会重复本页末条，需按 `topic_id` 去重。
-- 时间格式：`scheduled_time` 等时间为 `2006-01-02T15:04:05.000+0800`（UTC+8，毫秒三位）。
+- 分页：时间序列表用 `count` 控制条数，取本页最后一条的 `create_time` 原值作为下一页 `end_time`；评论按热度翻页时使用返回的 `index`，按时间翻页时使用 `end_time`。实测时间游标边界会重复本页末条，需按实体 ID 去重。
+- 时间格式：`scheduled_time`、`begin_time`、`end_time` 等使用 `2006-01-02T15:04:05.000+0800`（UTC+8，毫秒三位）。相对日期以可靠的东八区当前日期计算；缺少当前日期时先确认，不用最新帖子时间代替今天。
 - 下文 `{base}` 省略不写，path 以 `/v2/` 或 `/v3/` 开头。
 
 ## 只读端点
@@ -17,16 +17,20 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 |------|--------|------|--------------|
 | 当前用户信息 | GET | `/v2/users/self` | 无；返回 `body.resp_data.user.user_id` 供其他接口使用 |
 | 我加入/创建的星球 | GET | `/v2/groups` | 无 query（条数与范围筛选不在接口层上送） |
-| 星球最新主题 | GET | `/v2/groups/{group_id}/topics` | `count`（默认 20）；`end_time` 可选；`scope` 仅非 `all` 时传 |
+| 星球主题时间线 | GET | `/v2/groups/{group_id}/topics` | `count`（≤30）、`begin_time`/`end_time`、`scope`（`all`/`digests`/`by_owner`/`questions`/`unanswered_questions`/`tasks`）；详见 [group-topics](group-topics.md) |
+| 精华列表 | GET | `/v2/groups/{group_id}/topics/digests` | `sort=by_create_time`、`count` 必传（1–30）、`direction`、`hashtag_id`；用 `index` 翻页 |
 | 星球标签 | GET | `/v2/groups/{group_id}/hashtags` | 无 |
-| 标签下主题 | GET | `/v2/hashtags/{hashtag_id}/topics` | `count`、`with_hashtag=true`、`end_time` 可选 |
-| 主题详情 | GET | `/v2/topics/{topic_id}/info` | 无。长文（`inline_article_url`）不做服务端回填，透传返回原始字段 |
-| 主题评论 | GET | `/v2/topics/{topic_id}/comments` | `sort_type=by_interactions_count`、`count`、`with_sticky=false`、`index` 可选（翻页游标） |
+| 标签下主题 | GET | `/v2/hashtags/{hashtag_id}/topics` | `scope`（`all`/`digests`）、`count`、`end_time` 可选 |
+| 主题详情 | GET | `/v2/topics/{topic_id}/info` | 无 query；`shape=topic.brief` 时支持长文展开，不传 shape 保持原始字段 |
+| 主题评论 | GET | `/v2/topics/{topic_id}/comments` | 时间序：`sort_type=by_create_time`、`sort`、`count`、`end_time`；热度：`sort_type=by_interactions_count`、`index`；详见 [topic-detail](topic-detail.md#评论与楼中楼) |
+| 楼中楼评论 | GET | `/v2/comments/{comment_id}/replied_comments` | `count`；可能受星球权限或网关门禁限制，优先用评论列表的 `comment.brief` |
 | 用户足迹 | GET | `/v2/users/{user_id}/footprints` | `count`、`filter=all`；限定星球时 `filter=group&group_id={id}&filter_group_id={id}`；`end_time` 可选；仅可查本人 |
 | 用户笔记列表 | GET | `/v2/users/{user_id}/footprints` | 同上但 `filter=note`；从 `footprints[]` 的 `note` 字段取笔记 |
 | 搜索星球 | GET | `/v2/search/groups` | `keyword`、`scope=joined`、`count=4` |
 | 搜索星球成员 | GET | `/v2/search/groups/{group_id}/members` | `keyword`、`count`（≤50） |
-| 星球内搜索主题 | GET | `/v2/search/groups/{group_id}/topics` | `keyword`、`count=20`。注意：这是官方搜索端点，排序为官方相关度，与增强检索编排的结果顺序可能不同 |
+| 成员概况 | GET | `/v2/groups/{group_id}/members/{user_id}/summary` | 无 query；返回加入天数、主题数等成员统计，不是成员主题清单 |
+| 语义检索 | GET | `/v2/rag/topics/search` | `group_id`、`query` 必填；`size`（≤30）、`alias`、`start_time`/`end_time` 可选；无分页，不传 shape |
+| 关键词检索 | GET | `/v2/search/groups/{group_id}/topics` | `keyword`、`filter_roles`、`filter_types`、`order_by`、`index`、`count`；详见 [topic-search](topic-search.md) |
 | 我发起的提问 | GET | `/v2/users/self/topics/questions` | `filter`（`unanswered`/`answered`）、`count`、`end_time` 可选 |
 | 向我发起的提问 | GET | `/v2/users/self/topics/answers` | 同上 |
 | 定时任务列表 | GET | `/v2/groups/{group_id}/scheduled_jobs` | 无；任务数组在 `body.resp_data.jobs[]` |
@@ -34,7 +38,10 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 笔记详情 | GET | `/v2/notes/{note_id}` | 无 |
 | 星球成员列表 | GET | `/v2/groups/{group_id}/members` | query 字段见 [group-members](group-members.md) |
 | 星球专栏列表 | GET | `/v2/groups/{group_id}/columns` | 无 |
+| 专栏主题 | GET | `/v2/groups/{group_id}/columns/{column_id}/topics` | `count`、返回的 `index` 用于翻页；详见 [group-columns](group-columns.md) |
 | 星球打卡任务列表 | GET | `/v2/groups/{group_id}/checkins` | `scope`（`all`/`ongoing`/`over`/`closed`，默认 `all`）、`count`（≤100，必填）、`end_time` 可选（翻页游标）；详见 [group-checkins](group-checkins.md) |
+| 打卡任务主题 | GET | `/v2/groups/{group_id}/checkins/{checkin_id}/topics` | `begin_time`/`end_time`、`count`；按末条 `create_time` 翻页 |
+| 官方运营大盘 | GET | `/v2/dashboard/groups/{group_id}/overview` | 仅星主/管理员；不传 shape，按 [group-dashboard](group-dashboard.md) 显式传 fields |
 | 主题所属专栏 | GET | `/v2/topics/{topic_id}/attached_columns` | 无；需星主/管理员，否则 `权限不足` |
 | 星球公开信息（查价） | GET | `/v2/groups/{group_id}/public_info` | 见 [wechat-order-create](wechat-order-create.md#下单前查询价格) |
 | 星球详情（续费查价） | GET | `/v2/groups/{group_id}` | 同上 |
