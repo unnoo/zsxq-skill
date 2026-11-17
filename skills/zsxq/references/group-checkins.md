@@ -22,6 +22,10 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
 # 按创建时间向前翻页
 zsxq-cli api raw --method GET --path /v2/groups/<group_id>/checkins \
   --query '{"scope":"all","end_time":"2026-01-01T00:00:00.000+0800","count":100}'
+
+# 打卡任务主题
+zsxq-cli api raw --method GET --path /v2/groups/888888888/checkins/1148218242/topics \
+  --query '{"begin_time":"2026-01-01T00:00:00.000+0800","count":30}'
 ```
 
 <!-- cli-only:end -->
@@ -94,6 +98,16 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 - 翻页：响应不含显式游标。当返回数量达到 `count` 时，取本页最后一条的 `create_time` 填入下一次请求的 `end_time`，直到返回不足 `count` 或为空；按 `checkin_id` 去重。
 - 如果 `scope=ongoing` 为空，不代表星球没有历史打卡任务；查看全部任务改用 `scope=all`。
 - 已结束（`over`）或已关闭（`closed`）的任务能否继续关联发帖未经实测；发布打卡主题默认选择 `ongoing` 任务。
+
+### 打卡任务主题
+
+打卡主题默认不进入普通主题时间线。确认 `checkin_id` 后，读取 `GET /v2/groups/{group_id}/checkins/{checkin_id}/topics`：
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/checkins/1148218242/topics", "query": {"begin_time": "2026-01-01T00:00:00.000+0800", "count": 30}, "shape": "topic.excerpt"}
+```
+
+`begin_time`/`end_time` 限定时间窗；下一页保持起点不变，把本页末条 `create_time` 传给 `end_time`，按 `topic_id` 去重。未读完整时间窗时说明实际覆盖，不用样本估算全量打卡情况。
 
 ## 错误说明
 

@@ -21,6 +21,9 @@ zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
 # 已过期成员：按编号翻页
 zsxq-cli api raw --method GET --path /v2/groups/888888888/members \
   --query '{"scope":"expired","sort":"number","count":200}'
+
+# 成员概况
+zsxq-cli api raw --method GET --path /v2/groups/888888888/members/123456/summary
 ```
 
 <!-- cli-only:end -->
@@ -115,6 +118,16 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
   - `sort=number`（仅 `scope=expired`）：用上一页返回中最后一条的 `number` 作为下一次的 `page_tag`。
 - `number` 仅当星球启用「成员编号」并已分配时才有；未启用的星球该字段缺失（实测多数星球不返回）。
 - 定位**单个**成员用关键词搜索更直接：底层接口工具 `search_group_members`（`group_id` + `keyword` + `count`）；本接口用于**成批**拉取成员列表。
+
+### 成员概况
+
+确认 `user_id` 后，读取 `GET /v2/groups/{group_id}/members/{user_id}/summary`，不传 `shape`。返回 `member`、`joined_days`、`topics_count`、`liked_count`、`invitees_count`、`renewal_count` 等概况字段。
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/members/123456/summary"}
+```
+
+概况不是该成员的主题清单。没有直接列出指定成员全部主题的接口：星主或合伙人可用 [group-topics](group-topics.md) 的 `scope=by_owner`；其他成员按时间线扫描并用 `owner.user_id` 过滤，回答时披露扫描范围。成员与话题组合查询优先用 [topic-search](topic-search.md) 的语义检索 `alias`。
 
 ## 错误说明
 

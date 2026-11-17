@@ -1,8 +1,6 @@
-# topic +search（搜索主题）
+# topic +search（语义与关键词搜索）
 
-对应操作：`topic +search`；MCP 调用见下方命令块。
-
-在指定星球内进行全文搜索，返回匹配的主题列表。搜索使用 RAG 服务，结果按相关性排序。
+在指定星球内检索主题。话题、观点和“某成员谈过什么”优先语义检索；确切名称、术语、筛选和时间排序使用关键词检索。
 
 ## 命令
 
@@ -11,93 +9,101 @@
 **CLI 通道：**
 
 ```bash
-# 在星球内搜索关键词（表格显示）
-zsxq-cli topic +search --group-id 123456789 --query "Go 语言"
+# 增强语义检索
+zsxq-cli topic +search --group-id 123456789 --query "Go 语言" --json
 
-# 搜索中文内容
-zsxq-cli topic +search --group-id 123456789 --query "产品设计"
+# MCP 等效语义检索：可按成员别名和时间窗过滤
+zsxq-cli api call call_zsxq_api --params '{"method":"GET","path":"/v2/rag/topics/search","query":{"group_id":"123456789","query":"产品设计","alias":"示例成员","size":20}}'
 
-# JSON 格式输出（含完整 topic 字段）
-zsxq-cli topic +search --group-id 123456789 --query "AI" --json
+# 关键词检索：按时间排序并使用 index 翻页
+zsxq-cli api call call_zsxq_api --params '{"method":"GET","path":"/v2/search/groups/123456789/topics","query":{"keyword":"产品设计","filter_types":"talk","order_by":"time","index":0,"count":20},"shape":"topic.excerpt"}'
 ```
 
 <!-- cli-only:end -->
 
 **MCP 通道（`call_zsxq_api`）：**
 
+语义检索，不传 `shape`：
+
 ```json
-{"method": "GET", "path": "/v2/search/groups/123456789/topics", "query": {"keyword": "关键词", "count": 20}}
+{"method": "GET", "path": "/v2/rag/topics/search", "query": {"group_id": "123456789", "query": "产品设计", "size": 20}}
+```
+
+关键词检索：
+
+```json
+{"method": "GET", "path": "/v2/search/groups/123456789/topics", "query": {"keyword": "产品设计", "count": 20, "index": 0}, "shape": "topic.excerpt"}
 ```
 
 ## 参数
 
 | 参数 | 必填 | 说明 |
 |------|------|------|
-| `--group-id <id>` | **是** | 星球 ID（从 `group +list` 获取） |
-| `--query <text>` | **是** | 搜索关键词，支持中英文 |
-| `--json` | 否 | 输出原始 JSON |
+| `group_id` | **是** | 单个星球 ID |
+| `query` | **是** | 词、短语或完整问题，去掉首尾空白后不能为空 |
+| `size` | 否 | 返回条数，默认 20，不超过 30；环境上限可能更低，按错误修正一次 |
+| `alias` | 否 | 成员在星球内的别名或昵称；先匹配别名再匹配昵称，匹配不到返回空，不降级为全星球搜索 |
+| `start_time` / `end_time` | 否 | 主题创建时间窗，格式 `2026-01-01T00:00:00.000+0800` |
+| `shape` | 不使用 | 该伪接口不支持响应裁剪 |
+
+关键词检索 `/v2/search/groups/{group_id}/topics`：
+
+| 参数 | 必填 | 说明 |
+|------|------|------|
+| `keyword` | **是** | 1–128 字；多个名称分别查询，不拼成一个关键词 |
+| `filter_roles` | 否 | 逗号分隔：`owner`、`partner`、`guest`、`admin`、`member` |
+| `filter_types` | 否 | 逗号分隔：`digests`、`talk`、`qa`、`task`、`solution`、`checkin` |
+| `order_by` | 否 | `default` 综合排序；`time` 按时间从新到旧 |
+| `index` | 翻页必填 | 第一页为 0，之后传上一页返回的 `resp_data.index` |
+| `count` | 否 | 每页条数，建议 20 |
+| `shape` | 否 | 列表筛选建议 `topic.excerpt`，精读再取完整详情 |
 
 ### 通道映射
 
-| CLI flag | HTTP 字段 |
-|----------|-----------|
-| `--group-id` | path `/v2/search/groups/{group_id}/topics` |
-| `--query` | `query.keyword` |
+| CLI flag / 形式 | HTTP 字段 |
+|-----------------|-----------|
+| `--group-id` / `query.group_id` | 语义检索的 `query.group_id`；关键词检索的 path `group_id` |
+| `--query` | 语义检索的 `query.query`；关键词检索的 `query.keyword` |
+| `query` JSON | 同名 query 参数 |
+| `shape` | `call_zsxq_api` 顶层裁剪参数，不放入 query；语义检索禁用 |
 
 ## 输出
 
+语义检索返回 `body.topics[]` 和 `body.rag_response`，不是普通的 `body.resp_data` 列表；主题包含正文和来源信息，按相关度排列，无翻页。`rag_response.results[]` 是检索证据，最终引用以实际返回主题为准。
+
+关键词检索返回 `body.resp_data.topics[]` 和下一页 `index`。`topic.excerpt` 用于筛选，获得 `topic_id` 后用 [topic-detail](topic-detail.md) 精读。
+
 <!-- cli-only:start -->
 
-CLI 通道默认表格输出（`--json` 为 JSON）：
-
-| TOPIC ID | TYPE | TITLE / DIGEST | CREATED AT |
-|----------|------|----------------|------------|
-| 111222333444 | talk | 示例主题标题 | 2025-12-31T09:19:28.239+0800 |
+CLI shortcut 默认表格输出；`--json` 返回完整主题。CLI 通道无条数参数，需要增强检索的排序质量时使用 shortcut，不与 MCP 结果混排。
 
 <!-- cli-only:end -->
-
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`。
 
 ## 说明
 
-- 搜索范围限定在单个星球内，不支持跨星球搜索
-- 结果数量由服务端决定；MCP 通道可用 `count` 指定条数（见上方命令块）。
-- 若需要按时间浏览（而非搜索），改用 `group +topics`
-- 获得 `topic_id` 后，用 `topic +detail` 查看完整内容
-- 搜索为语义/模糊匹配（RAG 服务），可能漏召（相关内容没被命中）或误召（命中弱相关内容），检索结果需人工复核相关性后再采用
-- 无翻页与游标机制：要扩大召回请用多个近义/相关关键词分别检索再合并，不要指望单次结果覆盖全部
-- MCP 通道走官方搜索端点，排序为官方相关度，与增强检索编排的结果顺序可能不一致。
-
-<!-- cli-only:start -->
-- 需要增强检索的排序质量时改用 CLI 通道。
-- CLI 通道无条数参数。
-<!-- cli-only:end -->
+- 单星球检索；跨星球按 [search-across-groups](scenarios/search-across-groups.md) 组合，不拼多个 `group_id`。
+- 语义检索无分页，可用关键词检索补充；关键词支持筛选和翻页，但都不是全星球完整枚举。
+- 多个名称分别查。`alias` 无结果时先用 [group-members](group-members.md) 确认名字再修正一次，不自动搜全星球。
+- 精读后再下结论。零命中不等于没有相关内容；图片 URL 不等于模型已经看过图片。
 
 ## 推荐工作流
 
-<!-- cli-only:start -->
-**两通道步骤相同，仅调用形式不同**：`group +list` 对应 `GET /v2/groups`，`topic +detail` 对应 `GET /v2/topics/{topic_id}/info`。
-<!-- cli-only:end -->
-MCP 通道找星球用 `GET /v2/groups`；本命令见上方「## 命令」的调用块；查看主题详情用 `GET /v2/topics/{topic_id}/info`。
-
-**历史内容检索 / 资料合集**——围绕一个主题（如"如何做用户增长"）把星球里讲过的相关内容捞出来，去重归类后产出一份带分享链接的合集清单或要点摘要，用于避免重复回答、整理专题合集、旧内容二次发布、给新成员补历史资料。
-
-1. **拿 group_id**：用 `group +list` 找到目标星球 ID（见 [group-list](group-list.md)）。
-2. **按关键词检索**：用本命令 `topic +search`（指定星球与关键词）检索；命中偏少时换近义/相关词多跑几次（如"用户增长""拉新""获客"），靠多关键词扩大召回（本命令无条数参数、无翻页）。
-3. **去重归类**：合并多次检索结果，按 `topic_id` 去重；结果已按相关性排序，需要"最相关的前 N 条"时在结果侧自行截取（命令本身不限制条数），可再按 `CREATED AT` 发布时间归类。
-4. **补齐内容**：对入选主题用 [topic-detail](topic-detail.md) 拉完整正文与作者信息，据此写 2–3 句摘要说明这条讲了什么。
-5. **产出合集**：为每条主题拼接电脑端/手机端分享链接（见 [share-links](share-links.md)），输出"标题 + 发布时间 + 摘要 + 链接"的清单；若结果不足目标条数就把命中的全列出，若多条内容重合度高则提示可整合为一篇合集。
+1. 用 [group-list](group-list.md) 确认 `group_id`，按意图选择语义或关键词路径。
+2. 多次查询按 `topic_id` 去重并保留来源；入选主题用 [topic-detail](topic-detail.md) 精读后再总结。
+3. 输出查询范围和零命中/截断情况；需要链接时按 [share-links](share-links.md) 拼接。
 
 ## 错误说明
 
-| 症状 | 可能原因 | 处理 |
-|------|---------|------|
-| 返回空列表 | 关键词未命中或星球内容较少 | 换近义词或改用 `group +topics` 时间序浏览 |
+| 症状 | 处理 |
+|------|------|
+| 语义检索 `size` 超过环境上限 | 按错误提示缩小一次，不循环尝试 |
+| `alias` 无结果 | 确认成员别名/昵称后修正一次，不自动搜全星球 |
+| 关键词返回空列表 | 换用语义检索或相关词；不得表述为星球没有该内容 |
 
 通用错误（401、参数缺失等）见 [auth-errors](auth-errors.md#常见错误处理)。
 
 ## 参考
 
 - [topic-detail](topic-detail.md) — 查看主题完整详情
-- [group-topics](group-topics.md) — 按时间浏览主题
+- [search-across-groups](scenarios/search-across-groups.md) — 跨星球检索
 - [SKILL.md](../SKILL.md) — 能力索引与安全规则

@@ -47,7 +47,7 @@ shape 的实体名**必须与响应的主实体匹配**：预设按 `resp_data` 
 |---|---|---|
 | `/v2/groups/{id}/topics` 等主题列表/详情 | `topic.brief` | topic_id、type、title、content、create_time、owner、group、counts、digested、sticky、images、files、annotation、text_type、creation_statement、modify_time、stick_time（17 个） |
 | 同上 | `topic.excerpt` | topic_id、type、title、content、create_time、owner、group、counts、digested、sticky、images_count、files_count（12 个，附件只留计数） |
-| `/v2/topics/{id}/comments` | `comment.brief` | comment_id、text、create_time、owner、likes_count |
+| `/v2/topics/{id}/comments` | `comment.brief` | comment_id、text、create_time、owner、likes_count；有楼中楼时可含 replied_comments |
 | `/v2/groups/{id}/members` | `member.brief` | user_id、name、avatar_url、join_time |
 | `/v2/groups/{id}/hashtags` | `hashtag.brief` | hashtag_id、title、topics_count |
 | `/v2/groups` | `group.brief` | group_id、name、type、owner、background_url、risk_level、statistics |

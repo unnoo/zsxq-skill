@@ -16,6 +16,10 @@ zsxq-cli api raw --method GET --path /v2/groups/<group_id>/columns
 
 # 示例
 zsxq-cli api raw --method GET --path /v2/groups/888888888/columns
+
+# 专栏主题
+zsxq-cli api raw --method GET --path /v2/groups/888888888/columns/888888888001/topics \
+  --query '{"count":30}'
 ```
 
 <!-- cli-only:end -->
@@ -87,6 +91,16 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 <!-- cli-only:start -->
 - 该接口未封装为 shortcut 或 `api call`：CLI 通道只能用 `api raw` 以 `GET` 调用。
 <!-- cli-only:end -->
+
+### 专栏主题
+
+确认 `column_id` 后，读取 `GET /v2/groups/{group_id}/columns/{column_id}/topics`，建议传 `shape=topic.excerpt`：
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/columns/888888888001/topics", "query": {"count": 30}, "shape": "topic.excerpt"}
+```
+
+翻页时把上一页返回的 `resp_data.index` 传给 `index`。返回条数可能由服务端决定，不把一次请求当作完整专栏；用户要求完整清单时持续翻页并披露截断。预览用于筛选，精读后再总结或引用。
 
 ## 错误说明
 
