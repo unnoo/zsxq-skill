@@ -37,6 +37,7 @@ MCP 通道下所有操作通过底层接口工具 `call_zsxq_api` 调用，参�
 | 定时任务配额统计 | GET | `/v2/groups/{group_id}/scheduled_jobs/statistics` | 无；需星主/管理员，否则 `权限不足` |
 | 笔记详情 | GET | `/v2/notes/{note_id}` | 无 |
 | 星球成员列表 | GET | `/v2/groups/{group_id}/members` | query 字段见 [group-members](group-members.md) |
+| 拉黑成员列表 | GET | `/v2/groups/{group_id}/members/isolates` | 仅星主/管理员；`resp_data.isolates[]` 全量无分页；详见 [group-members](group-members.md#拉黑成员名单) |
 | 星球专栏列表 | GET | `/v2/groups/{group_id}/columns` | 无 |
 | 专栏主题 | GET | `/v2/groups/{group_id}/columns/{column_id}/topics` | `count`、返回的 `index` 用于翻页；详见 [group-columns](group-columns.md) |
 | 星球打卡任务列表 | GET | `/v2/groups/{group_id}/checkins` | `scope`（`all`/`ongoing`/`over`/`closed`，默认 `all`）、`count`（≤100，必填）、`end_time` 可选（翻页游标）；详见 [group-checkins](group-checkins.md) |
