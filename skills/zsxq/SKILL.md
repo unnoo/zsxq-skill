@@ -1,6 +1,6 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）与 MCP 操作指南。用户提到知识星球、zsxq、小密圈、星球、登录认证、发帖、评论/楼中楼、回答、编辑/删除主题、定时发布、投票、问答、打卡、markdown、AI 声明、置顶、精华、标签、成员/成员概况、足迹、分享链接、NPS、Skill Pay、微信支付、付费加入/续费/礼品卡/付费提问/赞赏/轻读、group_id、topic_id、comment_id，或需要查看/搜索/发布/管理内容、语义检索、关键词搜索、跨星球检索、星球 AI 搜索总结、读取精华列表/专栏主题/打卡主题、官方运营大盘/昨日活跃/近30日日均/昨日收入、运营日报周报、每日巡场、评论区运营、提问管理、精华标签整理、风险监控、批量打标签、续费关怀、专栏收录、修改星球设置、调用 api call/api raw/call_zsxq_api、接入 MCP/api-key，或询问退款/费率/提现/发票/认证/审核/封禁/用户协议等产品规则，以及迁移旧版知识星球 skill 时，必须使用本 Skill。单一操作（如获取 group_id、帖子详情、回复评论）也应触发"
+description: "知识星球 CLI（zsxq-cli）与 MCP 操作指南。用户提到知识星球、zsxq、小密圈、星球、登录认证、发帖、评论/楼中楼、回答、编辑/删除主题、定时发布、投票、问答、打卡、markdown、AI 声明、置顶、精华、标签、成员/成员概况、拉黑/黑名单、足迹、分享链接、NPS、Skill Pay、微信支付、付费加入/续费/礼品卡/付费提问/赞赏/轻读、group_id、topic_id、comment_id，或需要查看/搜索/发布/管理内容、语义检索、关键词搜索、跨星球检索、星球 AI 搜索总结、读取精华列表/专栏主题/打卡主题、官方运营大盘/昨日活跃/近30日日均/昨日收入、运营日报周报、每日巡场、评论区运营、提问管理、精华标签整理、风险监控、批量打标签、续费关怀、专栏收录、修改星球设置、调用 api call/api raw/call_zsxq_api、接入 MCP/api-key，或询问退款/费率/提现/发票/认证/审核/封禁/用户协议等产品规则，以及迁移旧版知识星球 skill 时，必须使用本 Skill。单一操作（如获取 group_id、帖子详情、回复评论）也应触发"
 metadata:
   version: "3.3.0"
   channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
@@ -89,6 +89,7 @@ metadata:
 | 修改星球名称 / 简介 / 背景图 / 亮点图 | → [`references/group-settings.md`](references/group-settings.md) |
 | 浏览星球内最新主题 / 时间窗更新 / 精华列表 | → [`references/group-topics.md`](references/group-topics.md) |
 | 查看星球标签 | → [`references/group-hashtags.md`](references/group-hashtags.md) |
+| 查看星球拉黑成员 / 黑名单 | → [`references/group-members.md#拉黑成员名单`](references/group-members.md#拉黑成员名单) |
 | 在星球内搜索内容（语义 / 关键词） | → [`references/topic-search.md`](references/topic-search.md) |
 | 跨星球检索与比较观点 | → [`scenarios/search-across-groups.md`](references/scenarios/search-across-groups.md) |
 | 把星球内搜索结果做成 AI 总结 | → [`scenarios/summarize-search-results.md`](references/scenarios/summarize-search-results.md) |
@@ -212,7 +213,7 @@ User (user_id) — 已登录账户
 
 | 操作 | 方法与路径 | Reference |
 |------|----------|-----------|
-| 成员列表 / 成员概况 | `GET /v2/groups/<group_id>/members`；`GET /v2/groups/<group_id>/members/<user_id>/summary` | [`group-members.md`](references/group-members.md) |
+| 成员列表 / 成员概况 / 拉黑成员 | `GET /v2/groups/<group_id>/members`；`GET /v2/groups/<group_id>/members/<user_id>/summary`；`GET /v2/groups/<group_id>/members/isolates` | [`group-members.md`](references/group-members.md) |
 | 专栏列表 / 专栏主题 | `GET /v2/groups/<group_id>/columns`；`GET /v2/groups/<group_id>/columns/<column_id>/topics` | [`group-columns.md`](references/group-columns.md) |
 | 打卡任务列表 / 打卡主题 | `GET /v2/groups/<group_id>/checkins`；`GET /v2/groups/<group_id>/checkins/<checkin_id>/topics` | [`group-checkins.md`](references/group-checkins.md) |
 | 官方运营大盘 | `GET /v2/dashboard/groups/<group_id>/overview` | [`group-dashboard.md`](references/group-dashboard.md) |

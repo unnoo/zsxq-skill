@@ -63,29 +63,7 @@ JSON 对象原样作为 `query` 传入，字段范围与约束见下方参数表
 返回 JSON 信封，成员在 `body.resp_data.members[]`（按 `sort` 字段和 `order` 顺序排列）：
 
 ```json
-{
-  "body": {
-    "resp_data": {
-      "members": [
-        {
-          "group_id": 888888888,
-          "user_id": 999999999,
-          "name": "测试成员",
-          "join_time": "2025-01-01T00:00:00.000+0800",
-          "expired_time": "2026-01-01T00:00:00.000+0800",
-          "update_time": "2025-06-01T00:00:00.000+0800",
-          "login_time": "2025-12-01T00:00:00.000+0800",
-          "status": "joined",
-          "location": "北京",
-          "isolated": false
-        }
-      ]
-    },
-    "succeeded": true
-  },
-  "status_code": 200,
-  "success": true
-}
+{"body":{"resp_data":{"members":[{"user_id":999999999,"name":"测试成员","status":"joined","isolated":false}]},"succeeded":true},"success":true}
 ```
 
 成员对象常见字段：
@@ -106,15 +84,12 @@ JSON 对象原样作为 `query` 传入，字段范围与约束见下方参数表
 | `description` | 成员描述（可选） |
 | `user_specific.remark` | 当前请求者为该成员设置的备注（可选） |
 
-MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.resp_data`（结构与上方返回一致）。
-
 ## 说明
 
 - **`expired_time` 的可见性**：仅当请求发起者是该付费星球的**星主或管理员**，或查询的是**付费星球中自己的信息**时才返回。免费星球、以及以普通成员身份查询他人时，`expired_time` 不返回（字段缺失或为 `null`）。查「即将到期」必须以星主/管理员身份操作。
 - **查即将到期成员**：用 `scope=regular` + `sort=expired_time` + `order=asc`（最先到期在前），配合 `begin_time`（设为当前时刻）和 `end_time`（设为窗口末端，如 14 天后）圈定时间窗；或直接用 `scope=expired` 拉取已过期成员。
-- **排序字段的适用范围**：`sort=expired_time` 只在 `scope=regular` 或 `scope=expired` 下有效，`sort=number` 只在 `scope=expired` 下有效，其他组合会返回空数组（已实测验证：`scope=all` + `sort=expired_time` 返回空）。
 - **翻页**：响应体不含 `has_more` / 游标字段，需自行判断。
-  - 时间排序（`join_time` / `expired_time` / `update_time`）：当返回条数等于 `count` 时可能还有更多，用最后一条的对应时间推进游标继续拉——`order=asc` 时把 `begin_time` 设为该时间，`order=desc` 时把 `end_time` 设为该时间，直到返回不足 `count` 或为空。
+  - 时间排序：返回条数等于 `count` 时可能还有更多，用末条对应时间推进 `begin_time`（`asc`）或 `end_time`（`desc`），直到不足 `count` 或为空。
   - `sort=number`（仅 `scope=expired`）：用上一页返回中最后一条的 `number` 作为下一次的 `page_tag`。
 - `number` 仅当星球启用「成员编号」并已分配时才有；未启用的星球该字段缺失（实测多数星球不返回）。
 - 定位**单个**成员用关键词搜索更直接：底层接口工具 `search_group_members`（`group_id` + `keyword` + `count`）；本接口用于**成批**拉取成员列表。
@@ -128,6 +103,16 @@ MCP 通道恒为 `{success, status_code, body}` 信封，业务数据在 `body.r
 ```
 
 概况不是该成员的主题清单。没有直接列出指定成员全部主题的接口：星主或合伙人可用 [group-topics](group-topics.md) 的 `scope=by_owner`；其他成员按时间线扫描并用 `owner.user_id` 过滤，回答时披露扫描范围。成员与话题组合查询优先用 [topic-search](topic-search.md) 的语义检索 `alias`。
+
+### 拉黑成员名单
+
+查看完整黑名单用 `GET /v2/groups/{group_id}/members/isolates`，仅星主/管理员可调用。返回 `body.resp_data.isolates[]`，字段同成员对象；`isolated=true`，按 `update_time` 正序，含已退出成员，无分页。
+
+```json
+{"method": "GET", "path": "/v2/groups/123456789/members/isolates"}
+```
+
+本接口仅返回 JSON，不提供黑名单专用文件导出；需要时由宿主保存。MCP 仍受 Skill 权限门控。
 
 ## 错误说明
 
