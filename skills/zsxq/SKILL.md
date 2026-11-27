@@ -1,8 +1,8 @@
 ---
 name: zsxq
-description: "知识星球 CLI（zsxq-cli）与 MCP 操作指南。用户提到知识星球、zsxq、小密圈、星球、登录认证、发帖、评论/楼中楼、回答、编辑/删除主题、定时发布、投票、问答、打卡、markdown、AI 声明、置顶、精华、标签、成员/成员概况、足迹、分享链接、NPS、Skill Pay、微信支付、付费加入/续费/礼品卡/付费提问/赞赏/轻读、group_id、topic_id、comment_id，或需要查看/搜索/发布/管理内容、语义检索、关键词搜索、跨星球检索、星球 AI 搜索总结、读取精华列表/专栏主题/打卡主题、官方运营大盘/昨日活跃/近30日日均/昨日收入、运营日报周报、每日巡场、评论区运营、提问管理、精华标签整理、风险监控、批量打标签、续费关怀、专栏收录、修改星球设置、调用 api call/api raw/call_zsxq_api、接入 MCP/api-key，或询问退款/费率/提现/发票/认证/审核/封禁/用户协议等产品规则，以及迁移旧版知识星球 skill 时，必须使用本 Skill。单一操作（如获取 group_id、帖子详情、回复评论）也应触发"
+description: "知识星球 CLI（zsxq-cli）与 MCP 操作指南。用户提到知识星球、zsxq、小密圈、星球、登录认证、发帖、评论/楼中楼、回答、编辑/删除主题、定时发布、投票、问答、打卡、markdown、AI 声明、置顶、精华、标签、成员/成员概况、足迹、分享链接、NPS、Skill Pay、微信支付、付费加入/续费/礼品卡/付费提问/赞赏/轻读、group_id、topic_id、comment_id，或需要查看/搜索/发布/管理内容、语义检索、关键词搜索、跨星球检索、星球 AI 搜索总结、读取精华列表/专栏主题/打卡主题、官方运营大盘/昨日活跃/近30日日均/昨日收入、运营日报周报、经营周报行动闭环、定位/简介/亮点优化、新星主设置引导、置顶/入圈须知重写判断、每日巡场、评论区运营、提问管理、精华标签整理、风险监控、批量打标签、续费关怀、专栏收录、修改星球设置、调用 api call/api raw/call_zsxq_api、接入 MCP/api-key，或询问退款/费率/提现/发票/认证/审核/封禁/用户协议等产品规则，以及迁移旧版知识星球 skill 时，必须使用本 Skill。单一操作（如获取 group_id、帖子详情、回复评论）也应触发"
 metadata:
-  version: "3.3.0"
+  version: "3.4.0"
   channels: "cli（zsxq-cli，优先）/ mcp（call_zsxq_api，兜底）"
   cliHelp: "zsxq-cli --help"
 ---
@@ -70,6 +70,9 @@ metadata:
 | 整理评论区、找未回复评论并起草回复 | → [`scenarios/triage-comments.md`](references/scenarios/triage-comments.md) |
 | 处理别人向我提的、还没回答的问题 | → [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
 | 整理精华与标签（加精 / 打标签建议） | → [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
+| 对照真实内容优化定位 / 简介 / 亮点图 | → [`scenarios/optimize-group-positioning.md`](references/scenarios/optimize-group-positioning.md) |
+| 检查星球设置、判断置顶或入圈须知、逐项确认补缺 | → [`scenarios/guide-new-group-setup.md`](references/scenarios/guide-new-group-setup.md) |
+| 解读指定日期经营周报，给一项行动并在确认后执行 | → [`scenarios/confirm-weekly-actions.md`](references/scenarios/confirm-weekly-actions.md) |
 | 生成运营日报 / 周报 / 复盘 | → [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
 | 把星球内容做成日报海报图片（PNG） | → [`scenarios/generate-daily-poster.md`](references/scenarios/generate-daily-poster.md) |
 | 把星球帖子做成竖版动画视频（MP4） | → [`scenarios/generate-video.md`](references/scenarios/generate-video.md) |
@@ -169,6 +172,9 @@ User (user_id) — 已登录账户
 | 评论区运营 | 「整理评论区问题给我回复」「找出没回复的评论、起草回复」 | [`scenarios/triage-comments.md`](references/scenarios/triage-comments.md) |
 | 提问管理 | 「找出别人向我提问但我还没回答的」「按优先级整理待回答提问」 | [`scenarios/manage-inbound-questions.md`](references/scenarios/manage-inbound-questions.md) |
 | 精华与标签整理 | 「整理最近主题，该加精加精、该打标签打标签」「哪些帖子值得设精华」 | [`scenarios/curate-digest-and-tags.md`](references/scenarios/curate-digest-and-tags.md) |
+| 定位、简介与亮点优化 | 「简介太虚，对照内容重写」「按现在的亮点图优化」「别人看不懂我星球是干嘛的」 | [`scenarios/optimize-group-positioning.md`](references/scenarios/optimize-group-positioning.md) |
+| 新星主设置引导 | 「刚建星球，带我一步步设置」「检查还缺哪些设置」「置顶说明 / 入圈须知要不要重写」 | [`scenarios/guide-new-group-setup.md`](references/scenarios/guide-new-group-setup.md) |
+| 经营周报行动闭环 | 「11/3–11/9 经营情况看看，挑一件我确认后你去做」「这周该加精哪条，我点头你就加」 | [`scenarios/confirm-weekly-actions.md`](references/scenarios/confirm-weekly-actions.md) |
 | 运营日报 / 周报 / 复盘 | 「做今天的运营日报」「做本周运营周报」「复盘过去 7 天运营」 | [`scenarios/compose-operations-report.md`](references/scenarios/compose-operations-report.md) |
 | 生成星球日报海报 | 「生成星球日报海报 / 做张日报图」「把最近内容做成一张海报发群里」 | [`scenarios/generate-daily-poster.md`](references/scenarios/generate-daily-poster.md) |
 | 生成竖版动画视频 | 「帮我把这篇帖子做成视频」「找最近适合做视频的帖子」「生成本周视频」「把星球内容做成视频」 | [`scenarios/generate-video.md`](references/scenarios/generate-video.md) |

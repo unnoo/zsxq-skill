@@ -12,7 +12,10 @@
       "references/scenarios/generate-video/**",
       "references/scenarios/generate-daily-poster.md",
       "references/scenarios/generate-daily-poster/**",
-      "references/scenarios/migrate-legacy-skills.md"
+      "references/scenarios/migrate-legacy-skills.md",
+      "references/scenarios/optimize-group-positioning.md",
+      "references/scenarios/confirm-weekly-actions.md",
+      "references/scenarios/guide-new-group-setup.md"
     ],
     "limits": {
       "body_bytes": 32768,
